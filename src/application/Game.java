@@ -8,21 +8,17 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Game {
-	JPanel boardPanel;
-	JFrame mainFrame;
-	JButton btnStart;
-	JButton btnGiveUp;
+	protected JPanel boardPanel;
+	protected JFrame mainFrame;
+	protected JButton btnStart;
+	protected JButton btnGiveUp;
 
 	public Game() {
 		boardPanel = new JPanel();
 		mainFrame = new JFrame("Gomoku Plus");
 		mainFrame.setSize(1000, 600);
-		btnStart = new JButton("Start!");
-		btnStart.setBackground(Color.CYAN);
-		btnStart.setFont(new Font("Open Sans", Font.PLAIN, 28));
-		btnGiveUp = new JButton("Give UP!");
-		btnGiveUp.setBackground(Color.RED);
-		btnGiveUp.setFont(new Font("Open Sans", Font.PLAIN, 28));
+		btnStart = Main.getPlainLookbtn("Start!", "Open Sans", 28, Font.PLAIN, Color.CYAN);
+		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 28, Font.PLAIN, Color.RED);
 		mainFrame.add(boardPanel);
 		mainFrame.setVisible(true);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
