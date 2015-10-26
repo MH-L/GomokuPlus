@@ -34,6 +34,7 @@ public abstract class Game {
 	public static final Dimension defaultFrameDimension = new Dimension(1000,
 			760);
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
+	public static final int functionPanelWidth = 295;
 	protected JPanel mainPanel;
 	protected JFrame mainFrame;
 	protected JButton btnStart;
@@ -56,14 +57,15 @@ public abstract class Game {
 		btnGiveUp.setMargin(new Insets(0,0,0,0));
 		mainFrame.add(mainPanel);
 		mainFrame.setVisible(true);
+		mainFrame.setResizable(false);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		functionPanel = new JPanel(new BorderLayout());
-		functionPanel.setPreferredSize(new Dimension(260, 700));
+		functionPanel.setPreferredSize(new Dimension(functionPanelWidth, 700));
 		buttonPanel = new JPanel(new GridLayout(2, 2));
-		buttonPanel.setPreferredSize(new Dimension(260, 200));
+		buttonPanel.setPreferredSize(new Dimension(functionPanelWidth, 200));
 		titlePanel = new JPanel(new BorderLayout());
-		titlePanel.setPreferredSize(new Dimension(260, 100));
+		titlePanel.setPreferredSize(new Dimension(functionPanelWidth, 100));
 		historyPanel = new JPanel(new BorderLayout());
 		functionPanel.add(titlePanel, BorderLayout.NORTH);
 		titlePanel.add(new JSeparator());

@@ -24,6 +24,7 @@ public class Main {
 		JFrame frame = new JFrame("Gomoku Plus");
 		frame.setSize(Game.defaultFrameDimension);
 		frame.setVisible(true);
+		frame.setResizable(false);
 		JPanel btnPanel = new JPanel();
 		frame.add(btnPanel);
 		JButton singleplayerBtn = getPlainLookbtn(
