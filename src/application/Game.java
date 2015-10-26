@@ -64,10 +64,24 @@ public abstract class Game {
 		JMenu helpMenu = new JMenu("Help");
 		helpMenu.setPreferredSize(new Dimension(166, 60));
 		helpMenu.setFont(smallGameFont);
+		JMenuItem about = new JMenuItem("About");
+		JMenuItem onlineHelp = new JMenuItem("Online Help");
+		about.setFont(smallGameFont);
+		onlineHelp.setFont(smallGameFont);
+		helpMenu.add(about);
+		helpMenu.addSeparator();
+		helpMenu.add(onlineHelp);
 
 		JMenu optionsMenu = new JMenu("Options");
 		optionsMenu.setPreferredSize(new Dimension(168, 60));
 		optionsMenu.setFont(smallGameFont);
+		JMenuItem soundOption = new JMenuItem("Sound");
+		JMenuItem animationOption = new JMenuItem("Animation");
+		soundOption.setFont(smallGameFont);
+		animationOption.setFont(smallGameFont);
+		optionsMenu.add(animationOption);
+		optionsMenu.addSeparator();
+		optionsMenu.add(soundOption);
 
 		JMenu exportMenu = new JMenu("Export");
 		exportMenu.setPreferredSize(new Dimension(166, 60));
@@ -83,9 +97,29 @@ public abstract class Game {
 		JMenu analysisMenu = new JMenu("Analysis");
 		analysisMenu.setPreferredSize(new Dimension(166, 60));
 		analysisMenu.setFont(smallGameFont);
+		JMenuItem stepForward = new JMenuItem("Step Forward");
+		JMenuItem stepBackward = new JMenuItem("Step Backward");
+		JMenuItem animate = new JMenuItem("Animate");
+		stepForward.setFont(smallGameFont);
+		stepBackward.setFont(smallGameFont);
+		animate.setFont(smallGameFont);
+		analysisMenu.add(stepForward);
+		analysisMenu.addSeparator();
+		analysisMenu.add(stepBackward);
+		analysisMenu.addSeparator();
+		analysisMenu.add(animate);
+
 		JMenu statsMenu = new JMenu("Stats");
 		statsMenu.setPreferredSize(new Dimension(168, 60));
 		statsMenu.setFont(smallGameFont);
+		JMenuItem clearStats = new JMenuItem("Clear Stats");
+		JMenuItem showStats = new JMenuItem("Show Stats");
+		clearStats.setFont(smallGameFont);
+		showStats.setFont(smallGameFont);
+		statsMenu.add(clearStats);
+		statsMenu.addSeparator();
+		statsMenu.add(showStats);
+
 		menus.add(gameMenu);
 		menus.add(helpMenu);
 		menus.add(optionsMenu);
