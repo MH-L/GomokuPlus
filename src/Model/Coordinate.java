@@ -1,6 +1,9 @@
 package Model;
 
-public class Coordinate {
+import javax.swing.JButton;
+
+public class Coordinate extends JButton {
+	private static final long serialVersionUID = -581532617710492838L;
 	public int x;
 	public int y;
 	public Stone stone;

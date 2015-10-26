@@ -23,6 +23,9 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import Model.Board;
+import Model.Coordinate;
+
 public abstract class Game {
 	protected static final Font smallGameFont = new Font("Open Sans",
 			Font.PLAIN, 28);
@@ -41,6 +44,7 @@ public abstract class Game {
 	protected JPanel historyPanel;
 	protected JPanel buttonPanel;
 	protected JPanel functionPanel;
+	private Board board;
 
 	public Game() {
 		mainPanel = new JPanel(new BorderLayout());
@@ -67,7 +71,7 @@ public abstract class Game {
 		historyPanel.add(new JSeparator());
 		functionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-		boardPanel = new JPanel();
+		boardPanel = new JPanel(new GridLayout(15,15));
 		boardPanel.setPreferredSize(new Dimension(700, 700));
 
 		menuBar = createJMenuBar();
@@ -77,6 +81,7 @@ public abstract class Game {
 		mainPanel.add(boardPanel, BorderLayout.LINE_START);
 		mainPanel.add(new JSeparator(JSeparator.VERTICAL));
 		mainPanel.add(functionPanel, BorderLayout.LINE_END);
+		this.board = new Board(boardPanel);
 	}
 
 	private static JMenuBar createJMenuBar() {
@@ -196,5 +201,9 @@ public abstract class Game {
 			lable.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 			statsPanel.add(lable);
 		}
+	}
+
+	public boolean isGameOver() {
+		return board.isGameOver();
 	}
 }
