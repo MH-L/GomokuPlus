@@ -22,7 +22,7 @@ public class Main {
 	 */
 	private static void displayWelcomeFrame() {
 		JFrame frame = new JFrame("Gomoku Plus");
-		frame.setSize(1000, 600);
+		frame.setSize(Game.defaultFrameDimension);
 		frame.setVisible(true);
 		JPanel btnPanel = new JPanel();
 		frame.add(btnPanel);

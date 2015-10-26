@@ -5,10 +5,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -19,6 +24,8 @@ import javax.swing.UIManager;
 public abstract class Game {
 	protected static final Font smallGameFont = new Font("Open Sans", Font.PLAIN, 28);
 	protected static final Font largeGameFont = new Font("Open Sans", Font.PLAIN, 40);
+	public static final Dimension defaultFrameDimension = new Dimension(1000, 600);
+	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
 	protected JPanel mainPanel;
 	protected JFrame mainFrame;
 	protected JButton btnStart;
@@ -32,7 +39,7 @@ public abstract class Game {
 	public Game() {
 		mainPanel = new JPanel();
 		mainFrame = new JFrame("Gomoku Plus");
-		mainFrame.setSize(1000, 600);
+		mainFrame.setSize(defaultFrameDimension);
 		btnStart = Main.getPlainLookbtn("Start!", "Open Sans", 28, Font.PLAIN, Color.CYAN);
 		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 28, Font.PLAIN, Color.RED);
 		mainFrame.add(mainPanel);
@@ -119,6 +126,12 @@ public abstract class Game {
 		statsMenu.add(clearStats);
 		statsMenu.addSeparator();
 		statsMenu.add(showStats);
+		showStats.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				showStatsWindow();
+			}
+		});
 
 		menus.add(gameMenu);
 		menus.add(helpMenu);
@@ -128,5 +141,27 @@ public abstract class Game {
 		menus.add(statsMenu);
 		menus.setPreferredSize(new Dimension(500, 60));
 		return menus;
+	}
+
+	private static void showStatsWindow() {
+		JFrame statsFrame = new JFrame("Stats");
+		statsFrame.setVisible(true);
+		statsFrame.setSize(defaultFrameSmall);
+		JPanel statsPanel = new JPanel(new GridLayout(3, 2));
+		statsPanel.setFont(smallGameFont);
+		statsPanel.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+		statsFrame.add(statsPanel);
+		ArrayList<JLabel> lablesToBeAddedToStats = new ArrayList<JLabel>();
+		lablesToBeAddedToStats.add(new JLabel("Wins:"));
+		lablesToBeAddedToStats.add(new JLabel("13"));
+		lablesToBeAddedToStats.add(new JLabel("Losses:"));
+		lablesToBeAddedToStats.add(new JLabel("9"));
+		lablesToBeAddedToStats.add(new JLabel("Win Percentage"));
+		lablesToBeAddedToStats.add(new JLabel("77%"));
+		for (JLabel lable : lablesToBeAddedToStats) {
+			lable.setFont(largeGameFont);
+			lable.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+			statsPanel.add(lable);
+		}
 	}
 }
