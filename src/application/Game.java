@@ -18,13 +18,17 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 public abstract class Game {
-	protected static final Font smallGameFont = new Font("Open Sans", Font.PLAIN, 28);
-	protected static final Font largeGameFont = new Font("Open Sans", Font.PLAIN, 40);
-	public static final Dimension defaultFrameDimension = new Dimension(1000, 600);
+	protected static final Font smallGameFont = new Font("Open Sans",
+			Font.PLAIN, 28);
+	protected static final Font largeGameFont = new Font("Open Sans",
+			Font.PLAIN, 40);
+	public static final Dimension defaultFrameDimension = new Dimension(1000,
+			760);
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
 	protected JPanel mainPanel;
 	protected JFrame mainFrame;
@@ -35,9 +39,10 @@ public abstract class Game {
 	protected JPanel boardPanel;
 	protected JPanel historyPanel;
 	protected JPanel buttonPanel;
+	protected JPanel functionPanel;
 
 	public Game() {
-		mainPanel = new JPanel();
+		mainPanel = new JPanel(new BorderLayout());
 		mainFrame = new JFrame("Gomoku Plus");
 		mainFrame.setSize(defaultFrameDimension);
 		btnStart = Main.getPlainLookbtn("Start!", "Open Sans", 28, Font.PLAIN, Color.CYAN);
@@ -46,13 +51,25 @@ public abstract class Game {
 		mainFrame.setVisible(true);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		historyPanel = new JPanel();
+		functionPanel = new JPanel(new GridLayout(3, 1));
+		functionPanel.setPreferredSize(new Dimension(300, 700));
+		buttonPanel = new JPanel(new GridLayout(2, 2));
+		titlePanel = new JPanel(new BorderLayout());
+		historyPanel = new JPanel(new BorderLayout());
+		functionPanel.add(historyPanel);
+		functionPanel.add(titlePanel);
+		functionPanel.add(buttonPanel);
+
 		boardPanel = new JPanel();
-		buttonPanel = new JPanel(new GridLayout());
+		boardPanel.setPreferredSize(new Dimension(700, 700));
+		boardPanel.add(new JButton("Testing"));
+
 		menuBar = createJMenuBar();
 		mainFrame.setJMenuBar(menuBar);
-		mainPanel.add(btnStart);
-		mainPanel.add(btnGiveUp);
+		buttonPanel.add(btnStart);
+		buttonPanel.add(btnGiveUp);
+		mainPanel.add(boardPanel);
+		mainPanel.add(functionPanel);
 	}
 
 	private static JMenuBar createJMenuBar() {
@@ -67,6 +84,10 @@ public abstract class Game {
 		JMenuItem loadGame = new JMenuItem("Load Game (F11)");
 		loadGame.setFont(smallGameFont);
 		gameMenu.add(loadGame);
+		gameMenu.addSeparator();
+		JMenuItem exit = new JMenuItem("Exit to main menu");
+		exit.setFont(smallGameFont);
+		gameMenu.add(exit);
 
 		JMenu helpMenu = new JMenu("Help");
 		helpMenu.setPreferredSize(new Dimension(166, 60));
@@ -134,10 +155,15 @@ public abstract class Game {
 		});
 
 		menus.add(gameMenu);
+		menus.add(new JSeparator(JSeparator.VERTICAL));
 		menus.add(helpMenu);
+		menus.add(new JSeparator(JSeparator.VERTICAL));
 		menus.add(optionsMenu);
+		menus.add(new JSeparator(JSeparator.VERTICAL));
 		menus.add(exportMenu);
+		menus.add(new JSeparator(JSeparator.VERTICAL));
 		menus.add(analysisMenu);
+		menus.add(new JSeparator(JSeparator.VERTICAL));
 		menus.add(statsMenu);
 		menus.setPreferredSize(new Dimension(500, 60));
 		return menus;
@@ -149,7 +175,7 @@ public abstract class Game {
 		statsFrame.setSize(defaultFrameSmall);
 		JPanel statsPanel = new JPanel(new GridLayout(3, 2));
 		statsPanel.setFont(smallGameFont);
-		statsPanel.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+		statsPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 		statsFrame.add(statsPanel);
 		ArrayList<JLabel> lablesToBeAddedToStats = new ArrayList<JLabel>();
 		lablesToBeAddedToStats.add(new JLabel("Wins:"));

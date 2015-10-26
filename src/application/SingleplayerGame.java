@@ -21,12 +21,10 @@ public class SingleplayerGame extends Game {
 		this.withdrawal_left = max_num_withdrawal;
 		this.btnWithdrawal = Main.getPlainLookbtn("Withdraw!", "Open Sans", 28, Font.PLAIN, Color.GRAY);
 		this.btnHint = Main.getPlainLookbtn("Hint", "Open Sans", 28, Font.PLAIN, Color.PINK);
-		this.mainPanel.add(btnWithdrawal);
-		this.mainPanel.add(btnHint);
-		this.titlePanel = new JPanel();
+		this.buttonPanel.add(btnWithdrawal);
+		this.buttonPanel.add(btnHint);
 		JLabel titleLabel = new JLabel("Singleplayer Game");
 		titleLabel.setFont(new Font("Open Sans", Font.PLAIN, 40));
 		this.titlePanel.add(titleLabel);
-		this.mainPanel.add(titlePanel);
 	}
 }
