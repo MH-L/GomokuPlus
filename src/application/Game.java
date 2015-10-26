@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -45,31 +46,37 @@ public abstract class Game {
 		mainPanel = new JPanel(new BorderLayout());
 		mainFrame = new JFrame("Gomoku Plus");
 		mainFrame.setSize(defaultFrameDimension);
-		btnStart = Main.getPlainLookbtn("Start!", "Open Sans", 28, Font.PLAIN, Color.CYAN);
-		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 28, Font.PLAIN, Color.RED);
+		btnStart = Main.getPlainLookbtn("Start!", "Open Sans", 23, Font.PLAIN, Color.CYAN);
+		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 23, Font.PLAIN, Color.RED);
+		btnStart.setMargin(new Insets(0,0,0,0));
+		btnGiveUp.setMargin(new Insets(0,0,0,0));
 		mainFrame.add(mainPanel);
 		mainFrame.setVisible(true);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		functionPanel = new JPanel(new GridLayout(3, 1));
-		functionPanel.setPreferredSize(new Dimension(300, 700));
+		functionPanel = new JPanel(new BorderLayout());
+		functionPanel.setPreferredSize(new Dimension(260, 700));
 		buttonPanel = new JPanel(new GridLayout(2, 2));
+		buttonPanel.setPreferredSize(new Dimension(260, 200));
 		titlePanel = new JPanel(new BorderLayout());
+		titlePanel.setPreferredSize(new Dimension(260, 100));
 		historyPanel = new JPanel(new BorderLayout());
-		functionPanel.add(historyPanel);
-		functionPanel.add(titlePanel);
-		functionPanel.add(buttonPanel);
+		functionPanel.add(titlePanel, BorderLayout.NORTH);
+		titlePanel.add(new JSeparator());
+		functionPanel.add(historyPanel, BorderLayout.CENTER);
+		historyPanel.add(new JSeparator());
+		functionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
 		boardPanel = new JPanel();
 		boardPanel.setPreferredSize(new Dimension(700, 700));
-		boardPanel.add(new JButton("Testing"));
 
 		menuBar = createJMenuBar();
 		mainFrame.setJMenuBar(menuBar);
 		buttonPanel.add(btnStart);
 		buttonPanel.add(btnGiveUp);
-		mainPanel.add(boardPanel);
-		mainPanel.add(functionPanel);
+		mainPanel.add(boardPanel, BorderLayout.LINE_START);
+		mainPanel.add(new JSeparator(JSeparator.VERTICAL));
+		mainPanel.add(functionPanel, BorderLayout.LINE_END);
 	}
 
 	private static JMenuBar createJMenuBar() {
