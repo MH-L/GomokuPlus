@@ -41,6 +41,22 @@ public class Main {
 				((JFrame) singleplayerBtn.getTopLevelAncestor()).dispose();
 			}
 		});
+
+		multiplayerBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				game = new MultiplayerGame();
+				((JFrame) multiplayerBtn.getTopLevelAncestor()).dispose();
+			}
+		});
+
+		networkBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				game = new NetworkGame();
+				((JFrame) networkBtn.getTopLevelAncestor()).dispose();
+			}
+		});
 	}
 
 	/**
