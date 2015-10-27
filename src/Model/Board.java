@@ -130,13 +130,49 @@ public class Board {
 					} else
 						return Result.GOTE;
 				}
-				prev = grid[i][j].getStone();
+				prev = grid[j][i].getStone();
 			}
 		}
 		return Result.UNDECIDED;
 	}
 
+	/**
+	 * If you were to maintain this code, keep in mind that it has
+	 * no readability AT ALL. The code itself is smart, yet extremely
+	 * hard to read.
+	 * @return
+	 */
 	private Result checkDiagWinning() {
+		int i = 0;
+		int j = 0;
+		int iStartIndex = 0;
+		int jStartIndex = 0;
+		while (i + j < width + height - 1) {
+			int counter = 0;
+			Stone prev = Stone.UNOCCUPIED;
+			while (j > -1 && i < height) {
+				i++;
+				j--;
+			}
+			if (jStartIndex >= width - 1)
+				iStartIndex ++;
+			else
+				jStartIndex ++;
+			i = iStartIndex;
+			j = jStartIndex;
+		}
+
+		j = width - 1;
+		i = 0;
+		iStartIndex = 0;
+		jStartIndex = width - 1;
+		while (i - j < width) {
+			int counter = 0;
+			Stone prev = Stone.UNOCCUPIED;
+			while (j < width && i < height) {
+
+			}
+		}
 		return Result.UNDECIDED;
 	}
 
