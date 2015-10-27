@@ -24,7 +24,7 @@ public class Board {
 	public static final int width = 15;
 	public static final int height = 15;
 	public static int activePlayer;
-	public static boolean isFrozen = false;
+	public static boolean isFrozen = true;
 
 	public Board(JPanel boardPanel) {
 		this.grid = new Coordinate[height][width];
@@ -48,7 +48,6 @@ public class Board {
 						}
 						if (square.isUnoccupied()) {
 							if (activePlayer == 1) {
-								square.setBackground(Color.RED);
 								try {
 									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
 									square.setIcon(new ImageIcon(img));
@@ -240,5 +239,22 @@ public class Board {
 
 	public int getActivePlayer() {
 		return activePlayer;
+	}
+
+	public void resetBoard() {
+		activePlayer = 1;
+		for (Coordinate[] coords : grid) {
+			for (Coordinate coord : coords) {
+				coord.reset();
+			}
+		}
+	}
+
+	public void freeze() {
+		isFrozen = true;
+	}
+
+	public void activate() {
+		isFrozen = false;
 	}
 }

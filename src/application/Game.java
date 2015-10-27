@@ -38,17 +38,17 @@ public abstract class Game {
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
 	public static final int functionPanelWidth = 295;
 	public static final int NUM_STONE_TO_WIN = 5;
-	protected JPanel mainPanel;
+	protected static JPanel mainPanel;
 	protected static JFrame mainFrame;
-	protected JButton btnStart;
-	protected JButton btnGiveUp;
-	protected JPanel titlePanel;
-	protected JMenuBar menuBar;
-	protected JPanel boardPanel;
-	protected JPanel historyPanel;
-	protected JPanel buttonPanel;
-	protected JPanel functionPanel;
-	private Board board;
+	protected static JButton btnStart;
+	protected static JButton btnGiveUp;
+	protected static JPanel titlePanel;
+	protected static JMenuBar menuBar;
+	protected static JPanel boardPanel;
+	protected static JPanel historyPanel;
+	protected static JPanel buttonPanel;
+	protected static JPanel functionPanel;
+	private static Board board;
 
 	/**
 	 * Sente -- first player
@@ -69,7 +69,7 @@ public abstract class Game {
 		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 23, Font.PLAIN, Color.RED);
 		btnStart.setMargin(new Insets(0,0,0,0));
 		btnGiveUp.setMargin(new Insets(0,0,0,0));
-		addStartButtonListener();
+		addStartButtonListener(btnStart);
 		addGiveUpButtonListener();
 		mainFrame.add(mainPanel);
 		mainFrame.setVisible(true);
@@ -99,17 +99,38 @@ public abstract class Game {
 		mainPanel.add(boardPanel, BorderLayout.LINE_START);
 		mainPanel.add(new JSeparator(JSeparator.VERTICAL));
 		mainPanel.add(functionPanel, BorderLayout.LINE_END);
-		this.board = new Board(boardPanel);
+		board = new Board(boardPanel);
 	}
 
 	private void addGiveUpButtonListener() {
-		// TODO Auto-generated method stub
+		btnGiveUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (board.getActivePlayer() == 1) {
+					JOptionPane.showMessageDialog(mainFrame, "Black, you lose.\n White, you win!",
+							"Game Over", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(mainFrame, "Black, you win!\n White, you lose!",
+							"Game Over", JOptionPane.INFORMATION_MESSAGE);
+				}
+				board.resetBoard();
+				board.activate();
+			}
+		});
 
 	}
 
-	private void addStartButtonListener() {
-		// TODO Auto-generated method stub
-
+	private void addStartButtonListener(JButton btn) {
+		btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JLabel gameStarted = new JLabel("Game started.");
+				gameStarted.setFont(smallGameFont);
+				historyPanel.add(gameStarted);
+				board.resetBoard();
+				board.activate();
+			}
+		});
 	}
 
 	private static JMenuBar createJMenuBar() {
@@ -117,6 +138,17 @@ public abstract class Game {
 		JMenu gameMenu = new JMenu("Game");
 		JMenuItem newGame = new JMenuItem("New Game (F12)");
 		newGame.setFont(smallGameFont);
+		newGame.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JLabel gameStarted = new JLabel("Game started.");
+				gameStarted.setFont(smallGameFont);
+				historyPanel.add(gameStarted);
+				board.resetBoard();
+				board.activate();
+			}
+		});
+
 		gameMenu.add(newGame);
 		gameMenu.setPreferredSize(new Dimension(166, 60));
 		gameMenu.setFont(smallGameFont);

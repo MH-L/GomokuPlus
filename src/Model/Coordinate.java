@@ -1,5 +1,7 @@
 package Model;
 
+import java.awt.Color;
+
 import javax.swing.JButton;
 
 public class Coordinate extends JButton {
@@ -52,5 +54,10 @@ public class Coordinate extends JButton {
 		if (y != other.y)
 			return false;
 		return true;
+	}
+
+	public void reset() {
+		this.stone = Stone.UNOCCUPIED;
+		this.setIcon(null);
 	}
 }
