@@ -14,6 +14,8 @@ import javax.swing.UIManager;
 public class Main {
 	private static Game game;
 	public static void main(String args[]) {
+		UIManager.put("OptionPane.messageFont", Game.smallGameFont);
+		UIManager.put("OptionPane.buttonFont", Game.smallGameFont);
 		displayWelcomeFrame();
 	}
 

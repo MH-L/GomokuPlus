@@ -8,6 +8,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import application.Game;
+
 public class Board {
 	private Coordinate[][] grid;
 	public static final int width = 15;
@@ -24,27 +26,39 @@ public class Board {
 		boardPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 		for (int i = 0; i < Board.height; i++) {
 			for (int j = 0; j < Board.width; j++) {
-				JButton square = new Coordinate(j, i);
+				Coordinate square = new Coordinate(j, i);
 				square.setBackground(Color.YELLOW);
 				square.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				square.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if (activePlayer == 1) {
-
+						if (square.isUnoccupied()) {
+							if (activePlayer == 1) {
+								square.setBackground(Color.BLACK);
+								square.setStone(true);
+								updateActivePlayer();
+							} else {
+								square.setBackground(Color.WHITE);
+								square.setStone(false);
+								updateActivePlayer();
+							}
 						} else {
-
+							Game.displayOccupiedWarning();
 						}
 						// Also need to update relevant information. This could be a hard task.
 					}
 				});
 				boardPanel.add(square);
-				grid[j][i] = (Coordinate) square;
+				grid[j][i] = square;
 			}
 		}
 	}
 
 	public boolean isGameOver() {
 		return false;
+	}
+
+	public void updateActivePlayer() {
+		activePlayer = activePlayer == 1 ? 2 : 1;
 	}
 }

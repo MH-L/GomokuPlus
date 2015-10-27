@@ -13,11 +13,13 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -36,7 +38,7 @@ public abstract class Game {
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
 	public static final int functionPanelWidth = 295;
 	protected JPanel mainPanel;
-	protected JFrame mainFrame;
+	protected static JFrame mainFrame;
 	protected JButton btnStart;
 	protected JButton btnGiveUp;
 	protected JPanel titlePanel;
@@ -207,5 +209,10 @@ public abstract class Game {
 
 	public boolean isGameOver() {
 		return board.isGameOver();
+	}
+
+	public static void displayOccupiedWarning() {
+		JOptionPane.showMessageDialog(mainFrame, "The square is already occupied.",
+				"Error", JOptionPane.ERROR_MESSAGE);
 	}
 }

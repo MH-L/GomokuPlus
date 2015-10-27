@@ -18,6 +18,14 @@ public class Coordinate extends JButton {
 		stone = Stone.UNOCCUPIED;
 	}
 
+	public boolean isUnoccupied() {
+		return stone == Stone.UNOCCUPIED;
+	}
+
+	public void setStone(boolean isFirst) {
+		stone = isFirst ? Stone.FIRST : Stone.SECOND;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
