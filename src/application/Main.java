@@ -23,6 +23,7 @@ public class Main {
 	 * Displays the welcome frame on game startup.
 	 */
 	private static void displayWelcomeFrame() {
+		System.out.println("Welcome to Gomoku Plus! Not a command line application anymore :)");
 		JFrame frame = new JFrame("Gomoku Plus");
 		frame.setSize(Game.defaultFrameDimension);
 		frame.setVisible(true);

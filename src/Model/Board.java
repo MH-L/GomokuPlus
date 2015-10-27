@@ -45,7 +45,7 @@ public class Board {
 							if (activePlayer == 1) {
 								square.setBackground(Color.RED);
 								try {
-									Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
+									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
 									square.setIcon(new ImageIcon(img));
 								} catch (IOException e1) {
 									Game.errorRendering();
@@ -54,7 +54,7 @@ public class Board {
 								updateActivePlayer();
 							} else {
 								try {
-									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
+									Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
 									square.setIcon(new ImageIcon(img));
 								} catch (IOException e1) {
 									Game.errorRendering();
@@ -68,15 +68,15 @@ public class Board {
 						Result currentGameResult = checkWinning();
 						if (currentGameResult != Result.UNDECIDED) {
 							if (currentGameResult == Result.SENTE) {
-
+								Game.displayWinnerInfo(true);
 							} else {
-
+								Game.displayWinnerInfo(false);
 							}
 						}
 					}
 				});
 				boardPanel.add(square);
-				grid[j][i] = square;
+				grid[i][j] = square;
 			}
 		}
 	}
@@ -99,7 +99,7 @@ public class Board {
 					if (grid[i][j].getStone() == prev)
 						counter ++;
 					else
-						counter = 0;
+						counter = 1;
 				} else
 					counter = 0;
 				if (counter == Game.NUM_STONE_TO_WIN) {
@@ -108,6 +108,7 @@ public class Board {
 					} else
 						return Result.GOTE;
 				}
+				prev = grid[i][j].getStone();
 			}
 		}
 
@@ -120,7 +121,7 @@ public class Board {
 					if (grid[j][i].getStone() == prev)
 						counter ++;
 					else
-						counter = 0;
+						counter = 1;
 				} else
 					counter = 0;
 				if (counter == Game.NUM_STONE_TO_WIN) {
@@ -129,6 +130,7 @@ public class Board {
 					} else
 						return Result.GOTE;
 				}
+				prev = grid[i][j].getStone();
 			}
 		}
 		return Result.UNDECIDED;
