@@ -1,10 +1,17 @@
 package Model;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -34,11 +41,22 @@ public class Board {
 					public void actionPerformed(ActionEvent e) {
 						if (square.isUnoccupied()) {
 							if (activePlayer == 1) {
-								square.setBackground(Color.BLACK);
+								square.setBackground(Color.RED);
+								try {
+									Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
+									square.setIcon(new ImageIcon(img));
+								} catch (IOException e1) {
+									System.out.println("Error Occurred!");
+								}
 								square.setStone(true);
 								updateActivePlayer();
 							} else {
-								square.setBackground(Color.WHITE);
+								try {
+									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
+									square.setIcon(new ImageIcon(img));
+								} catch (IOException e1) {
+									System.out.println("Error Occurred!");
+								}
 								square.setStone(false);
 								updateActivePlayer();
 							}
