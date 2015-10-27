@@ -215,4 +215,9 @@ public abstract class Game {
 		JOptionPane.showMessageDialog(mainFrame, "The square is already occupied.",
 				"Error", JOptionPane.ERROR_MESSAGE);
 	}
+
+	public static void errorRendering() {
+		JOptionPane.showMessageDialog(mainFrame, "Unable to render board image. Fatal error!",
+				"Error", JOptionPane.ERROR_MESSAGE);
+	}
 }

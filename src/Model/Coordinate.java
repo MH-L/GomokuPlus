@@ -26,6 +26,10 @@ public class Coordinate extends JButton {
 		stone = isFirst ? Stone.FIRST : Stone.SECOND;
 	}
 
+	public Stone getStone() {
+		return stone;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

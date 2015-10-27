@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import Model.Coordinate.Stone;
 import application.Game;
 
 public class Board {
@@ -46,7 +47,7 @@ public class Board {
 									Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
 									square.setIcon(new ImageIcon(img));
 								} catch (IOException e1) {
-									System.out.println("Error Occurred!");
+									Game.errorRendering();
 								}
 								square.setStone(true);
 								updateActivePlayer();
@@ -55,7 +56,7 @@ public class Board {
 									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
 									square.setIcon(new ImageIcon(img));
 								} catch (IOException e1) {
-									System.out.println("Error Occurred!");
+									Game.errorRendering();
 								}
 								square.setStone(false);
 								updateActivePlayer();
@@ -78,5 +79,20 @@ public class Board {
 
 	public void updateActivePlayer() {
 		activePlayer = activePlayer == 1 ? 2 : 1;
+	}
+
+	private boolean checkRowColWinning() {
+		for (int i = 0; i < height; i++) {
+			int counter = 0;
+			Stone prev = Stone.UNOCCUPIED;
+			for (int j = 0; j < width; j++) {
+
+			}
+		}
+		return false;
+	}
+
+	private boolean checkDiagWinning() {
+		return false;
 	}
 }
