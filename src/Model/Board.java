@@ -151,6 +151,20 @@ public class Board {
 			int counter = 0;
 			Stone prev = Stone.UNOCCUPIED;
 			while (j > -1 && i < height) {
+				if (grid[i][j].getStone() != Stone.UNOCCUPIED) {
+					if (grid[i][j].getStone() == prev)
+						counter ++;
+					else
+						counter = 1;
+				} else
+					counter = 0;
+				if (counter == Game.NUM_STONE_TO_WIN) {
+					if (grid[i][j].getStone() == Stone.FIRST) {
+						return Result.SENTE;
+					} else
+						return Result.GOTE;
+				}
+				prev = grid[i][j].getStone();
 				i++;
 				j--;
 			}
@@ -170,8 +184,29 @@ public class Board {
 			int counter = 0;
 			Stone prev = Stone.UNOCCUPIED;
 			while (j < width && i < height) {
-
+				if (grid[i][j].getStone() != Stone.UNOCCUPIED) {
+					if (grid[i][j].getStone() == prev)
+						counter ++;
+					else
+						counter = 1;
+				} else
+					counter = 0;
+				if (counter == Game.NUM_STONE_TO_WIN) {
+					if (grid[i][j].getStone() == Stone.FIRST) {
+						return Result.SENTE;
+					} else
+						return Result.GOTE;
+				}
+				prev = grid[i][j].getStone();
+				i++;
+				j++;
 			}
+			if (jStartIndex > 0)
+				jStartIndex --;
+			else
+				iStartIndex ++;
+			i = iStartIndex;
+			j = jStartIndex;
 		}
 		return Result.UNDECIDED;
 	}
