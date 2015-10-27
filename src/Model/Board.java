@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 
 import Model.Coordinate.Stone;
 import application.Game;
+import application.Game.Result;
 
 public class Board {
 	private Coordinate[][] grid;
@@ -64,7 +65,14 @@ public class Board {
 						} else {
 							Game.displayOccupiedWarning();
 						}
-						// Also need to update relevant information. This could be a hard task.
+						Result currentGameResult = checkWinning();
+						if (currentGameResult != Result.UNDECIDED) {
+							if (currentGameResult == Result.SENTE) {
+
+							} else {
+
+							}
+						}
 					}
 				});
 				boardPanel.add(square);
@@ -81,18 +89,59 @@ public class Board {
 		activePlayer = activePlayer == 1 ? 2 : 1;
 	}
 
-	private boolean checkRowColWinning() {
+	private Result checkRowColWinning() {
+		// Check for rows.
 		for (int i = 0; i < height; i++) {
 			int counter = 0;
 			Stone prev = Stone.UNOCCUPIED;
 			for (int j = 0; j < width; j++) {
-
+				if (grid[i][j].getStone() != Stone.UNOCCUPIED) {
+					if (grid[i][j].getStone() == prev)
+						counter ++;
+					else
+						counter = 0;
+				} else
+					counter = 0;
+				if (counter == Game.NUM_STONE_TO_WIN) {
+					if (grid[i][j].getStone() == Stone.FIRST) {
+						return Result.SENTE;
+					} else
+						return Result.GOTE;
+				}
 			}
 		}
-		return false;
+
+		// Check for columns.
+		for (int i = 0; i < width; i++) {
+			int counter = 0;
+			Stone prev = Stone.UNOCCUPIED;
+			for (int j = 0; j < height; j++) {
+				if (grid[j][i].getStone() != Stone.UNOCCUPIED) {
+					if (grid[j][i].getStone() == prev)
+						counter ++;
+					else
+						counter = 0;
+				} else
+					counter = 0;
+				if (counter == Game.NUM_STONE_TO_WIN) {
+					if (grid[j][i].getStone() == Stone.FIRST) {
+						return Result.SENTE;
+					} else
+						return Result.GOTE;
+				}
+			}
+		}
+		return Result.UNDECIDED;
 	}
 
-	private boolean checkDiagWinning() {
-		return false;
+	private Result checkDiagWinning() {
+		return Result.UNDECIDED;
+	}
+
+	public Result checkWinning() {
+		Result rowsAndCols = checkRowColWinning();
+		if (rowsAndCols != Result.UNDECIDED)
+			return rowsAndCols;
+		return checkDiagWinning();
 	}
 }

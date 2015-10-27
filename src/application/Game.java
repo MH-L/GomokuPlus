@@ -37,6 +37,7 @@ public abstract class Game {
 			760);
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
 	public static final int functionPanelWidth = 295;
+	public static final int NUM_STONE_TO_WIN = 5;
 	protected JPanel mainPanel;
 	protected static JFrame mainFrame;
 	protected JButton btnStart;
@@ -48,6 +49,17 @@ public abstract class Game {
 	protected JPanel buttonPanel;
 	protected JPanel functionPanel;
 	private Board board;
+
+	/**
+	 * Sente -- first player
+	 * Gote -- second player
+	 * These are originated from Japanese.
+	 * @author Minghao
+	 *
+	 */
+	public enum Result {
+		UNDECIDED, SENTE, GOTE
+	}
 
 	public Game() {
 		mainPanel = new JPanel(new BorderLayout());
@@ -219,5 +231,11 @@ public abstract class Game {
 	public static void errorRendering() {
 		JOptionPane.showMessageDialog(mainFrame, "Unable to render board image. Fatal error!",
 				"Error", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public static void displayWinnerInfo(boolean isSente) {
+		String winnerInfo = isSente ? "Black" : "White";
+		JOptionPane.showMessageDialog(mainFrame, winnerInfo + " wins!",
+				"Game Over", JOptionPane.INFORMATION_MESSAGE);
 	}
 }
