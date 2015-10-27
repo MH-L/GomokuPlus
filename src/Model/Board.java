@@ -24,6 +24,7 @@ public class Board {
 	public static final int width = 15;
 	public static final int height = 15;
 	public static int activePlayer;
+	public static boolean isFrozen = false;
 
 	public Board(JPanel boardPanel) {
 		this.grid = new Coordinate[height][width];
@@ -41,6 +42,10 @@ public class Board {
 				square.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
+						if (isFrozen) {
+							Game.warnGameFrozen();
+							return;
+						}
 						if (square.isUnoccupied()) {
 							if (activePlayer == 1) {
 								square.setBackground(Color.RED);
@@ -67,6 +72,7 @@ public class Board {
 						}
 						Result currentGameResult = checkWinning();
 						if (currentGameResult != Result.UNDECIDED) {
+							isFrozen = true;
 							if (currentGameResult == Result.SENTE) {
 								Game.displayWinnerInfo(true);
 							} else {
@@ -96,17 +102,20 @@ public class Board {
 			Stone prev = Stone.UNOCCUPIED;
 			for (int j = 0; j < width; j++) {
 				if (grid[i][j].getStone() != Stone.UNOCCUPIED) {
-					if (grid[i][j].getStone() == prev)
+					if (grid[i][j].getStone() == prev) {
 						counter ++;
-					else
+					} else {
 						counter = 1;
-				} else
+					}
+				} else {
 					counter = 0;
+				}
 				if (counter == Game.NUM_STONE_TO_WIN) {
 					if (grid[i][j].getStone() == Stone.FIRST) {
 						return Result.SENTE;
-					} else
+					} else {
 						return Result.GOTE;
+					}
 				}
 				prev = grid[i][j].getStone();
 			}
@@ -118,17 +127,20 @@ public class Board {
 			Stone prev = Stone.UNOCCUPIED;
 			for (int j = 0; j < height; j++) {
 				if (grid[j][i].getStone() != Stone.UNOCCUPIED) {
-					if (grid[j][i].getStone() == prev)
+					if (grid[j][i].getStone() == prev) {
 						counter ++;
-					else
+					} else {
 						counter = 1;
-				} else
+					}
+				} else {
 					counter = 0;
+				}
 				if (counter == Game.NUM_STONE_TO_WIN) {
 					if (grid[j][i].getStone() == Stone.FIRST) {
 						return Result.SENTE;
-					} else
+					} else {
 						return Result.GOTE;
+					}
 				}
 				prev = grid[j][i].getStone();
 			}
@@ -139,7 +151,7 @@ public class Board {
 	/**
 	 * If you were to maintain this code, keep in mind that it has
 	 * no readability AT ALL. The code itself is smart, yet extremely
-	 * hard to read.
+	 * hard to read. (Oh, this passed on my first attempt.)
 	 * @return
 	 */
 	private Result checkDiagWinning() {
@@ -152,26 +164,29 @@ public class Board {
 			Stone prev = Stone.UNOCCUPIED;
 			while (j > -1 && i < height) {
 				if (grid[i][j].getStone() != Stone.UNOCCUPIED) {
-					if (grid[i][j].getStone() == prev)
+					if (grid[i][j].getStone() == prev) {
 						counter ++;
-					else
+					} else {
 						counter = 1;
+					}
 				} else
 					counter = 0;
 				if (counter == Game.NUM_STONE_TO_WIN) {
 					if (grid[i][j].getStone() == Stone.FIRST) {
 						return Result.SENTE;
-					} else
+					} else {
 						return Result.GOTE;
+					}
 				}
 				prev = grid[i][j].getStone();
 				i++;
 				j--;
 			}
-			if (jStartIndex >= width - 1)
+			if (jStartIndex >= width - 1) {
 				iStartIndex ++;
-			else
+			} else {
 				jStartIndex ++;
+			}
 			i = iStartIndex;
 			j = jStartIndex;
 		}
@@ -185,26 +200,30 @@ public class Board {
 			Stone prev = Stone.UNOCCUPIED;
 			while (j < width && i < height) {
 				if (grid[i][j].getStone() != Stone.UNOCCUPIED) {
-					if (grid[i][j].getStone() == prev)
+					if (grid[i][j].getStone() == prev) {
 						counter ++;
-					else
+					} else {
 						counter = 1;
-				} else
+					}
+				} else {
 					counter = 0;
+				}
 				if (counter == Game.NUM_STONE_TO_WIN) {
 					if (grid[i][j].getStone() == Stone.FIRST) {
 						return Result.SENTE;
-					} else
+					} else {
 						return Result.GOTE;
+					}
 				}
 				prev = grid[i][j].getStone();
 				i++;
 				j++;
 			}
-			if (jStartIndex > 0)
+			if (jStartIndex > 0) {
 				jStartIndex --;
-			else
+			} else {
 				iStartIndex ++;
+			}
 			i = iStartIndex;
 			j = jStartIndex;
 		}
@@ -213,8 +232,13 @@ public class Board {
 
 	public Result checkWinning() {
 		Result rowsAndCols = checkRowColWinning();
-		if (rowsAndCols != Result.UNDECIDED)
+		if (rowsAndCols != Result.UNDECIDED) {
 			return rowsAndCols;
+		}
 		return checkDiagWinning();
+	}
+
+	public int getActivePlayer() {
+		return activePlayer;
 	}
 }

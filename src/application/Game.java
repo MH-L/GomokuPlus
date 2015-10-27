@@ -69,6 +69,8 @@ public abstract class Game {
 		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 23, Font.PLAIN, Color.RED);
 		btnStart.setMargin(new Insets(0,0,0,0));
 		btnGiveUp.setMargin(new Insets(0,0,0,0));
+		addStartButtonListener();
+		addGiveUpButtonListener();
 		mainFrame.add(mainPanel);
 		mainFrame.setVisible(true);
 		mainFrame.setResizable(false);
@@ -98,6 +100,16 @@ public abstract class Game {
 		mainPanel.add(new JSeparator(JSeparator.VERTICAL));
 		mainPanel.add(functionPanel, BorderLayout.LINE_END);
 		this.board = new Board(boardPanel);
+	}
+
+	private void addGiveUpButtonListener() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void addStartButtonListener() {
+		// TODO Auto-generated method stub
+
 	}
 
 	private static JMenuBar createJMenuBar() {
@@ -237,5 +249,10 @@ public abstract class Game {
 		String winnerInfo = isSente ? "Black" : "White";
 		JOptionPane.showMessageDialog(mainFrame, winnerInfo + " wins!",
 				"Game Over", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public static void warnGameFrozen() {
+		JOptionPane.showMessageDialog(mainFrame, "Game is finished. Please start new game by pressing"
+				+ " start or go to menu bar.", "Game Over", JOptionPane.INFORMATION_MESSAGE);
 	}
 }
