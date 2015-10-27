@@ -38,14 +38,17 @@ public class Main {
 				"Multiplayer", "Open Sans", 28, Font.PLAIN, Color.YELLOW);
 		JButton networkBtn = getPlainLookbtn(
 				"Network", "Open Sans", 28, Font.PLAIN, Color.RED);
+		JButton aiGameBtn = getPlainLookbtn("AI Game", "Open Sans", 28,
+				Font.PLAIN, Color.GRAY);
 		btnPanel.add(singleplayerBtn);
 		btnPanel.add(multiplayerBtn);
 		btnPanel.add(networkBtn);
+		btnPanel.add(aiGameBtn);
 		singleplayerBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game = new SingleplayerGame(4);
-				((JFrame) singleplayerBtn.getTopLevelAncestor()).dispose();
+				frame.dispose();
 			}
 		});
 
@@ -53,7 +56,7 @@ public class Main {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game = new MultiplayerGame();
-				((JFrame) multiplayerBtn.getTopLevelAncestor()).dispose();
+				frame.dispose();
 			}
 		});
 
@@ -61,7 +64,15 @@ public class Main {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game = new NetworkGame();
-				((JFrame) networkBtn.getTopLevelAncestor()).dispose();
+				frame.dispose();
+			}
+		});
+
+		aiGameBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				game = new AIGame();
+				frame.dispose();
 			}
 		});
 	}

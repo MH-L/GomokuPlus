@@ -15,11 +15,11 @@ public class NetworkGame extends Game {
 		btnProposeTie = Main.getPlainLookbtn("<html>Propose<br>Tie!</html>",
 				"Open Sans", 28, Font.ITALIC, Color.GREEN);
 		btnProposeTie.setMargin(new Insets(0, 0, 0, 0));
-		this.buttonPanel.add(btnProposeTie);
+		buttonPanel.add(btnProposeTie);
 		btnTryWithdraw = Main.getPlainLookbtn("<html>Try<br>Withdraw</html>",
 				"Open Sans", 28, Font.PLAIN, Color.YELLOW);
 		btnTryWithdraw.setMargin(new Insets(0, 0, 0, 0));
-		this.buttonPanel.add(btnTryWithdraw);
+		buttonPanel.add(btnTryWithdraw);
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		this.titlePanel.add(titleLabel);

@@ -49,7 +49,7 @@ public abstract class Game {
 	protected static JPanel historyPanel;
 	protected static JPanel buttonPanel;
 	protected static JPanel functionPanel;
-	private static Board board;
+	protected static Board board;
 
 	/**
 	 * Sente -- first player
