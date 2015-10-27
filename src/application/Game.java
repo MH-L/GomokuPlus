@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -74,7 +75,8 @@ public abstract class Game {
 		mainFrame.add(mainPanel);
 		mainFrame.setVisible(true);
 		mainFrame.setResizable(false);
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addCloseConfirmation(mainFrame);
 
 		functionPanel = new JPanel(new BorderLayout());
 		functionPanel.setPreferredSize(new Dimension(functionPanelWidth, 700));
@@ -160,6 +162,13 @@ public abstract class Game {
 		JMenuItem exit = new JMenuItem("Exit to main menu");
 		exit.setFont(smallGameFont);
 		gameMenu.add(exit);
+		exit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainFrame.dispose();
+				Main.displayWelcomeFrame();
+			}
+		});
 
 		JMenu helpMenu = new JMenu("Help");
 		helpMenu.setPreferredSize(new Dimension(166, 60));
@@ -286,5 +295,19 @@ public abstract class Game {
 	public static void warnGameFrozen() {
 		JOptionPane.showMessageDialog(mainFrame, "Game is finished. Please start new game by pressing"
 				+ " start or go to menu bar.", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public static void addCloseConfirmation(JFrame frame) {
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(frame,
+		            "Are you sure to close this window?", "Confirm Closing",
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		            System.exit(0);
+		        }
+		    }
+		});
 	}
 }

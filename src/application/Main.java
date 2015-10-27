@@ -22,12 +22,14 @@ public class Main {
 	/**
 	 * Displays the welcome frame on game startup.
 	 */
-	private static void displayWelcomeFrame() {
+	protected static void displayWelcomeFrame() {
 		System.out.println("Welcome to Gomoku Plus! Not a command line application anymore :)");
 		JFrame frame = new JFrame("Gomoku Plus");
 		frame.setSize(Game.defaultFrameDimension);
 		frame.setVisible(true);
 		frame.setResizable(false);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		Game.addCloseConfirmation(frame);
 		JPanel btnPanel = new JPanel();
 		frame.add(btnPanel);
 		JButton singleplayerBtn = getPlainLookbtn(
