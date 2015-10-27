@@ -104,7 +104,7 @@ public abstract class Game {
 		board = new Board(boardPanel);
 	}
 
-	private void addGiveUpButtonListener() {
+	protected void addGiveUpButtonListener() {
 		btnGiveUp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -122,7 +122,7 @@ public abstract class Game {
 
 	}
 
-	private void addStartButtonListener(JButton btn) {
+	protected void addStartButtonListener(JButton btn) {
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
