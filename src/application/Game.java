@@ -49,6 +49,7 @@ public abstract class Game {
 	protected static JPanel historyPanel;
 	protected static JPanel buttonPanel;
 	protected static JPanel functionPanel;
+	private static JLabel gameStarted;
 	protected static Board board;
 
 	/**
@@ -91,6 +92,10 @@ public abstract class Game {
 		historyPanel.add(new JSeparator());
 		functionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
+		gameStarted = new JLabel("Game Stalled.");
+		gameStarted.setFont(smallGameFont);
+		historyPanel.add(gameStarted);
+
 		boardPanel = new JPanel(new GridLayout(15,15));
 		boardPanel.setPreferredSize(new Dimension(700, 700));
 
@@ -108,15 +113,19 @@ public abstract class Game {
 		btnGiveUp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (board.isFrozen()) {
+					JOptionPane.showMessageDialog(mainFrame, "The game has not yet started.",
+							"Warning", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 				if (board.getActivePlayer() == 1) {
-					JOptionPane.showMessageDialog(mainFrame, "Black, you lose.\n White, you win!",
+					JOptionPane.showMessageDialog(mainFrame, "Black, you lose.\nWhite, you win!",
 							"Game Over", JOptionPane.INFORMATION_MESSAGE);
 				} else {
-					JOptionPane.showMessageDialog(mainFrame, "Black, you win!\n White, you lose!",
+					JOptionPane.showMessageDialog(mainFrame, "Black, you win!\nWhite, you lose!",
 							"Game Over", JOptionPane.INFORMATION_MESSAGE);
 				}
-				board.resetBoard();
-				board.activate();
+				gameEnd();
 			}
 		});
 
@@ -126,13 +135,21 @@ public abstract class Game {
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JLabel gameStarted = new JLabel("Game started.");
-				gameStarted.setFont(smallGameFont);
-				historyPanel.add(gameStarted);
-				board.resetBoard();
-				board.activate();
+				gameStart();
 			}
 		});
+	}
+
+	private static void gameStart() {
+		board.resetBoard();
+		board.activate();
+		gameStarted.setText("Game Started.");
+	}
+
+	private static void gameEnd() {
+		board.resetBoard();
+		board.freeze();
+		gameStarted.setText("Game Stalled.");
 	}
 
 	private static JMenuBar createJMenuBar() {
@@ -143,11 +160,7 @@ public abstract class Game {
 		newGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				JLabel gameStarted = new JLabel("Game started.");
-				gameStarted.setFont(smallGameFont);
-				historyPanel.add(gameStarted);
-				board.resetBoard();
-				board.activate();
+				gameStart();
 			}
 		});
 
@@ -272,10 +285,6 @@ public abstract class Game {
 		}
 	}
 
-	public boolean isGameOver() {
-		return board.isGameOver();
-	}
-
 	public static void displayOccupiedWarning() {
 		JOptionPane.showMessageDialog(mainFrame, "The square is already occupied.",
 				"Error", JOptionPane.ERROR_MESSAGE);
@@ -290,6 +299,7 @@ public abstract class Game {
 		String winnerInfo = isSente ? "Black" : "White";
 		JOptionPane.showMessageDialog(mainFrame, winnerInfo + " wins!",
 				"Game Over", JOptionPane.INFORMATION_MESSAGE);
+		gameEnd();
 	}
 
 	public static void warnGameFrozen() {

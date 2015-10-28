@@ -90,10 +90,6 @@ public class Board {
 		}
 	}
 
-	public boolean isGameOver() {
-		return false;
-	}
-
 	public void updateActivePlayer() {
 		activePlayer = activePlayer == 1 ? 2 : 1;
 	}
@@ -260,6 +256,10 @@ public class Board {
 
 	public void activate() {
 		isFrozen = false;
+	}
+
+	public boolean isFrozen() {
+		return isFrozen;
 	}
 
 	public boolean withdraw() {
