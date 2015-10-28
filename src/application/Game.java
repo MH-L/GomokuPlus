@@ -92,7 +92,7 @@ public abstract class Game {
 		historyPanel.add(new JSeparator());
 		functionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-		gameStarted = new JLabel("Game Stalled.");
+		gameStarted = new JLabel("Game not yet started.");
 		gameStarted.setFont(smallGameFont);
 		historyPanel.add(gameStarted);
 
@@ -149,7 +149,7 @@ public abstract class Game {
 	private static void gameEnd() {
 		board.resetBoard();
 		board.freeze();
-		gameStarted.setText("Game Stalled.");
+		gameStarted.setText("Game not yet started.");
 	}
 
 	private static JMenuBar createJMenuBar() {
@@ -305,6 +305,12 @@ public abstract class Game {
 	public static void warnGameFrozen() {
 		JOptionPane.showMessageDialog(mainFrame, "Game is finished. Please start new game by pressing"
 				+ " start or go to menu bar.", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public static void displayTieMessage() {
+		JOptionPane.showMessageDialog(mainFrame, "Board Full. Game comes to a tie.",
+				"Game Over", JOptionPane.INFORMATION_MESSAGE);
+		gameEnd();
 	}
 
 	public static void addCloseConfirmation(JFrame frame) {

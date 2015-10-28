@@ -20,16 +20,17 @@ import application.Game;
 import application.Game.Result;
 
 public class Board {
-	private Coordinate[][] grid;
+	private static Coordinate[][] grid;
 	public static final int width = 15;
 	public static final int height = 15;
 	private static int activePlayer;
 	private static boolean isFrozen = true;
 	private static Coordinate lastMove1 = null;
 	private static Coordinate lastMove2 = null;
+	private static int stoneCount = 0;
 
 	public Board(JPanel boardPanel) {
-		this.grid = new Coordinate[height][width];
+		grid = new Coordinate[height][width];
 		activePlayer = 1;
 		addCellsToBoard(boardPanel);
 	}
@@ -46,6 +47,10 @@ public class Board {
 					public void actionPerformed(ActionEvent e) {
 						if (isFrozen) {
 							Game.warnGameFrozen();
+							return;
+						}
+						if (isBoardFull()) {
+							Game.displayTieMessage();
 							return;
 						}
 						if (square.isUnoccupied()) {
@@ -88,6 +93,7 @@ public class Board {
 				grid[i][j] = square;
 			}
 		}
+		grid[3][12].setBackground(Color.BLUE);
 	}
 
 	public void updateActivePlayer() {
@@ -271,5 +277,43 @@ public class Board {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean isBoardFull() {
+		return stoneCount >= width * height;
+	}
+
+	public static Coordinate findEmptyLocSpiral() {
+		int curX = width / 2;
+		int curY = height / 2;
+		int curIncX = 1;
+		int curIncY = 0;
+
+		while (Board.isReachable(curX, curY)) {
+			if (grid[curY][curX].isUnoccupied()) {
+				return grid[curY][curX];
+			}
+			if (curX == curY && curX < width / 2) {
+				curIncX = 0;
+				curIncY = 1;
+			} else if (curX + curY == width - 1 && curX < width / 2) {
+				curIncX = 1;
+				curIncY = 0;
+			} else if (curX == curY + 1 && curX > width / 2) {
+				curIncX = 0;
+				curIncY = -1;
+			} else if (curX + curY == width - 1 && curX > width / 2) {
+				curIncX = -1;
+				curIncY = 0;
+			}
+			curY += curIncY;
+			curX += curIncX;
+		}
+
+		return null;
+	}
+
+	private static boolean isReachable(int x, int y) {
+		return x < width && y < height && x >= 0 && y >= 0;
 	}
 }
