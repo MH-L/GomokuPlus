@@ -23,8 +23,10 @@ public class Board {
 	private Coordinate[][] grid;
 	public static final int width = 15;
 	public static final int height = 15;
-	public static int activePlayer;
-	public static boolean isFrozen = true;
+	private static int activePlayer;
+	private static boolean isFrozen = true;
+	private static Coordinate lastMove1 = null;
+	private static Coordinate lastMove2 = null;
 
 	public Board(JPanel boardPanel) {
 		this.grid = new Coordinate[height][width];
@@ -36,7 +38,7 @@ public class Board {
 		boardPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 		for (int i = 0; i < Board.height; i++) {
 			for (int j = 0; j < Board.width; j++) {
-				Coordinate square = new Coordinate(j, i);
+				Coordinate square = new Coordinate(i, j);
 				square.setBackground(Color.YELLOW);
 				square.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				square.addActionListener(new ActionListener() {
@@ -66,6 +68,8 @@ public class Board {
 								square.setStone(false);
 								updateActivePlayer();
 							}
+							lastMove2 = lastMove1;
+							lastMove1 = square;
 						} else {
 							Game.displayOccupiedWarning();
 						}
@@ -256,5 +260,16 @@ public class Board {
 
 	public void activate() {
 		isFrozen = false;
+	}
+
+	public boolean withdraw() {
+		if (lastMove1 != null && lastMove2 != null) {
+			grid[lastMove1.getYCoord()][lastMove1.getXCoord()].reset();
+			lastMove1 = null;
+			grid[lastMove2.getYCoord()][lastMove2.getXCoord()].reset();
+			lastMove2 = null;
+			return true;
+		}
+		return false;
 	}
 }

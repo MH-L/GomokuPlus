@@ -1,11 +1,7 @@
 package application;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 public class AIGame extends Game {
 	/**
@@ -18,6 +14,11 @@ public class AIGame extends Game {
 		JLabel titleLabel = new JLabel("AI Game");
 		titleLabel.setFont(smallGameFont);
 		titlePanel.add(titleLabel);
+		automaticStart();
+	}
+
+	private void automaticStart() {
+
 	}
 
 	@Override

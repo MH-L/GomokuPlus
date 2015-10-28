@@ -310,4 +310,12 @@ public abstract class Game {
 		    }
 		});
 	}
+
+	public static void displayWithdrawFailed() {
+		JOptionPane.showMessageDialog(mainFrame, "You have run out of your withdrawals"
+				+ " or there is nothing to withdraw.",
+				"Error", JOptionPane.ERROR_MESSAGE);
+	}
+
+	public void withdraw() {}
 }

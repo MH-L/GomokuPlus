@@ -32,6 +32,14 @@ public class Coordinate extends JButton {
 		return stone;
 	}
 
+	public int getXCoord() {
+		return x;
+	}
+
+	public int getYCoord() {
+		return y;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
