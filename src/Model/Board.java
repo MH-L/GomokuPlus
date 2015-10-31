@@ -35,7 +35,7 @@ public class Board {
 		addCellsToBoard(boardPanel);
 	}
 
-	private void addCellsToBoard(JPanel boardPanel) {
+	protected void addCellsToBoard(JPanel boardPanel) {
 		boardPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 		for (int i = 0; i < Board.height; i++) {
 			for (int j = 0; j < Board.width; j++) {
@@ -93,7 +93,6 @@ public class Board {
 				grid[i][j] = square;
 			}
 		}
-		grid[3][12].setBackground(Color.BLUE);
 	}
 
 	public void updateActivePlayer() {

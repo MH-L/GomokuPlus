@@ -6,6 +6,7 @@ import java.awt.Insets;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 public class NetworkGame extends Game {
 	private JButton btnProposeTie;
@@ -22,6 +23,10 @@ public class NetworkGame extends Game {
 		buttonPanel.add(btnTryWithdraw);
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
-		this.titlePanel.add(titleLabel);
+		titlePanel.add(titleLabel);
+	}
+
+	public static void handleConnectionFailure() {
+		JOptionPane.showMessageDialog(mainFrame, "Connection failed. Return to main page.");
 	}
 }
