@@ -33,4 +33,9 @@ public class NetworkGame extends Game {
 	public static void handleConnectionFailure() {
 		JOptionPane.showMessageDialog(mainFrame, "Connection failed. Return to main page.");
 	}
+
+	@Override
+	protected void initialSetUp() {
+
+	}
 }

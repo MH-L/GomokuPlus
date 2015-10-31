@@ -107,7 +107,7 @@ public abstract class Game {
 		initialSetUp();
 	}
 
-	private void initialSetUp() {
+	protected void initialSetUp() {
 		addStartButtonListener(btnStart);
 		addGiveUpButtonListener();
 		board = new Board(boardPanel);
