@@ -20,7 +20,7 @@ import application.Game;
 import application.Game.Result;
 
 public class Board {
-	private static Coordinate[][] grid;
+	protected static Coordinate[][] grid;
 	public static final int width = 15;
 	public static final int height = 15;
 	private static int activePlayer;

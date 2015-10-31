@@ -21,14 +21,14 @@ public class ServerGame {
 		player2 = new ServerPlayer(player2Socket);
 	}
 
-	public void processRequest(String request) {
+	public int processRequest(String request) {
 		if (request.startsWith("Move")) {
 			String[] coords = request.split(",");
 			int xcoord = Integer.parseInt(coords[1]);
 			int ycoord = Integer.parseInt(coords[2]);
-			processMove(xcoord, ycoord);
+			return processMove(xcoord, ycoord);
 		} else if (request.startsWith("Quit")) {
-			// check for player quit.
+			return ServerConstants.REQUEST_OK;
 		} else if (request.startsWith("MSG")) {
 			// process message (to be completed)
 		} else if (request.startsWith("Surrender")) {
@@ -36,6 +36,7 @@ public class ServerGame {
 		} else if (request.startsWith("Withdraw")) {
 			// the player wants to try to withdraw.
 		}
+		return 1;
 	}
 
 	private class ServerBoard {
@@ -99,6 +100,12 @@ public class ServerGame {
 				return ServerConstants.MOVE_SQUARE_OCCUPIED;
 			}
 		}
+		if (activePlayer == SENTE) {
+			player2.notifyMove(xcoord, ycoord);
+		} else {
+			player1.notifyMove(xcoord, ycoord);
+		}
+		updateActivePlayer();
 		return ServerConstants.REQUEST_OK;
 	}
 
@@ -115,7 +122,21 @@ public class ServerGame {
 		}
 
 		private void play() {
+			while (true) {
+				try {
+					String playerRequest = playerIn.readLine();
+					int response = ServerGame.this.processRequest(playerRequest);
 
+				} catch (IOException e) {
+					break;
+				}
+
+			}
+		}
+
+		private void notifyMove(int xcoord, int ycoord) {
+			serverOut.println(String.format("%d,%d,%d", ServerConstants.OTHER_PLAYER_MOVE,
+					xcoord, ycoord));
 		}
 	}
 

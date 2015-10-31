@@ -19,6 +19,8 @@ public final class ServerConstants {
 	public static final int MOVE_OUT_BOUND = 3;
 	public static final int PEER_DISCONNECTED = 4;
 	public static final int WITHDRAW_DECLINED = 5;
+	public static final int OTHER_PLAYER_MOVE = 6;
+	public static final int NOT_YOUR_TURN = 7;
 
 	public static final int MAX_CAPACITY = 10;
 }
