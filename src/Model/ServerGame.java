@@ -17,17 +17,24 @@ public class ServerGame {
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException {
 		board = new ServerBoard();
 		activePlayer = SENTE;
-		player1 = new ServerPlayer(player1Socket);
-		player2 = new ServerPlayer(player2Socket);
+		player1 = new ServerPlayer(player1Socket, SENTE);
+		player2 = new ServerPlayer(player2Socket, GOTE);
 	}
 
-	public int processRequest(String request) {
+	public int processRequest(String request, int turn) {
 		if (request.startsWith("Move")) {
 			String[] coords = request.split(",");
 			int xcoord = Integer.parseInt(coords[1]);
 			int ycoord = Integer.parseInt(coords[2]);
 			return processMove(xcoord, ycoord);
 		} else if (request.startsWith("Quit")) {
+			if (turn == SENTE) {
+				player1 = null;
+				player2.sendQuitMessage();
+			} else {
+				player2 = null;
+				player1.sendQuitMessage();
+			}
 			return ServerConstants.REQUEST_OK;
 		} else if (request.startsWith("MSG")) {
 			// process message (to be completed)
@@ -112,20 +119,26 @@ public class ServerGame {
 	private class ServerPlayer {
 		private BufferedReader playerIn;
 		private PrintWriter serverOut;
-		private ServerPlayer(Socket playerSocket) throws IOException {
+		private int turn;
+		private ServerPlayer(Socket playerSocket, int turn) throws IOException {
 			playerIn = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
 			serverOut = new PrintWriter(playerSocket.getOutputStream(), true);
+			this.turn = turn;
 		}
 
 		private void returnResponse(String response) {
 			serverOut.println(response);
 		}
 
+		private void sendQuitMessage() {
+			serverOut.println(ServerConstants.PEER_DISCONNECTED);
+		}
+
 		private void play() {
 			while (true) {
 				try {
 					String playerRequest = playerIn.readLine();
-					int response = ServerGame.this.processRequest(playerRequest);
+					int response = ServerGame.this.processRequest(playerRequest, turn);
 
 				} catch (IOException e) {
 					break;

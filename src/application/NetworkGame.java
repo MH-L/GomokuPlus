@@ -124,6 +124,10 @@ public class NetworkGame extends Game {
 				"Warning", JOptionPane.WARNING_MESSAGE);
 	}
 
+	/**
+	 * Synchronized since it changes the dirty bit and also
+	 * receives responses from the game server.
+	 */
 	synchronized private static void play() {
 
 	}
