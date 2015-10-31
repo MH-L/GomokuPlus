@@ -1,14 +1,24 @@
 package Model;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
 public class ServerGame {
 	private static final int SENTE = 1;
 	private static final int GOTE = 2;
 	private ServerBoard board;
 	private int activePlayer;
+	private ServerPlayer player1;
+	private ServerPlayer player2;
 
-	public ServerGame() {
+	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException {
 		board = new ServerBoard();
 		activePlayer = SENTE;
+		player1 = new ServerPlayer(player1Socket);
+		player2 = new ServerPlayer(player2Socket);
 	}
 
 	public void processRequest(String request) {
@@ -90,5 +100,26 @@ public class ServerGame {
 			}
 		}
 		return ServerConstants.REQUEST_OK;
+	}
+
+	private class ServerPlayer {
+		private BufferedReader playerIn;
+		private PrintWriter serverOut;
+		private ServerPlayer(Socket playerSocket) throws IOException {
+			playerIn = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+			serverOut = new PrintWriter(playerSocket.getOutputStream(), true);
+		}
+
+		private void returnResponse(String response) {
+			serverOut.println(response);
+		}
+
+		private void play() {
+
+		}
+	}
+
+	private void updateActivePlayer() {
+		activePlayer = activePlayer == GOTE ? SENTE : GOTE;
 	}
 }
