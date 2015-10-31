@@ -13,7 +13,10 @@ public class ServerGame {
 
 	public void processRequest(String request) {
 		if (request.startsWith("Move")) {
-			// check for a valid move.
+			String[] coords = request.split(",");
+			int xcoord = Integer.parseInt(coords[1]);
+			int ycoord = Integer.parseInt(coords[2]);
+			processMove(xcoord, ycoord);
 		} else if (request.startsWith("Quit")) {
 			// check for player quit.
 		} else if (request.startsWith("MSG")) {
@@ -43,10 +46,10 @@ public class ServerGame {
 			if (xcoord > width || ycoord >= height || xcoord < 0 || ycoord < 0) {
 				throw new InvalidMoveException(MOVE_OUT_BOUND);
 			}
-			if (grid[xcoord][ycoord] != EMPTY_SPOT) {
+			if (grid[ycoord][xcoord] != EMPTY_SPOT) {
 				throw new InvalidMoveException(MOVE_SQUARE_OCCUPIED);
 			}
-			grid[xcoord][ycoord] = activePlayer == 1 ? SENTE_STONE : GOTE_STONE;
+			grid[ycoord][xcoord] = activePlayer == 1 ? SENTE_STONE : GOTE_STONE;
 		}
 	}
 
@@ -67,9 +70,25 @@ public class ServerGame {
 		return ServerConstants.REQUEST_OK;
 	}
 
-	private int processMove() {
+	private int processMessage() {
+		return ServerConstants.REQUEST_OK;
+	}
+
+	private int processPlayerQuit() {
+		return ServerConstants.REQUEST_OK;
+	}
+
+	private int processMove(int xcoord, int ycoord) {
 		// TODO need to parse the string passed in.
-		board.makeMove(1, 1);
-		return ServerConstants.MOVE_OUT_BOUND;
+		try {
+			board.makeMove(xcoord, ycoord);
+		} catch (InvalidMoveException e) {
+			if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
+				return ServerConstants.MOVE_OUT_BOUND;
+			} else {
+				return ServerConstants.MOVE_SQUARE_OCCUPIED;
+			}
+		}
+		return ServerConstants.REQUEST_OK;
 	}
 }

@@ -57,7 +57,7 @@ public final class NetworkBoard extends Board {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			serverWriter.println(String.format("Move, %d, %d", xcoord, ycoord));
+			serverWriter.println(String.format("Move,%d,%d", xcoord, ycoord));
 		}
 
 	}
