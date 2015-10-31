@@ -71,8 +71,6 @@ public abstract class Game {
 		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 23, Font.PLAIN, Color.RED);
 		btnStart.setMargin(new Insets(0,0,0,0));
 		btnGiveUp.setMargin(new Insets(0,0,0,0));
-		addStartButtonListener(btnStart);
-		addGiveUpButtonListener();
 		mainFrame.add(mainPanel);
 		mainFrame.setVisible(true);
 		mainFrame.setResizable(false);
@@ -106,6 +104,12 @@ public abstract class Game {
 		mainPanel.add(boardPanel, BorderLayout.LINE_START);
 		mainPanel.add(new JSeparator(JSeparator.VERTICAL));
 		mainPanel.add(functionPanel, BorderLayout.LINE_END);
+		initialSetUp();
+	}
+
+	private void initialSetUp() {
+		addStartButtonListener(btnStart);
+		addGiveUpButtonListener();
 		board = new Board(boardPanel);
 	}
 

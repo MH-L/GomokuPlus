@@ -8,9 +8,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import Model.NetworkBoard;
+
 public class NetworkGame extends Game {
 	private JButton btnProposeTie;
 	private JButton btnTryWithdraw;
+	private static NetworkBoard board;
 	public NetworkGame() {
 		super();
 		btnProposeTie = Main.getPlainLookbtn("<html>Propose<br>Tie!</html>",
@@ -24,6 +27,7 @@ public class NetworkGame extends Game {
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		titlePanel.add(titleLabel);
+		board = new NetworkBoard(boardPanel);
 	}
 
 	public static void handleConnectionFailure() {
