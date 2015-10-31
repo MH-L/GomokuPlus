@@ -3,6 +3,8 @@ package application;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -36,6 +38,11 @@ public class NetworkGame extends Game {
 
 	@Override
 	protected void initialSetUp() {
+		btnStart.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
+			}
+		});
 	}
 }

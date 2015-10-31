@@ -9,6 +9,7 @@ public final class ServerConstants {
 	public static final String MOVE_REQUEST = "Move";
 	public static final String WITHDRAW_REQUEST = "Withdraw";
 	public static final String TIE_REQUEST = "Tie";
+	public static final String GAME_START = "Start";
 
 	/**
 	 * Server response constants.
