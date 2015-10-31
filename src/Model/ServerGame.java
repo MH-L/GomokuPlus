@@ -22,6 +22,8 @@ public class ServerGame {
 	}
 
 	private static class ServerBoard {
+		private static final int MOVE_OUT_BOUND = 1;
+		private static final int MOVE_SQUARE_OCCUPIED = 2;
 		private static final int width = 15;
 		private static final int height = 15;
 		private static int[][] grid;
@@ -29,5 +31,30 @@ public class ServerGame {
 		private ServerBoard() {
 			grid = new int[height][width];
 		}
+
+		private void makeMove(int xcoord, int ycoord) throws InvalidMoveException {
+
+		}
+	}
+
+	private static class InvalidMoveException extends Exception {
+		private static final long serialVersionUID = 1L;
+		private int errorReason;
+
+		private InvalidMoveException(int errorReason) {
+			this.errorReason = errorReason;
+		}
+	}
+
+	private int processWithdraw() {
+		return ServerConstants.WITHDRAW_DECLINED;
+	}
+
+	private int processSurrender() {
+		return ServerConstants.REQUEST_OK;
+	}
+
+	private int processMove() {
+		return ServerConstants.MOVE_OUT_BOUND;
 	}
 }

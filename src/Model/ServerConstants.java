@@ -17,4 +17,5 @@ public final class ServerConstants {
 	public static final int MOVE_SQUARE_OCCUPIED = 2;
 	public static final int MOVE_OUT_BOUND = 3;
 	public static final int PEER_DISCONNECTED = 4;
+	public static final int WITHDRAW_DECLINED = 5;
 }
