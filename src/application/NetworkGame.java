@@ -28,7 +28,7 @@ public class NetworkGame extends Game {
 	private static NetworkBoard board;
 	private static BufferedReader serverReader;
 	private static PrintWriter serverWriter;
-	private static boolean dirtyBit = false;
+	private boolean dirtyBit = false;
 	private Socket mainSocket;
 	private static final String HOST = "104.236.97.57";
 	private static final int PORT = 1031;
@@ -49,10 +49,12 @@ public class NetworkGame extends Game {
 		board = new NetworkBoard(boardPanel);
 		try {
 			mainSocket = new Socket(HOST, PORT);
+			System.out.println("Has successfully binded to that address and port.");
 			serverReader = new BufferedReader(new InputStreamReader(
 					mainSocket.getInputStream()));
 			serverWriter = new PrintWriter(mainSocket.getOutputStream(), true);
 		} catch (IOException e) {
+			e.printStackTrace();
 			NetworkGame.handleConnectionFailure();
 		}
 		addCellsToBoard();
@@ -64,6 +66,7 @@ public class NetworkGame extends Game {
 
 	@Override
 	protected void initialSetUp() {
+		System.out.println("This is called.");
 		btnStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -73,6 +76,7 @@ public class NetworkGame extends Game {
 	}
 
 	public void addCellsToBoard() {
+		System.out.println("Adding cells to the board.");
 		boardPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 		for (int i = 0; i < Board.height; i++) {
 			for (int j = 0; j < Board.width; j++) {
@@ -80,13 +84,15 @@ public class NetworkGame extends Game {
 				square.setBackground(Color.YELLOW);
 				square.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				square.addActionListener(new SquareActionListener(i, j));
+				boardPanel.add(square);
+				board.setSquare(j, i, square);
 			}
 		}
 	}
 
-	private static class SquareActionListener implements ActionListener {
-		private static int xcoord;
-		private static int ycoord;
+	private class SquareActionListener implements ActionListener {
+		private int xcoord;
+		private int ycoord;
 
 		public SquareActionListener(int x, int y) {
 			xcoord = x;
@@ -128,7 +134,7 @@ public class NetworkGame extends Game {
 
 				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
 
-				}
+				}// kaishiba F11.zheli qinaide nikanjianle ma
 			} catch (IOException e1) {
 				return;
 			}
@@ -146,7 +152,7 @@ public class NetworkGame extends Game {
 	 * Synchronized since it changes the dirty bit and also
 	 * receives responses from the game server.
 	 */
-	synchronized private static void play() {
+	synchronized private void play() {
 		while (true) {
 			while (!dirtyBit) {
 				// still have to wait until the server gives a response.

@@ -26,6 +26,7 @@ public final class ServerConstants {
 	public static final int INT_TIE = 10;
 	public static final int INT_WITHDRAW_MESSAGE = 11;
 	public static final int INT_WITHDRAW_APPROVED = 12;
+	public static final int INT_PEER_CONNECTED = 13;
 
 	public static final int MAX_CAPACITY = 10;
 }
