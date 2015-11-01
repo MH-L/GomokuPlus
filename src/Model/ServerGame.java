@@ -13,6 +13,9 @@ public class ServerGame {
 	private int activePlayer;
 	private ServerPlayer player1;
 	private ServerPlayer player2;
+	private boolean gameStarted = false;
+	private boolean player1Started = false;
+	private boolean player2Started = false;
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException {
 		board = new ServerBoard();

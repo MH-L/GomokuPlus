@@ -9,7 +9,7 @@ public final class ServerConstants {
 	public static final String STR_MOVE_REQUEST = "Move";
 	public static final String STR_WITHDRAW_REQUEST = "Withdraw";
 	public static final String STR_TIE_REQUEST = "Tie";
-	public static final String STR_GAME_START = "Start";
+	public static final String STR_REQUEST_GAME_START = "Start";
 
 	/**
 	 * Server response constants.
@@ -27,6 +27,8 @@ public final class ServerConstants {
 	public static final int INT_WITHDRAW_MESSAGE = 11;
 	public static final int INT_WITHDRAW_APPROVED = 12;
 	public static final int INT_PEER_CONNECTED = 13;
+	public static final int INT_GAME_START_APPORVED = 14;
+	public static final int INT_PEER_STARTED = 15;
 
 	public static final int MAX_CAPACITY = 10;
 }

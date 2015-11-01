@@ -32,6 +32,9 @@ public class NetworkGame extends Game {
 	private Socket mainSocket;
 	private static final String HOST = "104.236.97.57";
 	private static final int PORT = 1031;
+	private boolean peerConnected = false;
+	private boolean gameStarted = false;
+	private boolean messageReceived = false;
 
 	public NetworkGame() {
 		super();
@@ -58,6 +61,43 @@ public class NetworkGame extends Game {
 			NetworkGame.handleConnectionFailure();
 		}
 		addCellsToBoard();
+		Thread coordinator = new Thread(new Runnable() {
+			@Override
+			synchronized public void run() {
+				Thread socketListener = new Thread(new Runnable() {
+					@Override
+					synchronized public void run() {
+						while (true) {
+							try {
+								String line = serverReader.readLine();
+								if (line != "" && line != null) {
+									messageReceived = true;
+								}
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				});
+				Thread gameThread = new Thread(new Runnable() {
+					@Override
+					synchronized public void run() {
+
+					}
+				});
+				while (true) {
+					if (messageReceived = true) {
+						gameThread.interrupt();
+						// do something here.
+					}
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 
 	public static void handleConnectionFailure() {
@@ -70,7 +110,14 @@ public class NetworkGame extends Game {
 		btnStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				if (peerConnected) {
+					serverWriter.println("Start");
+				} else {
+					JOptionPane.showMessageDialog(mainFrame,
+							"The other player has not connected to the server."
+							+ " Please wait.", "Warning: Peer not connected",
+							JOptionPane.WARNING_MESSAGE);
+				}
 			}
 		});
 	}
