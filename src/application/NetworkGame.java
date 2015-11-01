@@ -107,9 +107,27 @@ public class NetworkGame extends Game {
 			serverWriter.println(String.format("Move,%d,%d", xcoord, ycoord));
 			try {
 				String resp = serverReader.readLine();
-				if (resp.startsWith(String.valueOf((ServerConstants.REQUEST_OK)))) {
+				if (resp.startsWith(String.valueOf((ServerConstants.INT_REQUEST_OK)))) {
 					// Freeze the game board and display info message if player
 					// tries to make move during this period.
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_DEFEAT))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_VICTORY))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED))) {
+
+				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
+
 				}
 			} catch (IOException e1) {
 				return;
@@ -129,6 +147,23 @@ public class NetworkGame extends Game {
 	 * receives responses from the game server.
 	 */
 	synchronized private static void play() {
+		while (true) {
+			while (!dirtyBit) {
+				// still have to wait until the server gives a response.
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					continue;
+				}
+				try {
+					String serverResponse = serverReader.readLine();
+					if (serverResponse.startsWith(String.valueOf(ServerConstants.INT_REQUEST_OK))) {
 
+					}
+				} catch (IOException e) {
+					return;
+				}
+			}
+		}
 	}
 }

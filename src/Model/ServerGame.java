@@ -35,7 +35,7 @@ public class ServerGame {
 				player2 = null;
 				player1.sendQuitMessage();
 			}
-			return ServerConstants.REQUEST_OK;
+			return ServerConstants.INT_REQUEST_OK;
 		} else if (request.startsWith("MSG")) {
 			// process message (to be completed)
 		} else if (request.startsWith("Surrender")) {
@@ -81,19 +81,19 @@ public class ServerGame {
 	}
 
 	private int processWithdraw() {
-		return ServerConstants.WITHDRAW_DECLINED;
+		return ServerConstants.INT_WITHDRAW_DECLINED;
 	}
 
 	private int processSurrender() {
-		return ServerConstants.REQUEST_OK;
+		return ServerConstants.INT_REQUEST_OK;
 	}
 
 	private int processMessage() {
-		return ServerConstants.REQUEST_OK;
+		return ServerConstants.INT_REQUEST_OK;
 	}
 
 	private int processPlayerQuit() {
-		return ServerConstants.REQUEST_OK;
+		return ServerConstants.INT_REQUEST_OK;
 	}
 
 	private int processMove(int xcoord, int ycoord) {
@@ -102,9 +102,9 @@ public class ServerGame {
 			board.makeMove(xcoord, ycoord);
 		} catch (InvalidMoveException e) {
 			if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
-				return ServerConstants.MOVE_OUT_BOUND;
+				return ServerConstants.INT_MOVE_OUT_BOUND;
 			} else {
-				return ServerConstants.MOVE_SQUARE_OCCUPIED;
+				return ServerConstants.INT_MOVE_SQUARE_OCCUPIED;
 			}
 		}
 		if (activePlayer == SENTE) {
@@ -113,7 +113,7 @@ public class ServerGame {
 			player1.notifyMove(xcoord, ycoord);
 		}
 		updateActivePlayer();
-		return ServerConstants.REQUEST_OK;
+		return ServerConstants.INT_REQUEST_OK;
 	}
 
 	private class ServerPlayer {
@@ -126,12 +126,8 @@ public class ServerGame {
 			this.turn = turn;
 		}
 
-		private void returnResponse(String response) {
-			serverOut.println(response);
-		}
-
 		private void sendQuitMessage() {
-			serverOut.println(ServerConstants.PEER_DISCONNECTED);
+			serverOut.println(ServerConstants.INT_PEER_DISCONNECTED + ",");
 		}
 
 		private void play() {
@@ -139,7 +135,7 @@ public class ServerGame {
 				try {
 					String playerRequest = playerIn.readLine();
 					int response = ServerGame.this.processRequest(playerRequest, turn);
-
+					serverOut.println(response + ",");
 				} catch (IOException e) {
 					break;
 				}
@@ -148,7 +144,7 @@ public class ServerGame {
 		}
 
 		private void notifyMove(int xcoord, int ycoord) {
-			serverOut.println(String.format("%d,%d,%d", ServerConstants.OTHER_PLAYER_MOVE,
+			serverOut.println(String.format("%d,%d,%d", ServerConstants.INT_OTHER_PLAYER_MOVE,
 					xcoord, ycoord));
 		}
 	}

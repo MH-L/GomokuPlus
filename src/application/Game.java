@@ -324,7 +324,7 @@ public abstract class Game {
 		        if (JOptionPane.showConfirmDialog(frame,
 		            "Are you sure to close this window?", "Confirm Closing",
 		            JOptionPane.YES_NO_OPTION,
-		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 		            System.exit(0);
 		        }
 		    }
