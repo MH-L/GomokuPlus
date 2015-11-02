@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerGame {
 	private static final int SENTE = 1;
@@ -16,6 +17,7 @@ public class ServerGame {
 	private boolean gameStarted = false;
 	private boolean player1Started = false;
 	private boolean player2Started = false;
+	private ArrayList<String> requestQueue = new ArrayList<String>();
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException {
 		board = new ServerBoard();

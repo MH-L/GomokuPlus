@@ -29,6 +29,8 @@ public final class ServerConstants {
 	public static final int INT_PEER_CONNECTED = 13;
 	public static final int INT_GAME_START_APPORVED = 14;
 	public static final int INT_PEER_STARTED = 15;
+	public static final int INT_SENTE = 16;
+	public static final int INT_GOTE = 17;
 
 	public static final int MAX_CAPACITY = 10;
 }

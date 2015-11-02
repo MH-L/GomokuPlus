@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -63,7 +64,14 @@ public class Main {
 		networkBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game = new NetworkGame();
+				try {
+					game = new NetworkGame();
+				} catch (InterruptedException e1) {
+					JOptionPane.showMessageDialog(frame, "Unable to process network game due to"
+							+ " internal error.\nSorry for the inconvenience.",
+							"Internal Error", JOptionPane.ERROR_MESSAGE);
+					e1.printStackTrace();
+				}
 				frame.dispose();
 			}
 		});

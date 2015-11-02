@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -35,8 +36,9 @@ public class NetworkGame extends Game {
 	private boolean peerConnected = false;
 	private boolean gameStarted = false;
 	private boolean messageReceived = false;
+	private ArrayList<String> messageQueue = new ArrayList<String>();
 
-	public NetworkGame() {
+	public NetworkGame() throws InterruptedException {
 		super();
 		btnProposeTie = Main.getPlainLookbtn("<html>Propose<br>Tie!</html>",
 				"Open Sans", 28, Font.ITALIC, Color.GREEN);
@@ -72,6 +74,7 @@ public class NetworkGame extends Game {
 								String line = serverReader.readLine();
 								if (line != "" && line != null) {
 									messageReceived = true;
+									messageQueue.add(line);
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
@@ -85,6 +88,8 @@ public class NetworkGame extends Game {
 
 					}
 				});
+				socketListener.start();
+				gameThread.start();
 				while (true) {
 					if (messageReceived = true) {
 						gameThread.interrupt();
@@ -98,6 +103,8 @@ public class NetworkGame extends Game {
 				}
 			}
 		});
+		coordinator.start();
+		coordinator.join();
 	}
 
 	public static void handleConnectionFailure() {
@@ -137,6 +144,47 @@ public class NetworkGame extends Game {
 		}
 	}
 
+	synchronized public void handleServerMessage() {
+		while (!messageQueue.isEmpty()) {
+			String message = messageQueue.get(0);
+			if (message.startsWith(String.valueOf((ServerConstants.INT_REQUEST_OK)))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_DEFEAT))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
+
+			} else if (message.startsWith(String.valueOf(ServerConstants.INT_OTHER_PLAYER_MOVE))) {
+				String[] coords = message.split(",");
+				int xcoord = Integer.parseInt(coords[1]);
+				int ycoord = Integer.parseInt(coords[2]);
+
+			}
+			messageQueue.remove(0);
+		}
+	}
+
+	private void setSquareOpponent(int x, int y) {
+
+	}
+
 	private class SquareActionListener implements ActionListener {
 		private int xcoord;
 		private int ycoord;
@@ -159,29 +207,7 @@ public class NetworkGame extends Game {
 			dirtyBit = true;
 			serverWriter.println(String.format("Move,%d,%d", xcoord, ycoord));
 			try {
-				String resp = serverReader.readLine();
-				if (resp.startsWith(String.valueOf((ServerConstants.INT_REQUEST_OK)))) {
-					// Freeze the game board and display info message if player
-					// tries to make move during this period.
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_DEFEAT))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_VICTORY))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED))) {
-
-				} else if (resp.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
-
-				}// kaishiba F11.zheli qinaide nikanjianle ma
+				String message = serverReader.readLine();
 			} catch (IOException e1) {
 				return;
 			}
