@@ -37,6 +37,8 @@ public class NetworkGame extends Game {
 	private boolean gameStarted = false;
 	private boolean messageReceived = false;
 	private ArrayList<String> messageQueue = new ArrayList<String>();
+	private String lastRequest = null;
+	private int turn = 0;
 
 	public NetworkGame() throws InterruptedException {
 		super();
@@ -69,15 +71,17 @@ public class NetworkGame extends Game {
 				Thread socketListener = new Thread(new Runnable() {
 					@Override
 					synchronized public void run() {
-						while (true) {
-							try {
-								String line = serverReader.readLine();
-								if (line != "" && line != null) {
-									messageReceived = true;
-									messageQueue.add(line);
+						synchronized(messageQueue) {
+							while (true) {
+								try {
+									String line = serverReader.readLine();
+									if (line != "" && line != null) {
+										messageReceived = true;
+										messageQueue.add(line);
+									}
+								} catch (IOException e) {
+									e.printStackTrace();
 								}
-							} catch (IOException e) {
-								e.printStackTrace();
 							}
 						}
 					}
@@ -92,8 +96,10 @@ public class NetworkGame extends Game {
 				gameThread.start();
 				while (true) {
 					if (messageReceived = true) {
-						gameThread.interrupt();
+						gameThread.suspend();
 						// do something here.
+						handleServerMessage();
+						gameThread.resume();
 					}
 					try {
 						Thread.sleep(10);
@@ -145,39 +151,43 @@ public class NetworkGame extends Game {
 	}
 
 	synchronized public void handleServerMessage() {
-		while (!messageQueue.isEmpty()) {
-			String message = messageQueue.get(0);
-			if (message.startsWith(String.valueOf((ServerConstants.INT_REQUEST_OK)))) {
+		synchronized(messageQueue) {
+			while (!messageQueue.isEmpty()) {
+				String message = messageQueue.get(0);
+				if (message.startsWith(String.valueOf((ServerConstants.INT_REQUEST_OK)))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE))) {
+					turn = Game.TURN_SENTE;
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE))) {
+					turn = Game.TURN_GOTE;
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GAME_START_APPORVED))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_DEFEAT))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_DEFEAT))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OTHER_PLAYER_MOVE))) {
+					String[] coords = message.split(",");
+					int xcoord = Integer.parseInt(coords[1]);
+					int ycoord = Integer.parseInt(coords[2]);
 
-			} else if (message.startsWith(String.valueOf(ServerConstants.INT_OTHER_PLAYER_MOVE))) {
-				String[] coords = message.split(",");
-				int xcoord = Integer.parseInt(coords[1]);
-				int ycoord = Integer.parseInt(coords[2]);
-
+				}
+				messageQueue.remove(0);
 			}
-			messageQueue.remove(0);
 		}
 	}
 

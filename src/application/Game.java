@@ -39,6 +39,8 @@ public abstract class Game {
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
 	public static final int functionPanelWidth = 295;
 	public static final int NUM_STONE_TO_WIN = 5;
+	public static final int TURN_SENTE = 1;
+	public static final int TURN_GOTE = 2;
 	protected static JPanel mainPanel;
 	protected static JFrame mainFrame;
 	protected static JButton btnStart;
