@@ -309,8 +309,8 @@ public abstract class Game {
 	}
 
 	public static void warnGameFrozen() {
-		JOptionPane.showMessageDialog(mainFrame, "Game is finished. Please start new game by pressing"
-				+ " start or go to menu bar.", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(mainFrame, "Game is not yet started or has finished.\nPlease start new game by pressing"
+				+ " start\nor go to menu bar.", "Game Status Info", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public static void displayTieMessage() {

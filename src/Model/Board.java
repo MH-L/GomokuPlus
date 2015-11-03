@@ -315,4 +315,22 @@ public class Board {
 	private static boolean isReachable(int x, int y) {
 		return x < width && y < height && x >= 0 && y >= 0;
 	}
+
+	public void setSquareByTurn(int x, int y, int turn) {
+		if (turn == Game.TURN_SENTE) {
+			try {
+				Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
+				grid[y][x].setIcon(new ImageIcon(img));
+			} catch (IOException e1) {
+				Game.errorRendering();
+			}
+		} else {
+			try {
+				Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
+				grid[y][x].setIcon(new ImageIcon(img));
+			} catch (IOException e1) {
+				Game.errorRendering();
+			}
+		}
+	}
 }

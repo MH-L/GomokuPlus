@@ -54,7 +54,7 @@ public class NetworkGame extends Game {
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		titlePanel.add(titleLabel);
-		statusBar = new JLabel("");
+		statusBar = new JLabel("Peer Not Connected");
 		statusBar.setFont(smallGameFont);
 		historyPanel.add(statusBar);
 		board = new NetworkBoard(boardPanel);
@@ -114,7 +114,7 @@ public class NetworkGame extends Game {
 			}
 		});
 		coordinator.start();
-		coordinator.join();
+//		coordinator.join();
 	}
 
 	public static void handleConnectionFailure() {
@@ -191,12 +191,13 @@ public class NetworkGame extends Game {
 
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OTHER_PLAYER_MOVE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE))) {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
 					int ycoord = Integer.parseInt(coords[2]);
 					dirtyBit = false;
-
+					int otherTurn = turn == Game.TURN_SENTE ? Game.TURN_GOTE : Game.TURN_SENTE;
+					board.setSquareByTurn(xcoord, ycoord, otherTurn);
 				}
 				messageQueue.remove(0);
 			}
@@ -221,6 +222,9 @@ public class NetworkGame extends Game {
 		 */
 		@Override
 		synchronized public void actionPerformed(ActionEvent e) {
+			if (!gameStarted) {
+				Game.warnGameFrozen();
+			}
 			if (dirtyBit == true) {
 				multiClickWarning();
 				return;
@@ -228,11 +232,6 @@ public class NetworkGame extends Game {
 
 			dirtyBit = true;
 			serverWriter.println(String.format("Move,%d,%d", xcoord, ycoord));
-			try {
-				String message = serverReader.readLine();
-			} catch (IOException e1) {
-				return;
-			}
 		}
 
 	}

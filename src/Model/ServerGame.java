@@ -18,6 +18,9 @@ public class ServerGame {
 	private boolean player1Started = false;
 	private boolean player2Started = false;
 	private ArrayList<String> requestQueue = new ArrayList<String>();
+	private Thread coordinator;
+	private Thread socketListener;
+	private Thread gameThread;
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException {
 		board = new ServerBoard();
@@ -149,7 +152,7 @@ public class ServerGame {
 		}
 
 		private void notifyMove(int xcoord, int ycoord) {
-			serverOut.println(String.format("%d,%d,%d", ServerConstants.INT_OTHER_PLAYER_MOVE,
+			serverOut.println(String.format("%d,%d,%d", ServerConstants.INT_OPPONENT_MOVE,
 					xcoord, ycoord));
 		}
 	}

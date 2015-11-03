@@ -19,7 +19,7 @@ public final class ServerConstants {
 	public static final int INT_MOVE_OUT_BOUND = 3;
 	public static final int INT_PEER_DISCONNECTED = 4;
 	public static final int INT_WITHDRAW_DECLINED = 5;
-	public static final int INT_OTHER_PLAYER_MOVE = 6;
+	public static final int INT_OPPONENT_MOVE = 6;
 	public static final int INT_NOT_YOUR_TURN = 7;
 	public static final int INT_VICTORY = 8;
 	public static final int INT_DEFEAT = 9;
@@ -31,6 +31,8 @@ public final class ServerConstants {
 	public static final int INT_PEER_STARTED = 15;
 	public static final int INT_SENTE = 16;
 	public static final int INT_GOTE = 17;
+	public static final int INT_OPPONENT_PROPOSED_TIE = 18;
+	public static final int INT_YOUR_MOVE = 19;
 
 	public static final int MAX_CAPACITY = 10;
 }
