@@ -15,38 +15,18 @@ public class ServerGame {
 	private ServerPlayer player1;
 	private ServerPlayer player2;
 	private boolean gameStarted = false;
-	private boolean player1Started = false;
-	private boolean player2Started = false;
-	private ArrayList<String> requestQueue = new ArrayList<String>();
-	private Thread coordinator;
-	private Thread socketListener;
-	private Thread gameThread;
+	volatile private boolean player1Started = false;
+	volatile private boolean player2Started = false;
+	volatile private boolean player1Alive = false;
+	volatile private boolean player2Alive = false;
+	private Move player1LastMove = null;
+	private Move player2LastMove = null;
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException, InterruptedException {
 		board = new ServerBoard();
 		activePlayer = SENTE;
 		player1 = new ServerPlayer(player1Socket, SENTE);
 		player2 = new ServerPlayer(player2Socket, GOTE);
-		coordinator = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				socketListener = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						while (true) {
-
-						}
-					}
-				});
-				gameThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-
-					}
-				});
-			}
-		});
-		coordinator.join();
 	}
 
 	public int processRequest(String request, int turn) {
@@ -144,18 +124,100 @@ public class ServerGame {
 		return ServerConstants.INT_REQUEST_OK;
 	}
 
+	private class Move {
+		private int x;
+		private int y;
+
+		private Move(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+	}
+
 	private class ServerPlayer {
 		private BufferedReader playerIn;
 		private PrintWriter serverOut;
 		private int turn;
+		private Thread coordinator;
+		private Thread socketListener;
+		private Thread gameThread;
+		private ArrayList<String> requestQueue = new ArrayList<String>();
+
 		private ServerPlayer(Socket playerSocket, int turn) throws IOException {
 			playerIn = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
 			serverOut = new PrintWriter(playerSocket.getOutputStream(), true);
 			this.turn = turn;
+			coordinator = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					socketListener = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							synchronized(requestQueue) {
+								while (true) {
+									try {
+										String inline = playerIn.readLine();
+										if (inline == null) {
+											// TODO indicate the game is over.
+											break;
+										}
+										requestQueue.add(inline);
+									} catch (IOException e) {
+										// TODO Game is finished.
+									}
+								}
+							}
+						}
+					});
+					gameThread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+
+						}
+					});
+					socketListener.start();
+					gameThread.start();
+				}
+			});
 		}
 
 		private void sendQuitMessage() {
 			serverOut.println(ServerConstants.INT_PEER_DISCONNECTED + ",");
+		}
+
+		private void handlePlayerRequests() {
+			synchronized(requestQueue) {
+				while (true) {
+					while (!requestQueue.isEmpty()) {
+						String req = requestQueue.get(0);
+						if (req.startsWith(ServerConstants.STR_ONLINE)) {
+							if (turn == SENTE) {
+								player1Alive = true;
+								if (player2Alive) {
+									serverOut.println(ServerConstants.INT_PEER_CONNECTED);
+								}
+							} else {
+								player2Alive = true;
+								if (player1Alive) {
+									serverOut.println(ServerConstants.INT_PEER_CONNECTED);
+								}
+							}
+						} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
+
+						} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
+
+						} else if (req.startsWith(ServerConstants.STR_QUIT)) {
+
+						} else if (req.startsWith(ServerConstants.STR_MESSAGE_REQUEST)) {
+
+						} else if (req.startsWith(ServerConstants.STR_TIE_REQUEST)) {
+
+						} else if (req.startsWith(ServerConstants.STR_REQUEST_GAME_START)) {
+
+						}
+					}
+				}
+			}
 		}
 
 		private void play() {

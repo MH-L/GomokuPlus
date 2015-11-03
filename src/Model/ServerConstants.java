@@ -4,6 +4,8 @@ public final class ServerConstants {
 	/**
 	 * Server request contants.
 	 */
+	public static final String STR_ONLINE = "Online";
+	public static final String STR_QUIT = "Quit";
 	public static final String STR_MESSAGE_REQUEST = "Message";
 	public static final String STR_GIVEUP_REQUEST = "Surrender";
 	public static final String STR_MOVE_REQUEST = "Move";

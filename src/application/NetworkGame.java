@@ -93,7 +93,7 @@ public class NetworkGame extends Game {
 				Thread gameThread = new Thread(new Runnable() {
 					@Override
 					synchronized public void run() {
-
+						serverWriter.println("Online");
 					}
 				});
 				socketListener.start();
@@ -157,41 +157,41 @@ public class NetworkGame extends Game {
 		synchronized(messageQueue) {
 			while (!messageQueue.isEmpty()) {
 				String message = messageQueue.get(0);
-				if (message.startsWith(String.valueOf((ServerConstants.INT_REQUEST_OK)))) {
+				if (message.startsWith(String.valueOf(ServerConstants.INT_REQUEST_OK) + ",")) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE) + ",")) {
 					turn = Game.TURN_SENTE;
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE) + ",")) {
 					turn = Game.TURN_GOTE;
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_CONNECTED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_CONNECTED) + ",")) {
 					statusBar.setText("Peer Connected");
 					peerConnected = true;
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GAME_START_APPORVED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GAME_START_APPORVED) + ",")) {
 					statusBar.setText("Game Started");
 					gameStarted = true;
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_DEFEAT))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_DEFEAT) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Your opponent wins. Good luck next time!",
 							"Game Over -- You Lose", JOptionPane.INFORMATION_MESSAGE);
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Congratulations! You win!",
 							"Game Over -- You Win", JOptionPane.INFORMATION_MESSAGE);
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "The square is occupied. Please check"
 							+ " your move.", "Re-move", JOptionPane.INFORMATION_MESSAGE);
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_OUT_BOUND))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_OUT_BOUND) + ",")) {
 					// Normally this should not happen.
 					// If this happens, then there must be something wrong with game implementation.
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN) + ",")) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE) + ",")) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED) + ",")) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE) + ",")) {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
 					int ycoord = Integer.parseInt(coords[2]);
