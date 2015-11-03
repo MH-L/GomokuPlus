@@ -39,6 +39,7 @@ public class NetworkGame extends Game {
 	private ArrayList<String> messageQueue = new ArrayList<String>();
 	private String lastRequest = null;
 	private int turn = 0;
+	private JLabel statusBar;
 
 	public NetworkGame() throws InterruptedException {
 		super();
@@ -53,6 +54,9 @@ public class NetworkGame extends Game {
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		titlePanel.add(titleLabel);
+		statusBar = new JLabel("");
+		statusBar.setFont(smallGameFont);
+		historyPanel.add(statusBar);
 		board = new NetworkBoard(boardPanel);
 		try {
 			mainSocket = new Socket(HOST, PORT);
@@ -119,7 +123,6 @@ public class NetworkGame extends Game {
 
 	@Override
 	protected void initialSetUp() {
-		System.out.println("This is called.");
 		btnStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -160,16 +163,24 @@ public class NetworkGame extends Game {
 					turn = Game.TURN_SENTE;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE))) {
 					turn = Game.TURN_GOTE;
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_CONNECTED))) {
+					statusBar.setText("Peer Connected");
+					peerConnected = true;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GAME_START_APPORVED))) {
-
+					statusBar.setText("Game Started");
+					gameStarted = true;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_DEFEAT))) {
-
+					JOptionPane.showMessageDialog(mainFrame, "Your opponent wins. Good luck next time!",
+							"Game Over -- You Lose", JOptionPane.INFORMATION_MESSAGE);
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY))) {
-
+					JOptionPane.showMessageDialog(mainFrame, "Congratulations! You win!",
+							"Game Over -- You Win", JOptionPane.INFORMATION_MESSAGE);
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
-
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED))) {
-
+					JOptionPane.showMessageDialog(mainFrame, "The square is occupied. Please check"
+							+ " your move.", "Re-move", JOptionPane.INFORMATION_MESSAGE);
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_OUT_BOUND))) {
+					// Normally this should not happen.
+					// If this happens, then there must be something wrong with game implementation.
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN))) {
 
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE))) {
@@ -184,6 +195,7 @@ public class NetworkGame extends Game {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
 					int ycoord = Integer.parseInt(coords[2]);
+					dirtyBit = false;
 
 				}
 				messageQueue.remove(0);
