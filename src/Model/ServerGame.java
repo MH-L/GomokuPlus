@@ -21,10 +21,12 @@ public class ServerGame {
 	volatile private boolean player2Alive = false;
 	private Move player1LastMove = null;
 	private Move player2LastMove = null;
+	volatile private boolean giveUpReceived = false;
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException, InterruptedException {
 		board = new ServerBoard();
 		activePlayer = SENTE;
+		System.out.println("Game shall be started.");
 		player1 = new ServerPlayer(player1Socket, SENTE);
 		player2 = new ServerPlayer(player2Socket, GOTE);
 	}
@@ -52,6 +54,22 @@ public class ServerGame {
 			// the player wants to try to withdraw.
 		}
 		return 1;
+	}
+
+	private void promptPlayerForVictory(int loserTurn) {
+		if (loserTurn == SENTE) {
+			player2.sendVictoryMessage();
+		} else {
+			player1.sendVictoryMessage();
+		}
+	}
+
+	private void promptPlayerForQuit(int quitter) {
+		if (quitter == SENTE) {
+			player2.sendQuitMessage();
+		} else {
+			player1.sendQuitMessage();
+		}
 	}
 
 	private class ServerBoard {
@@ -148,12 +166,15 @@ public class ServerGame {
 			serverOut = new PrintWriter(playerSocket.getOutputStream(), true);
 			this.turn = turn;
 			coordinator = new Thread(new Runnable() {
+				@SuppressWarnings("deprecation")
 				@Override
 				public void run() {
+					System.out.println("Coordinator on server is running.");
 					socketListener = new Thread(new Runnable() {
 						@Override
 						public void run() {
 							synchronized(requestQueue) {
+								System.out.println("Socket listener Checking request Queue.");
 								while (true) {
 									try {
 										String inline = playerIn.readLine();
@@ -172,49 +193,83 @@ public class ServerGame {
 					gameThread = new Thread(new Runnable() {
 						@Override
 						public void run() {
-
+							System.out.println("Game thread dealing with game logics.");
 						}
 					});
 					socketListener.start();
 					gameThread.start();
+					while (true) {
+						if (!requestQueue.isEmpty()) {
+							System.out.println("Received message from game client.");
+							gameThread.suspend();
+							handlePlayerRequests();
+							gameThread.resume();
+						}
+					}
 				}
 			});
+			coordinator.start();
 		}
 
 		private void sendQuitMessage() {
 			serverOut.println(ServerConstants.INT_PEER_DISCONNECTED + ",");
 		}
 
-		private void handlePlayerRequests() {
+		private void sendVictoryMessage() {
+			serverOut.println(ServerConstants.INT_VICTORY + ",");
+		}
+
+		synchronized private void handlePlayerRequests() {
 			synchronized(requestQueue) {
-				while (true) {
-					while (!requestQueue.isEmpty()) {
-						String req = requestQueue.get(0);
-						if (req.startsWith(ServerConstants.STR_ONLINE)) {
-							if (turn == SENTE) {
-								player1Alive = true;
-								if (player2Alive) {
-									serverOut.println(ServerConstants.INT_PEER_CONNECTED);
-								}
-							} else {
-								player2Alive = true;
-								if (player1Alive) {
-									serverOut.println(ServerConstants.INT_PEER_CONNECTED);
-								}
+				while (!requestQueue.isEmpty()) {
+					String req = requestQueue.get(0);
+					if (req.startsWith(ServerConstants.STR_ONLINE)) {
+						System.out.println("Should have received this two times here.");
+						if (turn == SENTE) {
+							player1Alive = true;
+							if (player2Alive) {
+								serverOut.println(ServerConstants.INT_PEER_CONNECTED);
 							}
-						} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
-
-						} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
-
-						} else if (req.startsWith(ServerConstants.STR_QUIT)) {
-
-						} else if (req.startsWith(ServerConstants.STR_MESSAGE_REQUEST)) {
-
-						} else if (req.startsWith(ServerConstants.STR_TIE_REQUEST)) {
-
-						} else if (req.startsWith(ServerConstants.STR_REQUEST_GAME_START)) {
-
+						} else {
+							player2Alive = true;
+							if (player1Alive) {
+								serverOut.println(ServerConstants.INT_PEER_CONNECTED);
+							}
 						}
+					} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
+						String[] coordinates = req.split(",");
+						int xcoord = Integer.parseInt(coordinates[1]);
+						int ycoord = Integer.parseInt(coordinates[2]);
+						try {
+							board.makeMove(xcoord, ycoord);
+						} catch (InvalidMoveException e) {
+							if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
+								serverOut.println(ServerConstants.INT_MOVE_OUT_BOUND + ",");
+							} else {
+								serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
+							}
+						}
+					} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
+						if (!giveUpReceived) {
+							serverOut.println(ServerConstants.INT_DEFEAT + ",");
+							ServerGame.this.promptPlayerForVictory(turn);
+						}
+					} else if (req.startsWith(ServerConstants.STR_QUIT)) {
+						boolean isNecessary = false;
+						if (turn == SENTE) {
+							isNecessary = player2Alive;
+						} else {
+							isNecessary = player1Alive;
+						}
+						if (isNecessary) {
+							ServerGame.this.promptPlayerForQuit(turn);
+						}
+					} else if (req.startsWith(ServerConstants.STR_MESSAGE_REQUEST)) {
+
+					} else if (req.startsWith(ServerConstants.STR_TIE_REQUEST)) {
+
+					} else if (req.startsWith(ServerConstants.STR_REQUEST_GAME_START)) {
+
 					}
 				}
 			}

@@ -24,6 +24,7 @@ public class ServerMain {
 							+ " cannot be started. Exiting...");
 					System.exit(1);
 				}
+				System.out.println("Clients disconnected. Establishing new connection.");
 			}
 		} finally {
 			ss.close();

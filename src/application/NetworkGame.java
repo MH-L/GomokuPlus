@@ -31,9 +31,9 @@ public class NetworkGame extends Game {
 	private static PrintWriter serverWriter;
 	private boolean dirtyBit = false;
 	private Socket mainSocket;
-	private static final String HOST = "104.236.97.57";
+	private static final String HOST = "localhost";
 	private static final int PORT = 1031;
-	private boolean peerConnected = false;
+	private boolean peerConnected = true;
 	private boolean gameStarted = false;
 	private boolean messageReceived = false;
 	private ArrayList<String> messageQueue = new ArrayList<String>();
@@ -54,7 +54,7 @@ public class NetworkGame extends Game {
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		titlePanel.add(titleLabel);
-		statusBar = new JLabel("Peer Not Connected");
+		statusBar = new JLabel("Peer Connected");
 		statusBar.setFont(smallGameFont);
 		historyPanel.add(statusBar);
 		board = new NetworkBoard(boardPanel);
@@ -70,18 +70,24 @@ public class NetworkGame extends Game {
 		}
 		addCellsToBoard();
 		Thread coordinator = new Thread(new Runnable() {
+			@SuppressWarnings("deprecation")
 			@Override
 			synchronized public void run() {
+				System.out.println("Coordinator thread from game client up and running.");
 				Thread socketListener = new Thread(new Runnable() {
 					@Override
 					synchronized public void run() {
+						System.out.println("Socket listener up and running.");
 						synchronized(messageQueue) {
 							while (true) {
 								try {
 									String line = serverReader.readLine();
 									if (line != "" && line != null) {
+										System.out.println("Received reply from the server.");
 										messageReceived = true;
 										messageQueue.add(line);
+									} else if (line == null) {
+										// do something since server is no longer reachable.
 									}
 								} catch (IOException e) {
 									e.printStackTrace();
@@ -92,7 +98,8 @@ public class NetworkGame extends Game {
 				});
 				Thread gameThread = new Thread(new Runnable() {
 					@Override
-					synchronized public void run() {
+					public void run() {
+						System.err.println("Sending online request.");
 						serverWriter.println("Online");
 					}
 				});
@@ -156,6 +163,7 @@ public class NetworkGame extends Game {
 	synchronized public void handleServerMessage() {
 		synchronized(messageQueue) {
 			while (!messageQueue.isEmpty()) {
+				JOptionPane.showMessageDialog(mainFrame, "Received Message!!!");
 				String message = messageQueue.get(0);
 				if (message.startsWith(String.valueOf(ServerConstants.INT_REQUEST_OK) + ",")) {
 
