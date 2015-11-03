@@ -22,11 +22,31 @@ public class ServerGame {
 	private Thread socketListener;
 	private Thread gameThread;
 
-	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException {
+	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException, InterruptedException {
 		board = new ServerBoard();
 		activePlayer = SENTE;
 		player1 = new ServerPlayer(player1Socket, SENTE);
 		player2 = new ServerPlayer(player2Socket, GOTE);
+		coordinator = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				socketListener = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						while (true) {
+
+						}
+					}
+				});
+				gameThread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+
+					}
+				});
+			}
+		});
+		coordinator.join();
 	}
 
 	public int processRequest(String request, int turn) {

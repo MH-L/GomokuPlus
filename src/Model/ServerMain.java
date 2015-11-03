@@ -19,7 +19,7 @@ public class ServerMain {
 				Socket clientSocket2 = ss.accept();
 				try {
 					ServerGame game = new ServerGame(clientSocket1, clientSocket2);
-				} catch (IOException e) {
+				} catch (IOException | InterruptedException e) {
 					System.out.println("Cannot reliably bind on the socket or the game"
 							+ " cannot be started. Exiting...");
 					System.exit(1);
