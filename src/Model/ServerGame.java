@@ -227,6 +227,14 @@ public class ServerGame {
 			serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED);
 		}
 
+		private void sendTurnMessage() {
+			if (turn == SENTE) {
+				serverOut.println(ServerConstants.INT_SENTE);
+			} else {
+				serverOut.println(ServerConstants.INT_GOTE);
+			}
+		}
+
 		synchronized private void handlePlayerRequests() {
 			while (!requestQueue.isEmpty()) {
 				System.out.println("Request queue is not empty... dealing with requests sent from user.");
@@ -241,12 +249,14 @@ public class ServerGame {
 						if (player2Alive) {
 							sendPeerConnectedMessage();
 							promptOtherPlayerPeerConnected(turn);
+							sendTurnMessage();
 						}
 					} else {
 						player2Alive = true;
 						if (player1Alive) {
 							sendPeerConnectedMessage();
 							promptOtherPlayerPeerConnected(turn);
+							sendTurnMessage();
 						}
 					}
 				} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {

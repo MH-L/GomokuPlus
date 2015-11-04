@@ -65,7 +65,7 @@ public class NetworkGame extends Game {
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		titlePanel.add(titleLabel);
-		statusBar = new JLabel("Peer Connected");
+		statusBar = new JLabel("Peer Not Connected");
 		statusBar.setFont(smallGameFont);
 		historyPanel.add(statusBar);
 		board = new NetworkBoard(boardPanel);
@@ -151,6 +151,19 @@ public class NetworkGame extends Game {
 							"The other player has not connected to the server."
 							+ " Please wait.", "Warning: Peer not connected",
 							JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		});
+		btnTryWithdraw.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (withdrawProposed) {
+					JOptionPane.showMessageDialog(mainFrame, "You cannot propose withdrawal"
+							+ " more than one\ntime in a round.", "Withdrawal Proposed Notice",
+							JOptionPane.WARNING_MESSAGE);
+					return;
+				} else {
+					serverWriter.println(ServerConstants.STR_WITHDRAW_REQUEST);
 				}
 			}
 		});
@@ -240,6 +253,22 @@ public class NetworkGame extends Game {
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Unfortunately, your opponent declined"
 							+ " your withdrawal request.", "Withdrawal Declined",
+							JOptionPane.INFORMATION_MESSAGE);
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_DECLINED))) {
+					JOptionPane.showMessageDialog(mainFrame, "Your opponent has declined your tie proposal."
+							+ "\nGood luck next time!", "Tie Proposal Declined",
+							JOptionPane.INFORMATION_MESSAGE);
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_PROPOSED))) {
+					int response = JOptionPane.showConfirmDialog(mainFrame,
+									"Your opponent wants to tie the game."
+									+ " Do you agree?", "Tie Proposal", JOptionPane.YES_NO_OPTION);
+					if (response == JOptionPane.YES_OPTION) {
+						serverWriter.println(ServerConstants.STR_TIE_APPROVED);
+					} else {
+						serverWriter.println(ServerConstants.STR_TIE_DECLINED);
+					}
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE))) {
+					JOptionPane.showMessageDialog(mainFrame, "Tie! Game over!", "Game Over -- Tie",
 							JOptionPane.INFORMATION_MESSAGE);
 				}
 				messageQueue.remove(0);

@@ -34,10 +34,8 @@ public final class ServerConstants {
 	public static final int INT_WITHDRAW_APPROVED = 12;
 	public static final int INT_PEER_CONNECTED = 13;
 	public static final int INT_GAME_START_APPORVED = 14;
-	public static final int INT_PEER_STARTED = 15;
 	public static final int INT_SENTE = 16;
 	public static final int INT_GOTE = 17;
-	public static final int INT_OPPONENT_PROPOSED_TIE = 18;
 	public static final int INT_YOUR_MOVE = 19;
 	public static final int INT_TIE_PROPOSED = 20;
 	public static final int INT_TIE_DECLINED = 21;
