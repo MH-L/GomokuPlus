@@ -40,6 +40,7 @@ public class NetworkGame extends Game {
 	private boolean messageReceived = false;
 	private ArrayList<String> messageQueue = new ArrayList<String>();
 	private String lastRequest = null;
+	private Object booleanLock = new Object();
 	private int turn = 0;
 	/**
 	 * Status bar for game status. Indicating whether the game is started,
@@ -88,20 +89,20 @@ public class NetworkGame extends Game {
 					@Override
 					synchronized public void run() {
 						System.out.println("Socket listener up and running.");
-						synchronized(messageQueue) {
-							while (true) {
-								try {
-									String line = serverReader.readLine();
-									if (line != "" && line != null) {
-										System.out.println("Received reply from the server.");
-										messageReceived = true;
+						while (true) {
+							try {
+								String line = serverReader.readLine();
+								if (line != "" && line != null) {
+									System.out.println("Received reply from the server.");
+									messageReceived = true;
+									synchronized(messageQueue) {
 										messageQueue.add(line);
-									} else if (line == null) {
-										// do something since server is no longer reachable.
 									}
-								} catch (IOException e) {
-									e.printStackTrace();
+								} else if (line == null) {
+									// do something since server is no longer reachable.
 								}
+							} catch (IOException e) {
+								e.printStackTrace();
 							}
 						}
 					}
@@ -200,15 +201,32 @@ public class NetworkGame extends Game {
 					// Normally this should not happen.
 					// If this happens, then there must be something wrong with game implementation.
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_NOT_YOUR_TURN) + ",")) {
-
+					JOptionPane.showMessageDialog(mainFrame, "It is not your turn yet!", "Warning",
+							JOptionPane.WARNING_MESSAGE);
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_MESSAGE) + ",")) {
+					int confirmation = JOptionPane.showConfirmDialog(mainFrame,
+							"Other player wants to withdraw."
+							+ " Click\n\"yes\" to approve, \"no\" to decline.",
+							"Withdraw Proposal", JOptionPane.YES_NO_OPTION);
 
+					if (confirmation == JOptionPane.YES_OPTION) {
+						serverWriter.println(ServerConstants.STR_WITHDRAW_APPROVED);
+					} else {
+						serverWriter.println(ServerConstants.STR_WITHDRAW_DECLINED);
+					}
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
-
+					String[] withdrawCoordinates = message.split(",");
+					// do something with withdrawal.
+					// Not a high priority now.
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED) + ",")) {
+					int choice = JOptionPane.showConfirmDialog(mainFrame,
+							"Your opponent quitted the game. Do you want to \n stay in the game?",
+							"Opponent Quit", JOptionPane.INFORMATION_MESSAGE);
+					if (choice == JOptionPane.YES_OPTION) {
 
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
+					} else {
 
+					}
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE) + ",")) {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
@@ -217,9 +235,12 @@ public class NetworkGame extends Game {
 					int otherTurn = turn == Game.TURN_SENTE ? Game.TURN_GOTE : Game.TURN_SENTE;
 					board.setSquareByTurn(xcoord, ycoord, otherTurn);
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
-					// do something.
+					JOptionPane.showMessageDialog(mainFrame, "Your withdrawal has been approved by your opponent!",
+							"Congratulations!", JOptionPane.INFORMATION_MESSAGE);
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
-					// do something.
+					JOptionPane.showMessageDialog(mainFrame, "Unfortunately, your opponent declined"
+							+ " your withdrawal request.", "Withdrawal Declined",
+							JOptionPane.INFORMATION_MESSAGE);
 				}
 				messageQueue.remove(0);
 			}
