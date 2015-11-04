@@ -79,6 +79,7 @@ public class NetworkGame extends Game {
 			e.printStackTrace();
 			NetworkGame.handleConnectionFailure();
 		}
+		initialSetUp2();
 		addCellsToBoard();
 		Thread coordinator = new Thread(new Runnable() {
 			@SuppressWarnings("deprecation")
@@ -141,6 +142,10 @@ public class NetworkGame extends Game {
 
 	@Override
 	protected void initialSetUp() {
+
+	}
+
+	protected void initialSetUp2() {
 		btnStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -177,7 +182,7 @@ public class NetworkGame extends Game {
 				Coordinate square = new Coordinate(i, j);
 				square.setBackground(Color.YELLOW);
 				square.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-				square.addActionListener(new SquareActionListener(i, j));
+				square.addActionListener(new SquareActionListener(j, i));
 				boardPanel.add(square);
 				board.setSquare(j, i, square);
 			}
@@ -187,10 +192,9 @@ public class NetworkGame extends Game {
 	synchronized public void handleServerMessage() {
 		synchronized(messageQueue) {
 			while (!messageQueue.isEmpty()) {
-				JOptionPane.showMessageDialog(mainFrame, "Received Message!!!");
 				String message = messageQueue.get(0);
 				if (message.startsWith(String.valueOf(ServerConstants.INT_REQUEST_OK) + ",")) {
-
+					// Probably too general; leave it for now.
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE) + ",")) {
 					turn = Game.TURN_SENTE;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE) + ",")) {
@@ -210,6 +214,7 @@ public class NetworkGame extends Game {
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "The square is occupied. Please check"
 							+ " your move.", "Re-move", JOptionPane.INFORMATION_MESSAGE);
+					dirtyBit = false;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_OUT_BOUND) + ",")) {
 					// Normally this should not happen.
 					// If this happens, then there must be something wrong with game implementation.
@@ -240,13 +245,19 @@ public class NetworkGame extends Game {
 					} else {
 
 					}
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_YOUR_MOVE) + ",")) {
+					String[] coords = message.split(",");
+					int xcoord = Integer.parseInt(coords[1]);
+					int ycoord = Integer.parseInt(coords[2]);
+					dirtyBit = true;
+					board.setSquareByTurn(ycoord, xcoord, turn);
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE) + ",")) {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
 					int ycoord = Integer.parseInt(coords[2]);
 					dirtyBit = false;
-					int otherTurn = turn == Game.TURN_SENTE ? Game.TURN_GOTE : Game.TURN_SENTE;
-					board.setSquareByTurn(xcoord, ycoord, otherTurn);
+					int otherTurn = (turn == Game.TURN_SENTE) ? Game.TURN_GOTE : Game.TURN_SENTE;
+					board.setSquareByTurn(ycoord, xcoord, otherTurn);
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Your withdrawal has been approved by your opponent!",
 							"Congratulations!", JOptionPane.INFORMATION_MESSAGE);
@@ -254,11 +265,11 @@ public class NetworkGame extends Game {
 					JOptionPane.showMessageDialog(mainFrame, "Unfortunately, your opponent declined"
 							+ " your withdrawal request.", "Withdrawal Declined",
 							JOptionPane.INFORMATION_MESSAGE);
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_DECLINED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_DECLINED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Your opponent has declined your tie proposal."
 							+ "\nGood luck next time!", "Tie Proposal Declined",
 							JOptionPane.INFORMATION_MESSAGE);
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_PROPOSED))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_PROPOSED) + ",")) {
 					int response = JOptionPane.showConfirmDialog(mainFrame,
 									"Your opponent wants to tie the game."
 									+ " Do you agree?", "Tie Proposal", JOptionPane.YES_NO_OPTION);
@@ -267,7 +278,7 @@ public class NetworkGame extends Game {
 					} else {
 						serverWriter.println(ServerConstants.STR_TIE_DECLINED);
 					}
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE))) {
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Tie! Game over!", "Game Over -- Tie",
 							JOptionPane.INFORMATION_MESSAGE);
 				}
@@ -304,6 +315,7 @@ public class NetworkGame extends Game {
 			}
 
 			dirtyBit = true;
+			System.out.println(String.format("Made move %d,%d", xcoord, ycoord));
 			serverWriter.println(String.format("Move,%d,%d", xcoord, ycoord));
 		}
 

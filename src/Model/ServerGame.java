@@ -116,9 +116,9 @@ public class ServerGame {
 			}
 		}
 		if (activePlayer == SENTE) {
-			player2.notifyMove(xcoord, ycoord);
+			player2.notifyOpponentMove(xcoord, ycoord);
 		} else {
-			player1.notifyMove(xcoord, ycoord);
+			player1.notifyOpponentMove(xcoord, ycoord);
 		}
 		updateActivePlayer();
 		return ServerConstants.INT_REQUEST_OK;
@@ -229,9 +229,9 @@ public class ServerGame {
 
 		private void sendTurnMessage() {
 			if (turn == SENTE) {
-				serverOut.println(ServerConstants.INT_SENTE);
+				serverOut.println(ServerConstants.INT_SENTE + ",");
 			} else {
-				serverOut.println(ServerConstants.INT_GOTE);
+				serverOut.println(ServerConstants.INT_GOTE + ",");
 			}
 		}
 
@@ -260,25 +260,31 @@ public class ServerGame {
 						}
 					}
 				} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
-					String[] coordinates = req.split(",");
-					int xcoord = Integer.parseInt(coordinates[1]);
-					int ycoord = Integer.parseInt(coordinates[2]);
-					try {
-						board.makeMove(xcoord, ycoord);
-					} catch (InvalidMoveException e) {
-						if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
-							serverOut.println(ServerConstants.INT_MOVE_OUT_BOUND + ",");
-						} else {
-							serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
+					if (turn == activePlayer) {
+						String[] coordinates = req.split(",");
+						int xcoord = Integer.parseInt(coordinates[1]);
+						int ycoord = Integer.parseInt(coordinates[2]);
+						try {
+							board.makeMove(xcoord, ycoord);
+						} catch (InvalidMoveException e) {
+							if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
+								serverOut.println(ServerConstants.INT_MOVE_OUT_BOUND + ",");
+							} else {
+								serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
+							}
 						}
-					}
-					if (turn == SENTE) {
-						player1LastMove = new Move(xcoord, ycoord);
+						if (turn == SENTE) {
+							player1LastMove = new Move(xcoord, ycoord);
+						} else {
+							player2LastMove = new Move(xcoord, ycoord);
+						}
+						ServerGame.this.updateActivePlayer();
+						ServerGame.this.promptOtherPlayerOppnentMove(turn, xcoord, ycoord);
+						notifySelfMove(xcoord, ycoord); // TODO wrong
+						System.out.println(String.format("The player made move:%d,%d", xcoord, ycoord));
 					} else {
-						player2LastMove = new Move(xcoord, ycoord);
+						serverOut.println(ServerConstants.INT_NOT_YOUR_TURN + ",");
 					}
-					ServerGame.this.updateActivePlayer();
-					notifyMove(xcoord, ycoord);
 				} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
 					if (!giveUpReceived) {
 						serverOut.println(ServerConstants.INT_DEFEAT + ",");
@@ -346,9 +352,14 @@ public class ServerGame {
 			}
 		}
 
-		private void notifyMove(int xcoord, int ycoord) {
+		private void notifyOpponentMove(int xcoord, int ycoord) {
 			serverOut.println(String.format("%d,%d,%d", ServerConstants.INT_OPPONENT_MOVE,
 					xcoord, ycoord));
+		}
+
+		private void notifySelfMove(int xcoord, int ycoord) {
+			serverOut.println(String.format("%d,%d,%d",
+					ServerConstants.INT_YOUR_MOVE, xcoord, ycoord));
 		}
 	}
 
@@ -393,6 +404,14 @@ public class ServerGame {
 			player2.sendWithdrawMessage();
 		} else {
 			player1.sendWithdrawMessage();
+		}
+	}
+
+	private void promptOtherPlayerOppnentMove(int turn, int xcoord, int ycoord) {
+		if (turn == SENTE) {
+			player2.notifyOpponentMove(xcoord, ycoord);
+		} else {
+			player1.notifyOpponentMove(xcoord, ycoord);
 		}
 	}
 }
