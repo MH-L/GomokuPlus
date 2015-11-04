@@ -25,6 +25,7 @@ public class ServerMain {
 					System.exit(1);
 				}
 				System.out.println("Clients disconnected. Establishing new connection.");
+				System.out.println("Fuck.");
 			}
 		} finally {
 			ss.close();

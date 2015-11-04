@@ -1,5 +1,7 @@
 package application;
 
+import Model.ServerConstants;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
@@ -21,7 +23,6 @@ import javax.swing.JPanel;
 import Model.Board;
 import Model.Coordinate;
 import Model.NetworkBoard;
-import Model.ServerConstants;
 
 public class NetworkGame extends Game {
 	private JButton btnProposeTie;
@@ -31,6 +32,7 @@ public class NetworkGame extends Game {
 	private static PrintWriter serverWriter;
 	private boolean dirtyBit = false;
 	private Socket mainSocket;
+//	private static final String HOST = "104.236.97.57";
 	private static final String HOST = "localhost";
 	private static final int PORT = 1031;
 	private boolean peerConnected = true;
@@ -232,6 +234,7 @@ public class NetworkGame extends Game {
 		synchronized public void actionPerformed(ActionEvent e) {
 			if (!gameStarted) {
 				Game.warnGameFrozen();
+				return;
 			}
 			if (dirtyBit == true) {
 				multiClickWarning();

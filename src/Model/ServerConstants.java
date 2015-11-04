@@ -12,6 +12,10 @@ public final class ServerConstants {
 	public static final String STR_WITHDRAW_REQUEST = "Withdraw";
 	public static final String STR_TIE_REQUEST = "Tie";
 	public static final String STR_REQUEST_GAME_START = "Start";
+	public static final String STR_TIE_APPROVED = "ApprovedTie";
+	public static final String STR_TIE_DECLINED = "DeclineTie";
+	public static final String STR_WITHDRAW_DECLINED = "DeclineWithdraw";
+	public static final String STR_WITHDRAW_APPROVED = "ApprovedWithdraw";
 
 	/**
 	 * Server response constants.
@@ -35,6 +39,8 @@ public final class ServerConstants {
 	public static final int INT_GOTE = 17;
 	public static final int INT_OPPONENT_PROPOSED_TIE = 18;
 	public static final int INT_YOUR_MOVE = 19;
+	public static final int INT_TIE_PROPOSED = 20;
+	public static final int INT_TIE_DECLINED = 21;
 
 	public static final int MAX_CAPACITY = 10;
 }

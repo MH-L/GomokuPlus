@@ -173,19 +173,19 @@ public class ServerGame {
 					socketListener = new Thread(new Runnable() {
 						@Override
 						public void run() {
-							synchronized(requestQueue) {
-								System.out.println("Socket listener Checking request Queue.");
-								while (true) {
-									try {
-										String inline = playerIn.readLine();
-										if (inline == null) {
-											// TODO indicate the game is over.
-											break;
-										}
-										requestQueue.add(inline);
-									} catch (IOException e) {
-										// TODO Game is finished.
+							System.out.println("Socket listener Checking request Queue.");
+							while (true) {
+								try {
+									String inline = playerIn.readLine();
+									if (inline == null) {
+										// TODO indicate the game is over.
+										break;
 									}
+									synchronized(requestQueue) {
+										requestQueue.add(inline);
+									}
+								} catch (IOException e) {
+									// TODO Game is finished.
 								}
 							}
 						}
@@ -204,6 +204,12 @@ public class ServerGame {
 							gameThread.suspend();
 							handlePlayerRequests();
 							gameThread.resume();
+							System.out.println("Game thread is resumed!");
+						}
+						try {
+							Thread.sleep(200);
+						} catch (InterruptedException e) {
+							System.out.println("Oops, interrupted!");
 						}
 					}
 				}
@@ -219,58 +225,67 @@ public class ServerGame {
 			serverOut.println(ServerConstants.INT_VICTORY + ",");
 		}
 
+		private void sendTieRequestMessage() {
+			serverOut.println(ServerConstants.INT_TIE_PROPOSED + ",");
+		}
+
 		synchronized private void handlePlayerRequests() {
-			synchronized(requestQueue) {
-				while (!requestQueue.isEmpty()) {
-					String req = requestQueue.get(0);
-					if (req.startsWith(ServerConstants.STR_ONLINE)) {
-						System.out.println("Should have received this two times here.");
-						if (turn == SENTE) {
-							player1Alive = true;
-							if (player2Alive) {
-								serverOut.println(ServerConstants.INT_PEER_CONNECTED);
-							}
-						} else {
-							player2Alive = true;
-							if (player1Alive) {
-								serverOut.println(ServerConstants.INT_PEER_CONNECTED);
-							}
+			while (!requestQueue.isEmpty()) {
+				System.out.println("Request queue is not empty... dealing with requests sent from user.");
+				String req = "";
+				synchronized(requestQueue) {
+					req = requestQueue.get(0);
+				}
+				if (req.startsWith(ServerConstants.STR_ONLINE)) {
+					System.out.println("Should have received this two times here.");
+					if (turn == SENTE) {
+						player1Alive = true;
+						if (player2Alive) {
+							serverOut.println(ServerConstants.INT_PEER_CONNECTED);
 						}
-					} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
-						String[] coordinates = req.split(",");
-						int xcoord = Integer.parseInt(coordinates[1]);
-						int ycoord = Integer.parseInt(coordinates[2]);
-						try {
-							board.makeMove(xcoord, ycoord);
-						} catch (InvalidMoveException e) {
-							if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
-								serverOut.println(ServerConstants.INT_MOVE_OUT_BOUND + ",");
-							} else {
-								serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
-							}
+					} else {
+						player2Alive = true;
+						if (player1Alive) {
+							serverOut.println(ServerConstants.INT_PEER_CONNECTED);
 						}
-					} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
-						if (!giveUpReceived) {
-							serverOut.println(ServerConstants.INT_DEFEAT + ",");
-							ServerGame.this.promptPlayerForVictory(turn);
-						}
-					} else if (req.startsWith(ServerConstants.STR_QUIT)) {
-						boolean isNecessary = false;
-						if (turn == SENTE) {
-							isNecessary = player2Alive;
-						} else {
-							isNecessary = player1Alive;
-						}
-						if (isNecessary) {
-							ServerGame.this.promptPlayerForQuit(turn);
-						}
-					} else if (req.startsWith(ServerConstants.STR_MESSAGE_REQUEST)) {
-
-					} else if (req.startsWith(ServerConstants.STR_TIE_REQUEST)) {
-
-					} else if (req.startsWith(ServerConstants.STR_REQUEST_GAME_START)) {
-
 					}
+				} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
+					String[] coordinates = req.split(",");
+					int xcoord = Integer.parseInt(coordinates[1]);
+					int ycoord = Integer.parseInt(coordinates[2]);
+					try {
+						board.makeMove(xcoord, ycoord);
+					} catch (InvalidMoveException e) {
+						if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
+							serverOut.println(ServerConstants.INT_MOVE_OUT_BOUND + ",");
+						} else {
+							serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
+						}
+					}
+				} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
+					if (!giveUpReceived) {
+						serverOut.println(ServerConstants.INT_DEFEAT + ",");
+						ServerGame.this.promptPlayerForVictory(turn);
+					}
+				} else if (req.startsWith(ServerConstants.STR_QUIT)) {
+					boolean isNecessary = false;
+					if (turn == SENTE) {
+						isNecessary = player2Alive;
+					} else {
+						isNecessary = player1Alive;
+					}
+					if (isNecessary) {
+						ServerGame.this.promptPlayerForQuit(turn);
+					}
+				} else if (req.startsWith(ServerConstants.STR_MESSAGE_REQUEST)) {
+
+				} else if (req.startsWith(ServerConstants.STR_TIE_REQUEST)) {
+
+				} else if (req.startsWith(ServerConstants.STR_REQUEST_GAME_START)) {
+
+				}
+				synchronized(requestQueue) {
+					requestQueue.remove(0);
 				}
 			}
 		}
@@ -296,5 +311,13 @@ public class ServerGame {
 
 	private void updateActivePlayer() {
 		activePlayer = activePlayer == GOTE ? SENTE : GOTE;
+	}
+
+	private void promptOtherPlayerForTie(int proposerTurn) {
+		if (proposerTurn == SENTE) {
+			player2.sendTieRequestMessage();
+		} else {
+			player1.sendTieRequestMessage();
+		}
 	}
 }
