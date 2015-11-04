@@ -41,7 +41,15 @@ public class NetworkGame extends Game {
 	private ArrayList<String> messageQueue = new ArrayList<String>();
 	private String lastRequest = null;
 	private int turn = 0;
+	/**
+	 * Status bar for game status. Indicating whether the game is started,
+	 * paused or something else.
+	 */
 	private JLabel statusBar;
+	/**
+	 * Player is only allowed to propose withdraw once in each round.
+	 */
+	private boolean withdrawProposed = false;
 
 	public NetworkGame() throws InterruptedException {
 		super();
@@ -208,6 +216,10 @@ public class NetworkGame extends Game {
 					dirtyBit = false;
 					int otherTurn = turn == Game.TURN_SENTE ? Game.TURN_GOTE : Game.TURN_SENTE;
 					board.setSquareByTurn(xcoord, ycoord, otherTurn);
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
+					// do something.
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
+					// do something.
 				}
 				messageQueue.remove(0);
 			}

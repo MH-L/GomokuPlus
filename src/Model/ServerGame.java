@@ -14,9 +14,7 @@ public class ServerGame {
 	private int activePlayer;
 	private ServerPlayer player1;
 	private ServerPlayer player2;
-	private boolean gameStarted = false;
-	volatile private boolean player1Started = false;
-	volatile private boolean player2Started = false;
+	volatile private boolean gameStarted = false;
 	volatile private boolean player1Alive = false;
 	volatile private boolean player2Alive = false;
 	private Move player1LastMove = null;
@@ -217,6 +215,10 @@ public class ServerGame {
 			coordinator.start();
 		}
 
+		private void sendPeerConnectedMessage() {
+			serverOut.println(ServerConstants.INT_PEER_CONNECTED + ",");
+		}
+
 		private void sendQuitMessage() {
 			serverOut.println(ServerConstants.INT_PEER_DISCONNECTED + ",");
 		}
@@ -227,6 +229,10 @@ public class ServerGame {
 
 		private void sendTieRequestMessage() {
 			serverOut.println(ServerConstants.INT_TIE_PROPOSED + ",");
+		}
+
+		private void sendGameStartMessage() {
+			serverOut.println(ServerConstants.INT_GAME_START_APPORVED + ",");
 		}
 
 		synchronized private void handlePlayerRequests() {
@@ -241,12 +247,12 @@ public class ServerGame {
 					if (turn == SENTE) {
 						player1Alive = true;
 						if (player2Alive) {
-							serverOut.println(ServerConstants.INT_PEER_CONNECTED);
+							sendPeerConnectedMessage();
 						}
 					} else {
 						player2Alive = true;
 						if (player1Alive) {
-							serverOut.println(ServerConstants.INT_PEER_CONNECTED);
+							sendPeerConnectedMessage();
 						}
 					}
 				} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
@@ -280,8 +286,30 @@ public class ServerGame {
 				} else if (req.startsWith(ServerConstants.STR_MESSAGE_REQUEST)) {
 
 				} else if (req.startsWith(ServerConstants.STR_TIE_REQUEST)) {
-
+					ServerGame.this.promptOtherPlayerForTie(turn);
 				} else if (req.startsWith(ServerConstants.STR_REQUEST_GAME_START)) {
+					if (!gameStarted) {
+						if (turn == SENTE) {
+							if (player2Alive) {
+								gameStarted = true;
+								sendGameStartMessage();
+								ServerGame.this.promptOtherPlayerForStart(turn);
+							}
+						} else {
+							if (player1Alive) {
+								gameStarted = true;
+								sendGameStartMessage();
+								ServerGame.this.promptOtherPlayerForStart(turn);
+							}
+						}
+					}
+				} else if (req.startsWith(ServerConstants.STR_TIE_APPROVED)) {
+
+				} else if (req.startsWith(ServerConstants.STR_TIE_DECLINED)) {
+
+				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_APPROVED)) {
+
+				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_DECLINED)) {
 
 				}
 				synchronized(requestQueue) {
@@ -318,6 +346,22 @@ public class ServerGame {
 			player2.sendTieRequestMessage();
 		} else {
 			player1.sendTieRequestMessage();
+		}
+	}
+
+	private void promptOtherPlayerForStart(int alreadyInformed) {
+		if (alreadyInformed == SENTE) {
+			player2.sendGameStartMessage();
+		} else {
+			player1.sendGameStartMessage();
+		}
+	}
+
+	private void promptOtherPlayerPeerConnected(int alreadyConnected) {
+		if (alreadyConnected == SENTE) {
+			player2.sendPeerConnectedMessage();
+		} else {
+			player1.sendPeerConnectedMessage();
 		}
 	}
 }
