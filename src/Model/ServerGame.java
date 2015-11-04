@@ -10,6 +10,10 @@ import java.util.ArrayList;
 public class ServerGame {
 	private static final int SENTE = 1;
 	private static final int GOTE = 2;
+	private static final int RESULT_SENTE = 3;
+	private static final int RESULT_GOTE = 2;
+	private static final int RESULT_UNDECIDED = 1;
+	private static final int NUM_STONE_TO_WIN = 5;
 	private ServerBoard board;
 	private int activePlayer;
 	private ServerPlayer player1;
@@ -82,6 +86,11 @@ public class ServerGame {
 
 		private ServerBoard() {
 			grid = new int[height][width];
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
+					grid[i][j] = EMPTY_SPOT;
+				}
+			}
 		}
 
 		private void makeMove(int xcoord, int ycoord) throws InvalidMoveException {
@@ -92,6 +101,144 @@ public class ServerGame {
 				throw new InvalidMoveException(MOVE_SQUARE_OCCUPIED);
 			}
 			grid[ycoord][xcoord] = activePlayer == 1 ? SENTE_STONE : GOTE_STONE;
+		}
+
+		private int checkDiagWinning() {
+			int i = 0;
+			int j = 0;
+			int iStartIndex = 0;
+			int jStartIndex = 0;
+			while (i + j < width + height - 1) {
+				int counter = 0;
+				int prev = EMPTY_SPOT;
+				while (j > -1 && i < height) {
+					if (grid[i][j] != EMPTY_SPOT) {
+						if (grid[i][j] == prev) {
+							counter ++;
+						} else {
+							counter = 1;
+						}
+					} else
+						counter = 0;
+					if (counter == NUM_STONE_TO_WIN) {
+						if (grid[i][j] == SENTE_STONE) {
+							return RESULT_SENTE;
+						} else {
+							return RESULT_GOTE;
+						}
+					}
+					prev = grid[i][j];
+					i++;
+					j--;
+				}
+				if (jStartIndex >= width - 1) {
+					iStartIndex ++;
+				} else {
+					jStartIndex ++;
+				}
+				i = iStartIndex;
+				j = jStartIndex;
+			}
+
+			j = width - 1;
+			i = 0;
+			iStartIndex = 0;
+			jStartIndex = width - 1;
+			while (i - j < width) {
+				int counter = 0;
+				int prev = EMPTY_SPOT;
+				while (j < width && i < height) {
+					if (grid[i][j] != EMPTY_SPOT) {
+						if (grid[i][j] == prev) {
+							counter ++;
+						} else {
+							counter = 1;
+						}
+					} else {
+						counter = 0;
+					}
+					if (counter == NUM_STONE_TO_WIN) {
+						if (grid[i][j] == SENTE_STONE) {
+							return RESULT_SENTE;
+						} else {
+							return RESULT_GOTE;
+						}
+					}
+					prev = grid[i][j];
+					i++;
+					j++;
+				}
+				if (jStartIndex > 0) {
+					jStartIndex --;
+				} else {
+					iStartIndex ++;
+				}
+				i = iStartIndex;
+				j = jStartIndex;
+			}
+			return RESULT_UNDECIDED;
+		}
+
+		private int checkRowColWinning() {
+			// Check for rows.
+			for (int i = 0; i < height; i++) {
+				int counter = 0;
+				int prev = EMPTY_SPOT;
+				for (int j = 0; j < width; j++) {
+					if (grid[i][j] != EMPTY_SPOT) {
+						if (grid[i][j] == prev) {
+							counter ++;
+						} else {
+							counter = 1;
+						}
+					} else {
+						counter = 0;
+					}
+					if (counter == NUM_STONE_TO_WIN) {
+						if (grid[i][j] == SENTE_STONE) {
+							return RESULT_SENTE;
+						} else {
+							return RESULT_GOTE;
+						}
+					}
+					prev = grid[i][j];
+				}
+			}
+
+			// Check for columns.
+			for (int i = 0; i < width; i++) {
+				int counter = 0;
+				int prev = EMPTY_SPOT;
+				for (int j = 0; j < height; j++) {
+					if (grid[j][i] != EMPTY_SPOT) {
+						if (grid[j][i] == prev) {
+							counter ++;
+						} else {
+							counter = 1;
+						}
+					} else {
+						counter = 0;
+					}
+					if (counter == NUM_STONE_TO_WIN) {
+						if (grid[j][i] == SENTE_STONE) {
+							return RESULT_SENTE;
+						} else {
+							return RESULT_GOTE;
+						}
+					}
+					prev = grid[j][i];
+				}
+			}
+			return RESULT_UNDECIDED;
+		}
+
+		private int gameOver() {
+			int resultRowCol = checkRowColWinning();
+			if (resultRowCol != RESULT_UNDECIDED) {
+				return resultRowCol;
+			} else {
+				return checkDiagWinning();
+			}
 		}
 	}
 

@@ -314,8 +314,6 @@ public class NetworkGame extends Game {
 				return;
 			}
 
-			dirtyBit = true;
-			System.out.println(String.format("Made move %d,%d", xcoord, ycoord));
 			serverWriter.println(String.format("Move,%d,%d", xcoord, ycoord));
 		}
 
