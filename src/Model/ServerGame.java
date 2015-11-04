@@ -104,22 +104,6 @@ public class ServerGame {
 		}
 	}
 
-	private int processWithdraw() {
-		return ServerConstants.INT_WITHDRAW_DECLINED;
-	}
-
-	private int processSurrender() {
-		return ServerConstants.INT_REQUEST_OK;
-	}
-
-	private int processMessage() {
-		return ServerConstants.INT_REQUEST_OK;
-	}
-
-	private int processPlayerQuit() {
-		return ServerConstants.INT_REQUEST_OK;
-	}
-
 	private int processMove(int xcoord, int ycoord) {
 		// TODO need to parse the string passed in.
 		try {
@@ -231,8 +215,16 @@ public class ServerGame {
 			serverOut.println(ServerConstants.INT_TIE_PROPOSED + ",");
 		}
 
+		private void sendGameTieMessage() {
+			serverOut.println(ServerConstants.INT_TIE + ",");
+		}
+
 		private void sendGameStartMessage() {
 			serverOut.println(ServerConstants.INT_GAME_START_APPORVED + ",");
+		}
+
+		private void sendWithdrawMessage() {
+			serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED);
 		}
 
 		synchronized private void handlePlayerRequests() {
@@ -248,11 +240,13 @@ public class ServerGame {
 						player1Alive = true;
 						if (player2Alive) {
 							sendPeerConnectedMessage();
+							promptOtherPlayerPeerConnected(turn);
 						}
 					} else {
 						player2Alive = true;
 						if (player1Alive) {
 							sendPeerConnectedMessage();
+							promptOtherPlayerPeerConnected(turn);
 						}
 					}
 				} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
@@ -268,6 +262,13 @@ public class ServerGame {
 							serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
 						}
 					}
+					if (turn == SENTE) {
+						player1LastMove = new Move(xcoord, ycoord);
+					} else {
+						player2LastMove = new Move(xcoord, ycoord);
+					}
+					ServerGame.this.updateActivePlayer();
+					notifyMove(xcoord, ycoord);
 				} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
 					if (!giveUpReceived) {
 						serverOut.println(ServerConstants.INT_DEFEAT + ",");
@@ -284,7 +285,7 @@ public class ServerGame {
 						ServerGame.this.promptPlayerForQuit(turn);
 					}
 				} else if (req.startsWith(ServerConstants.STR_MESSAGE_REQUEST)) {
-
+					// TODO message services have not been implemented yet.
 				} else if (req.startsWith(ServerConstants.STR_TIE_REQUEST)) {
 					ServerGame.this.promptOtherPlayerForTie(turn);
 				} else if (req.startsWith(ServerConstants.STR_REQUEST_GAME_START)) {
@@ -304,13 +305,17 @@ public class ServerGame {
 						}
 					}
 				} else if (req.startsWith(ServerConstants.STR_TIE_APPROVED)) {
-
+					sendGameTieMessage();
+					promptOtherPlayerTieMessage(turn);
 				} else if (req.startsWith(ServerConstants.STR_TIE_DECLINED)) {
-
+					serverOut.println(ServerConstants.INT_TIE_DECLINED + ",");
 				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_APPROVED)) {
-
+					// TODO the withdraw logic is not flawless.
+					// maybe just tell the client which moves to withdraw?
+					sendWithdrawMessage();
+					ServerGame.this.promptOtherPlayerWithdraw(turn);
 				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_DECLINED)) {
-
+					serverOut.println(ServerConstants.INT_WITHDRAW_DECLINED + ",");
 				}
 				synchronized(requestQueue) {
 					requestQueue.remove(0);
@@ -362,6 +367,22 @@ public class ServerGame {
 			player2.sendPeerConnectedMessage();
 		} else {
 			player1.sendPeerConnectedMessage();
+		}
+	}
+
+	private void promptOtherPlayerTieMessage(int prompted) {
+		if (prompted == SENTE) {
+			player2.sendGameTieMessage();
+		} else {
+			player1.sendGameTieMessage();
+		}
+	}
+
+	private void promptOtherPlayerWithdraw(int turn) {
+		if (turn == SENTE) {
+			player2.sendWithdrawMessage();
+		} else {
+			player1.sendWithdrawMessage();
 		}
 	}
 }
