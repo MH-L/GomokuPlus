@@ -12,6 +12,7 @@ public class ServerGame {
 	private static final int GOTE = 2;
 	private static final int RESULT_SENTE = 3;
 	private static final int RESULT_GOTE = 2;
+	private static final int RESULT_TIE = 4;
 	private static final int RESULT_UNDECIDED = 1;
 	private static final int NUM_STONE_TO_WIN = 5;
 	private ServerBoard board;
@@ -233,12 +234,26 @@ public class ServerGame {
 		}
 
 		private int gameOver() {
+			if (boardFull()) {
+				return RESULT_TIE;
+			}
 			int resultRowCol = checkRowColWinning();
 			if (resultRowCol != RESULT_UNDECIDED) {
 				return resultRowCol;
 			} else {
 				return checkDiagWinning();
 			}
+		}
+
+		private boolean boardFull() {
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < height; j++) {
+					if (grid[i][j] == EMPTY_SPOT) {
+						return false;
+					}
+				}
+			}
+			return true;
 		}
 	}
 
@@ -427,8 +442,30 @@ public class ServerGame {
 						}
 						ServerGame.this.updateActivePlayer();
 						ServerGame.this.promptOtherPlayerOppnentMove(turn, xcoord, ycoord);
-						notifySelfMove(xcoord, ycoord); // TODO wrong
-						System.out.println(String.format("The player made move:%d,%d", xcoord, ycoord));
+						notifySelfMove(xcoord, ycoord);
+						int gameResult = board.gameOver();
+						if (gameResult != RESULT_UNDECIDED) {
+							if (gameResult == RESULT_SENTE) {
+								if (turn == SENTE) {
+									sendWinMessage();
+									ServerGame.this.promptOtherPlayerForLost(turn);
+								} else {
+									sendLostMessage();
+									ServerGame.this.promptOtherPlayerForVictory(turn);
+								}
+							} else if (gameResult == RESULT_GOTE) {
+								if (turn == GOTE) {
+									sendWinMessage();
+									ServerGame.this.promptOtherPlayerForLost(turn);
+								} else {
+									sendLostMessage();
+									ServerGame.this.promptOtherPlayerForVictory(turn);
+								}
+							} else {
+								serverOut.println(ServerConstants.INT_TIE + ",");
+								ServerGame.this.promptOtherPlayerForTie(turn);
+							}
+						}
 					} else {
 						serverOut.println(ServerConstants.INT_NOT_YOUR_TURN + ",");
 					}
@@ -508,6 +545,14 @@ public class ServerGame {
 			serverOut.println(String.format("%d,%d,%d",
 					ServerConstants.INT_YOUR_MOVE, xcoord, ycoord));
 		}
+
+		private void sendLostMessage() {
+			serverOut.println(ServerConstants.INT_DEFEAT + ",");
+		}
+
+		private void sendWinMessage() {
+			serverOut.println(ServerConstants.INT_VICTORY + ",");
+		}
 	}
 
 	private void updateActivePlayer() {
@@ -559,6 +604,22 @@ public class ServerGame {
 			player2.notifyOpponentMove(xcoord, ycoord);
 		} else {
 			player1.notifyOpponentMove(xcoord, ycoord);
+		}
+	}
+
+	private void promptOtherPlayerForLost(int turn) {
+		if (turn == SENTE) {
+			player2.sendLostMessage();
+		} else {
+			player1.sendLostMessage();
+		}
+	}
+
+	private void promptOtherPlayerForVictory(int turn) {
+		if (turn == SENTE) {
+			player2.sendWinMessage();
+		} else {
+			player1.sendWinMessage();
 		}
 	}
 }
