@@ -32,8 +32,7 @@ public class NetworkGame extends Game {
 	private static PrintWriter serverWriter;
 	private boolean dirtyBit = false;
 	private Socket mainSocket;
-//	private static final String HOST = "104.236.97.57";
-	private static final String HOST = "localhost";
+	private static final String HOST = "104.236.97.57";
 	private static final int PORT = 1031;
 	private boolean peerConnected = true;
 	private boolean gameStarted = false;
@@ -41,7 +40,7 @@ public class NetworkGame extends Game {
 	private ArrayList<String> messageQueue = new ArrayList<String>();
 	private String lastRequest = null;
 	private Object booleanLock = new Object();
-	private int turn = 0;
+	private int turn;
 	/**
 	 * Status bar for game status. Indicating whether the game is started,
 	 * paused or something else.
@@ -95,12 +94,16 @@ public class NetworkGame extends Game {
 								String line = serverReader.readLine();
 								if (line != "" && line != null) {
 									System.out.println("Received reply from the server.");
-									messageReceived = true;
+									synchronized(booleanLock) {
+										messageReceived = true;
+									}
 									synchronized(messageQueue) {
 										messageQueue.add(line);
 									}
 								} else if (line == null) {
-									// do something since server is no longer reachable.
+									JOptionPane.showMessageDialog(mainFrame, "You are disconnected from the game server."
+											+ "\nPlease log on once again.", "Game Info -- Disconnected",
+											JOptionPane.INFORMATION_MESSAGE);
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
@@ -123,6 +126,7 @@ public class NetworkGame extends Game {
 						// do something here.
 						handleServerMessage();
 						gameThread.resume();
+						System.out.println("Game thread resumed");
 					}
 					try {
 						Thread.sleep(10);
@@ -190,6 +194,7 @@ public class NetworkGame extends Game {
 	}
 
 	synchronized public void handleServerMessage() {
+//		System.out.println("I am " + (turn == TURN_SENTE ? "SENTE" : "GOTE"));
 		synchronized(messageQueue) {
 			while (!messageQueue.isEmpty()) {
 				String message = messageQueue.get(0);
@@ -197,8 +202,10 @@ public class NetworkGame extends Game {
 					// Probably too general; leave it for now.
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE) + ",")) {
 					turn = Game.TURN_SENTE;
+					System.out.println("I am sente!");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE) + ",")) {
 					turn = Game.TURN_GOTE;
+					System.out.println("I am gote!");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_CONNECTED) + ",")) {
 					statusBar.setText("Peer Connected");
 					peerConnected = true;
@@ -284,6 +291,9 @@ public class NetworkGame extends Game {
 				}
 				messageQueue.remove(0);
 			}
+		}
+		synchronized(booleanLock) {
+			messageReceived = false;
 		}
 	}
 
