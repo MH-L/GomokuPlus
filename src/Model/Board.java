@@ -324,13 +324,16 @@ public class Board {
 			} catch (IOException e1) {
 				Game.errorRendering();
 			}
-		} else {
+		} else if (turn == Game.TURN_GOTE) {
 			try {
 				Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
 				grid[y][x].setIcon(new ImageIcon(img));
 			} catch (IOException e1) {
 				Game.errorRendering();
 			}
+		} else {
+			// Something went wrong apparently.
+			grid[y][x].setBackground(Color.RED);
 		}
 	}
 }

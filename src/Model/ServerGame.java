@@ -94,7 +94,7 @@ public class ServerGame {
 			}
 		}
 
-		private void makeMove(int xcoord, int ycoord) throws InvalidMoveException {
+		synchronized private void makeMove(int xcoord, int ycoord) throws InvalidMoveException {
 			if (xcoord > width || ycoord >= height || xcoord < 0 || ycoord < 0) {
 				throw new InvalidMoveException(MOVE_OUT_BOUND);
 			}
@@ -385,8 +385,14 @@ public class ServerGame {
 			serverOut.println(ServerConstants.INT_GAME_START_APPORVED + ",");
 		}
 
-		private void sendWithdrawMessage() {
-			serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED);
+		private void sendWithdrawMessage(int firstX, int firstY, int secondX, int secondY) {
+			if (secondX == -1 && secondY == -1) {
+				serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED +
+						String.format(",%d,%d", firstX, firstY));
+			} else {
+				serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED +
+						String.format(",%d,%d,%d,%d", firstX, firstY, secondX, secondY));
+			}
 		}
 
 		private void sendTurnMessage() {
@@ -409,18 +415,18 @@ public class ServerGame {
 					if (turn == SENTE) {
 						player1Alive = true;
 						if (player2Alive) {
+							// TODO turn message not correct.
 							sendPeerConnectedMessage();
 							promptOtherPlayerPeerConnected(turn);
-							sendTurnMessage();
 						}
 					} else {
 						player2Alive = true;
 						if (player1Alive) {
 							sendPeerConnectedMessage();
 							promptOtherPlayerPeerConnected(turn);
-							sendTurnMessage();
 						}
 					}
+					sendTurnMessage();
 				} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
 					if (turn == activePlayer) {
 						String[] coordinates = req.split(",");
@@ -434,6 +440,10 @@ public class ServerGame {
 							} else {
 								serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
 							}
+							synchronized(requestQueue) {
+								requestQueue.remove(0);
+							}
+							continue;
 						}
 						if (turn == SENTE) {
 							player1LastMove = new Move(xcoord, ycoord);
@@ -512,10 +522,43 @@ public class ServerGame {
 				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_APPROVED)) {
 					// TODO the withdraw logic is not flawless.
 					// maybe just tell the client which moves to withdraw?
-					sendWithdrawMessage();
-					ServerGame.this.promptOtherPlayerWithdraw(turn);
+					int firstX = -1, firstY = -1, secondX = -1, secondY = -1;
+					if (turn == SENTE && player2LastMove != null) {
+						firstX = player2LastMove.x;
+						firstY = player2LastMove.y;
+						if (activePlayer == GOTE) {
+							secondX = player1LastMove.x;
+							secondY = player2LastMove.y;
+						}
+						sendWithdrawMessage(firstX, firstY, secondX, secondY);
+						ServerGame.this.promptOtherPlayerWithdraw(turn, firstX, firstY, secondX, secondY);
+					} else if (player1LastMove != null) {
+						firstX = player1LastMove.x;
+						firstY = player1LastMove.y;
+						if (activePlayer == SENTE) {
+							secondX = player2LastMove.x;
+							secondY = player2LastMove.y;
+						}
+						sendWithdrawMessage(firstX, firstY, secondX, secondY);
+						ServerGame.this.promptOtherPlayerWithdraw(turn, firstX, firstY, secondX, secondY);
+					} else {
+						serverOut.println(ServerConstants.INT_WITHDRAW_FAILED + ",");
+					}
 				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_DECLINED)) {
 					serverOut.println(ServerConstants.INT_WITHDRAW_DECLINED + ",");
+				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_REQUEST)) {
+					if (turn == SENTE) {
+						if (player1LastMove != null) {
+							if (ServerGame.this.activePlayer == SENTE) {
+								serverOut.println(ServerConstants.int_wi);
+							}
+						} else {
+							serverOut.println(ServerConstants.INT_WITHDRAW_FAILED + ",");
+						}
+					} else {
+
+					}
+					ServerGame.this.promptOtherPlayerForWithdraw(turn);
 				}
 				synchronized(requestQueue) {
 					requestQueue.remove(0);
@@ -552,6 +595,10 @@ public class ServerGame {
 
 		private void sendWinMessage() {
 			serverOut.println(ServerConstants.INT_VICTORY + ",");
+		}
+
+		public void sendWithdrawRequestMsg() {
+			serverOut.println(ServerConstants.INT_WITHDRAW_MESSAGE + ",");
 		}
 	}
 
@@ -591,11 +638,12 @@ public class ServerGame {
 		}
 	}
 
-	private void promptOtherPlayerWithdraw(int turn) {
+	private void promptOtherPlayerWithdraw(int turn, int firstX,
+			int firstY, int secondX, int secondY) {
 		if (turn == SENTE) {
-			player2.sendWithdrawMessage();
+			player2.sendWithdrawMessage(firstX, firstY, secondX, secondY);
 		} else {
-			player1.sendWithdrawMessage();
+			player1.sendWithdrawMessage(firstX, firstY, secondX, secondY);
 		}
 	}
 
@@ -620,6 +668,14 @@ public class ServerGame {
 			player2.sendWinMessage();
 		} else {
 			player1.sendWinMessage();
+		}
+	}
+
+	private void promptOtherPlayerForWithdraw(int turn) {
+		if (turn == SENTE) {
+			player2.sendWithdrawRequestMsg();
+		} else {
+			player1.sendWithdrawRequestMsg();
 		}
 	}
 }

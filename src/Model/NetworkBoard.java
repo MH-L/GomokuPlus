@@ -26,7 +26,13 @@ public final class NetworkBoard extends Board {
 	public void addCellsToBoard(JPanel boardPanel) {}
 
 	public void setSquare(int xcoord, int ycoord, Coordinate square) {
+		// This is possibly changed from its correct version because
+		// I could not find anything wrong before...
 		grid[xcoord][ycoord] = square;
+	}
+
+	public void resetSquare(int xcoord, int ycoord) {
+		grid[ycoord][xcoord].setIcon(null);
 	}
 
 }

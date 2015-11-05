@@ -39,6 +39,7 @@ public final class ServerConstants {
 	public static final int INT_YOUR_MOVE = 19;
 	public static final int INT_TIE_PROPOSED = 20;
 	public static final int INT_TIE_DECLINED = 21;
+	public static final int INT_WITHDRAW_FAILED = 22;
 
 	public static final int MAX_CAPACITY = 10;
 }

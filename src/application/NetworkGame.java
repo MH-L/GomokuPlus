@@ -121,7 +121,7 @@ public class NetworkGame extends Game {
 				socketListener.start();
 				gameThread.start();
 				while (true) {
-					if (messageReceived = true) {
+					if (messageReceived) {
 						gameThread.suspend();
 						// do something here.
 						handleServerMessage();
@@ -172,6 +172,7 @@ public class NetworkGame extends Game {
 							JOptionPane.WARNING_MESSAGE);
 					return;
 				} else {
+					withdrawProposed = true;
 					serverWriter.println(ServerConstants.STR_WITHDRAW_REQUEST);
 				}
 			}
@@ -239,10 +240,6 @@ public class NetworkGame extends Game {
 					} else {
 						serverWriter.println(ServerConstants.STR_WITHDRAW_DECLINED);
 					}
-				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
-					String[] withdrawCoordinates = message.split(",");
-					// do something with withdrawal.
-					// Not a high priority now.
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED) + ",")) {
 					int choice = JOptionPane.showConfirmDialog(mainFrame,
 							"Your opponent quitted the game. Do you want to \n stay in the game?",
@@ -265,9 +262,26 @@ public class NetworkGame extends Game {
 					dirtyBit = false;
 					int otherTurn = (turn == Game.TURN_SENTE) ? Game.TURN_GOTE : Game.TURN_SENTE;
 					board.setSquareByTurn(ycoord, xcoord, otherTurn);
+					withdrawProposed = false;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
-					JOptionPane.showMessageDialog(mainFrame, "Your withdrawal has been approved by your opponent!",
-							"Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+					if (withdrawProposed) {
+						JOptionPane.showMessageDialog(mainFrame, "Your withdrawal"
+								+ " has been approved by your opponent!",
+								"Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+					}
+					String[] coordinates = message.split(",");
+					if (coordinates.length == 5) {
+						int firstX = Integer.parseInt(coordinates[1]);
+						int firstY = Integer.parseInt(coordinates[2]);
+						int secondX = Integer.parseInt(coordinates[3]);
+						int secondY = Integer.parseInt(coordinates[4]);
+						board.resetSquare(firstX, firstY);
+						board.resetSquare(secondX, secondY);
+					} else {
+						int firstX = Integer.parseInt(coordinates[1]);
+						int firstY = Integer.parseInt(coordinates[2]);
+						board.resetSquare(firstX, firstY);
+					}
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Unfortunately, your opponent declined"
 							+ " your withdrawal request.", "Withdrawal Declined",
@@ -288,6 +302,10 @@ public class NetworkGame extends Game {
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Tie! Game over!", "Game Over -- Tie",
 							JOptionPane.INFORMATION_MESSAGE);
+				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_FAILED))) {
+					JOptionPane.showMessageDialog(mainFrame, "You have nothing to withdraw "
+							+ "or you cannot\nwithdraw twice.", "Withdraw Failed",
+							JOptionPane.WARNING_MESSAGE);
 				}
 				messageQueue.remove(0);
 			}
