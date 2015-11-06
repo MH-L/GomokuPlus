@@ -16,6 +16,7 @@ public final class ServerConstants {
 	public static final String STR_TIE_DECLINED = "DeclineTie";
 	public static final String STR_WITHDRAW_DECLINED = "DeclineWithdraw";
 	public static final String STR_WITHDRAW_APPROVED = "ApprovedWithdraw";
+	public static final String STR_AVAILABLE = "Available";
 
 	/**
 	 * Server response constants.

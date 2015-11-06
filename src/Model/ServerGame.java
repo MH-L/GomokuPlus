@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ServerGame {
 	private static final int SENTE = 1;
@@ -304,6 +306,9 @@ public class ServerGame {
 		private Thread socketListener;
 		private Thread gameThread;
 		private ArrayList<String> requestQueue = new ArrayList<String>();
+		private long lastReply = 0L;
+		private static final long RESPONSE_DELTA = 1200;
+		private static final long CHECK_DELTA = 200;
 
 		private ServerPlayer(Socket playerSocket, final int turn) throws IOException {
 			playerIn = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
@@ -343,12 +348,23 @@ public class ServerGame {
 						@Override
 						public void run() {
 							System.out.println("Game thread dealing with game logics.");
+							Timer threadTimer = new Timer();
+							threadTimer.schedule(new TimerTask() {
+								@Override
+								public void run() {
+									if (lastReply != 0 && System.currentTimeMillis()
+											- lastReply > RESPONSE_DELTA) {
+										ServerGame.this.promptOtherPlayerPeerDisconnected(turn);
+									}
+								}
+							}, CHECK_DELTA, CHECK_DELTA);
 						}
 					});
 					socketListener.start();
 					gameThread.start();
 					while (true) {
 						if (!requestQueue.isEmpty()) {
+							lastReply = System.currentTimeMillis();
 							System.out.println("Received message from game client.");
 							gameThread.suspend();
 							handlePlayerRequests();
@@ -368,6 +384,10 @@ public class ServerGame {
 
 		private void sendPeerConnectedMessage() {
 			serverOut.println(ServerConstants.INT_PEER_CONNECTED + ",");
+		}
+
+		private void sendPeerDisconnectedMessage() {
+			serverOut.println(ServerConstants.INT_PEER_DISCONNECTED + ",");
 		}
 
 		private void sendQuitMessage() {
@@ -696,6 +716,14 @@ public class ServerGame {
 			player2.sendWithdrawDeclinedMsg();
 		} else {
 			player1.sendWithdrawDeclinedMsg();
+		}
+	}
+
+	private void promptOtherPlayerPeerDisconnected(int turn) {
+		if (turn == SENTE) {
+			player2.sendPeerDisconnectedMessage();
+		} else {
+			player1.sendPeerDisconnectedMessage();
 		}
 	}
 }

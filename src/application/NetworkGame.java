@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -34,6 +36,7 @@ public class NetworkGame extends Game {
 	private Socket mainSocket;
 	private static final String HOST = "104.236.97.57";
 	private static final int PORT = 1031;
+	private static final int MESSAGE_INTERVAL = 500;
 	private boolean peerConnected = true;
 	private boolean gameStarted = false;
 	private boolean messageReceived = false;
@@ -116,6 +119,14 @@ public class NetworkGame extends Game {
 					public void run() {
 						System.err.println("Sending online request.");
 						serverWriter.println("Online");
+						Timer timer = new Timer();
+						timer.schedule(new TimerTask() {
+							@Override
+							public void run() {
+								serverWriter.println(ServerConstants.STR_AVAILABLE);
+								System.out.println(System.currentTimeMillis());
+							}
+						}, MESSAGE_INTERVAL, MESSAGE_INTERVAL);
 					}
 				});
 				socketListener.start();
