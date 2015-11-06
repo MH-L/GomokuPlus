@@ -177,6 +177,12 @@ public class NetworkGame extends Game {
 				}
 			}
 		});
+		btnGiveUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
 	}
 
 	public void addCellsToBoard() {
@@ -195,7 +201,6 @@ public class NetworkGame extends Game {
 	}
 
 	synchronized public void handleServerMessage() {
-//		System.out.println("I am " + (turn == TURN_SENTE ? "SENTE" : "GOTE"));
 		synchronized(messageQueue) {
 			while (!messageQueue.isEmpty()) {
 				String message = messageQueue.get(0);
@@ -241,6 +246,8 @@ public class NetworkGame extends Game {
 						serverWriter.println(ServerConstants.STR_WITHDRAW_DECLINED);
 					}
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_DISCONNECTED) + ",")) {
+					System.out.println("Aaaaaa your peer doesn't like you!");
+					statusBar.setText("Peer Quitted");
 					int choice = JOptionPane.showConfirmDialog(mainFrame,
 							"Your opponent quitted the game. Do you want to \n stay in the game?",
 							"Opponent Quit", JOptionPane.INFORMATION_MESSAGE);
@@ -282,6 +289,7 @@ public class NetworkGame extends Game {
 						int firstY = Integer.parseInt(coordinates[2]);
 						board.resetSquare(firstX, firstY);
 					}
+					dirtyBit = false;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Unfortunately, your opponent declined"
 							+ " your withdrawal request.", "Withdrawal Declined",

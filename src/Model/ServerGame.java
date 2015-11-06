@@ -305,7 +305,7 @@ public class ServerGame {
 		private Thread gameThread;
 		private ArrayList<String> requestQueue = new ArrayList<String>();
 
-		private ServerPlayer(Socket playerSocket, int turn) throws IOException {
+		private ServerPlayer(Socket playerSocket, final int turn) throws IOException {
 			playerIn = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
 			serverOut = new PrintWriter(playerSocket.getOutputStream(), true);
 			this.turn = turn;
@@ -322,8 +322,13 @@ public class ServerGame {
 								try {
 									String inline = playerIn.readLine();
 									if (inline == null) {
-										// TODO indicate the game is over.
-										break;
+										if (turn == SENTE) {
+											ServerGame.this.player1Alive = false;
+										} else {
+											ServerGame.this.player2Alive = false;
+										}
+										sendQuitMessage();
+										return;
 									}
 									synchronized(requestQueue) {
 										requestQueue.add(inline);
@@ -403,6 +408,10 @@ public class ServerGame {
 			}
 		}
 
+		private void sendWithdrawDeclinedMsg() {
+			serverOut.println(ServerConstants.INT_WITHDRAW_DECLINED + ",");
+		}
+
 		synchronized private void handlePlayerRequests() {
 			while (!requestQueue.isEmpty()) {
 				System.out.println("Request queue is not empty... dealing with requests sent from user.");
@@ -428,56 +437,60 @@ public class ServerGame {
 					}
 					sendTurnMessage();
 				} else if (req.startsWith(ServerConstants.STR_MOVE_REQUEST)) {
-					if (turn == activePlayer) {
-						String[] coordinates = req.split(",");
-						int xcoord = Integer.parseInt(coordinates[1]);
-						int ycoord = Integer.parseInt(coordinates[2]);
-						try {
-							board.makeMove(xcoord, ycoord);
-						} catch (InvalidMoveException e) {
-							if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
-								serverOut.println(ServerConstants.INT_MOVE_OUT_BOUND + ",");
+					if (player1Alive && player2Alive) {
+						if (turn == activePlayer) {
+							String[] coordinates = req.split(",");
+							int xcoord = Integer.parseInt(coordinates[1]);
+							int ycoord = Integer.parseInt(coordinates[2]);
+							try {
+								board.makeMove(xcoord, ycoord);
+							} catch (InvalidMoveException e) {
+								if (e.errorReason == ServerBoard.MOVE_OUT_BOUND) {
+									serverOut.println(ServerConstants.INT_MOVE_OUT_BOUND + ",");
+								} else {
+									serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
+								}
+								synchronized(requestQueue) {
+									requestQueue.remove(0);
+								}
+								continue;
+							}
+							if (turn == SENTE) {
+								player1LastMove = new Move(xcoord, ycoord);
 							} else {
-								serverOut.println(ServerConstants.INT_MOVE_SQUARE_OCCUPIED + ",");
+								player2LastMove = new Move(xcoord, ycoord);
 							}
-							synchronized(requestQueue) {
-								requestQueue.remove(0);
+							ServerGame.this.updateActivePlayer();
+							ServerGame.this.promptOtherPlayerOppnentMove(turn, xcoord, ycoord);
+							notifySelfMove(xcoord, ycoord);
+							int gameResult = board.gameOver();
+							if (gameResult != RESULT_UNDECIDED) {
+								if (gameResult == RESULT_SENTE) {
+									if (turn == SENTE) {
+										sendWinMessage();
+										ServerGame.this.promptOtherPlayerForLost(turn);
+									} else {
+										sendLostMessage();
+										ServerGame.this.promptOtherPlayerForVictory(turn);
+									}
+								} else if (gameResult == RESULT_GOTE) {
+									if (turn == GOTE) {
+										sendWinMessage();
+										ServerGame.this.promptOtherPlayerForLost(turn);
+									} else {
+										sendLostMessage();
+										ServerGame.this.promptOtherPlayerForVictory(turn);
+									}
+								} else {
+									serverOut.println(ServerConstants.INT_TIE + ",");
+									ServerGame.this.promptOtherPlayerForTie(turn);
+								}
 							}
-							continue;
-						}
-						if (turn == SENTE) {
-							player1LastMove = new Move(xcoord, ycoord);
 						} else {
-							player2LastMove = new Move(xcoord, ycoord);
-						}
-						ServerGame.this.updateActivePlayer();
-						ServerGame.this.promptOtherPlayerOppnentMove(turn, xcoord, ycoord);
-						notifySelfMove(xcoord, ycoord);
-						int gameResult = board.gameOver();
-						if (gameResult != RESULT_UNDECIDED) {
-							if (gameResult == RESULT_SENTE) {
-								if (turn == SENTE) {
-									sendWinMessage();
-									ServerGame.this.promptOtherPlayerForLost(turn);
-								} else {
-									sendLostMessage();
-									ServerGame.this.promptOtherPlayerForVictory(turn);
-								}
-							} else if (gameResult == RESULT_GOTE) {
-								if (turn == GOTE) {
-									sendWinMessage();
-									ServerGame.this.promptOtherPlayerForLost(turn);
-								} else {
-									sendLostMessage();
-									ServerGame.this.promptOtherPlayerForVictory(turn);
-								}
-							} else {
-								serverOut.println(ServerConstants.INT_TIE + ",");
-								ServerGame.this.promptOtherPlayerForTie(turn);
-							}
+							serverOut.println(ServerConstants.INT_NOT_YOUR_TURN + ",");
 						}
 					} else {
-						serverOut.println(ServerConstants.INT_NOT_YOUR_TURN + ",");
+						sendQuitMessage();
 					}
 				} else if (req.startsWith(ServerConstants.STR_GIVEUP_REQUEST)) {
 					if (!giveUpReceived) {
@@ -526,18 +539,24 @@ public class ServerGame {
 					if (turn == SENTE && player2LastMove != null) {
 						firstX = player2LastMove.x;
 						firstY = player2LastMove.y;
+						ServerGame.this.board.grid[firstY][firstX] = ServerBoard.EMPTY_SPOT;
+						updateActivePlayer();
 						if (activePlayer == GOTE) {
 							secondX = player1LastMove.x;
 							secondY = player2LastMove.y;
+							ServerGame.this.board.grid[secondY][secondX] = ServerBoard.EMPTY_SPOT;
 						}
 						sendWithdrawMessage(firstX, firstY, secondX, secondY);
 						ServerGame.this.promptOtherPlayerWithdraw(turn, firstX, firstY, secondX, secondY);
 					} else if (player1LastMove != null) {
 						firstX = player1LastMove.x;
 						firstY = player1LastMove.y;
+						ServerGame.this.board.grid[firstY][firstX] = ServerBoard.EMPTY_SPOT;
+						updateActivePlayer();
 						if (activePlayer == SENTE) {
 							secondX = player2LastMove.x;
 							secondY = player2LastMove.y;
+							ServerGame.this.board.grid[secondY][secondX] = ServerBoard.EMPTY_SPOT;
 						}
 						sendWithdrawMessage(firstX, firstY, secondX, secondY);
 						ServerGame.this.promptOtherPlayerWithdraw(turn, firstX, firstY, secondX, secondY);
@@ -545,18 +564,11 @@ public class ServerGame {
 						serverOut.println(ServerConstants.INT_WITHDRAW_FAILED + ",");
 					}
 				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_DECLINED)) {
-					serverOut.println(ServerConstants.INT_WITHDRAW_DECLINED + ",");
+					ServerGame.this.promptOtherPlayerWithdrawDeclined(turn);
 				} else if (req.startsWith(ServerConstants.STR_WITHDRAW_REQUEST)) {
-					if (turn == SENTE) {
-						if (player1LastMove != null) {
-							if (ServerGame.this.activePlayer == SENTE) {
-								serverOut.println(ServerConstants.int_wi);
-							}
-						} else {
-							serverOut.println(ServerConstants.INT_WITHDRAW_FAILED + ",");
-						}
-					} else {
-
+					if ((turn == SENTE && player1LastMove == null)
+							|| (turn == GOTE && player2LastMove == null)) {
+						serverOut.println(ServerConstants.INT_WITHDRAW_FAILED + ",");
 					}
 					ServerGame.this.promptOtherPlayerForWithdraw(turn);
 				}
@@ -676,6 +688,14 @@ public class ServerGame {
 			player2.sendWithdrawRequestMsg();
 		} else {
 			player1.sendWithdrawRequestMsg();
+		}
+	}
+
+	private void promptOtherPlayerWithdrawDeclined(int turn) {
+		if (turn == SENTE) {
+			player2.sendWithdrawDeclinedMsg();
+		} else {
+			player1.sendWithdrawDeclinedMsg();
 		}
 	}
 }
