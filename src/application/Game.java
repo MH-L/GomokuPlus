@@ -85,11 +85,10 @@ public abstract class Game {
 		buttonPanel.setPreferredSize(new Dimension(functionPanelWidth, 200));
 		titlePanel = new JPanel(new BorderLayout());
 		titlePanel.setPreferredSize(new Dimension(functionPanelWidth, 100));
-		historyPanel = new JPanel(new BorderLayout());
+		historyPanel = new JPanel(new GridLayout(4, 1));
 		functionPanel.add(titlePanel, BorderLayout.NORTH);
 		titlePanel.add(new JSeparator());
 		functionPanel.add(historyPanel, BorderLayout.CENTER);
-		historyPanel.add(new JSeparator());
 		functionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
 		gameStarted = new JLabel("Game not yet started.");

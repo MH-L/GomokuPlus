@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import Model.Board;
 import Model.Coordinate;
@@ -49,6 +50,8 @@ public class NetworkGame extends Game {
 	 * paused or something else.
 	 */
 	private JLabel statusBar;
+	private JLabel infoBar;
+	private JLabel actionBar;
 	/**
 	 * Player is only allowed to propose withdraw once in each round.
 	 */
@@ -56,6 +59,7 @@ public class NetworkGame extends Game {
 
 	public NetworkGame() throws InterruptedException {
 		super();
+		historyPanel.removeAll();
 		btnProposeTie = Main.getPlainLookbtn("<html>Propose<br>Tie!</html>",
 				"Open Sans", 28, Font.ITALIC, Color.GREEN);
 		btnProposeTie.setMargin(new Insets(0, 0, 0, 0));
@@ -70,6 +74,13 @@ public class NetworkGame extends Game {
 		statusBar = new JLabel("Peer Not Connected");
 		statusBar.setFont(smallGameFont);
 		historyPanel.add(statusBar);
+//		historyPanel.add(new JSeparator());
+		infoBar = new JLabel("Turn Undetermined");
+		infoBar.setFont(smallGameFont);
+		actionBar = new JLabel("");
+		actionBar.setFont(smallGameFont);
+		historyPanel.add(infoBar);
+		historyPanel.add(actionBar);
 		board = new NetworkBoard(boardPanel);
 		try {
 			mainSocket = new Socket(HOST, PORT);
@@ -124,7 +135,6 @@ public class NetworkGame extends Game {
 							@Override
 							public void run() {
 								serverWriter.println(ServerConstants.STR_AVAILABLE);
-								System.out.println(System.currentTimeMillis());
 							}
 						}, MESSAGE_INTERVAL, MESSAGE_INTERVAL);
 					}
@@ -135,7 +145,11 @@ public class NetworkGame extends Game {
 					if (messageReceived) {
 						gameThread.suspend();
 						// do something here.
-						handleServerMessage();
+						try {
+							handleServerMessage();
+						} catch (IOException e) {
+							JOptionPane.showMessageDialog(mainFrame, "Internal Error!");
+						}
 						gameThread.resume();
 						System.out.println("Game thread resumed");
 					}
@@ -148,7 +162,6 @@ public class NetworkGame extends Game {
 			}
 		});
 		coordinator.start();
-//		coordinator.join();
 	}
 
 	public static void handleConnectionFailure() {
@@ -191,7 +204,13 @@ public class NetworkGame extends Game {
 		btnGiveUp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				serverWriter.println(ServerConstants.STR_GIVEUP_REQUEST);
+			}
+		});
+		btnProposeTie.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				serverWriter.println(ServerConstants.STR_TIE_REQUEST);
 			}
 		});
 	}
@@ -211,7 +230,7 @@ public class NetworkGame extends Game {
 		}
 	}
 
-	synchronized public void handleServerMessage() {
+	synchronized public void handleServerMessage() throws IOException {
 		synchronized(messageQueue) {
 			while (!messageQueue.isEmpty()) {
 				String message = messageQueue.get(0);
@@ -219,9 +238,13 @@ public class NetworkGame extends Game {
 					// Probably too general; leave it for now.
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_SENTE) + ",")) {
 					turn = Game.TURN_SENTE;
+					actionBar.setText("Your Turn");
+					infoBar.setText("You're First.");
 					System.out.println("I am sente!");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_GOTE) + ",")) {
 					turn = Game.TURN_GOTE;
+					actionBar.setText("Opponent's Turn");
+					infoBar.setText("You're Second");
 					System.out.println("I am gote!");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_PEER_CONNECTED) + ",")) {
 					statusBar.setText("Peer Connected");
@@ -232,12 +255,17 @@ public class NetworkGame extends Game {
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_DEFEAT) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Your opponent wins. Good luck next time!",
 							"Game Over -- You Lose", JOptionPane.INFORMATION_MESSAGE);
+					statusBar.setText("You Lose");
+					mainSocket.close();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Congratulations! You win!",
 							"Game Over -- You Win", JOptionPane.INFORMATION_MESSAGE);
+					statusBar.setText("You Win");
+					mainSocket.close();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "The square is occupied. Please check"
 							+ " your move.", "Re-move", JOptionPane.INFORMATION_MESSAGE);
+					actionBar.setText("Turn Invalid --\nPlease Re-move");
 					dirtyBit = false;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_OUT_BOUND) + ",")) {
 					// Normally this should not happen.
@@ -273,6 +301,7 @@ public class NetworkGame extends Game {
 					int ycoord = Integer.parseInt(coords[2]);
 					dirtyBit = true;
 					board.setSquareByTurn(ycoord, xcoord, turn);
+					actionBar.setText("Opponent's Turn");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE) + ",")) {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
@@ -281,6 +310,7 @@ public class NetworkGame extends Game {
 					int otherTurn = (turn == Game.TURN_SENTE) ? Game.TURN_GOTE : Game.TURN_SENTE;
 					board.setSquareByTurn(ycoord, xcoord, otherTurn);
 					withdrawProposed = false;
+					actionBar.setText("Your Turn");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
 					if (withdrawProposed) {
 						JOptionPane.showMessageDialog(mainFrame, "Your withdrawal"
@@ -305,10 +335,12 @@ public class NetworkGame extends Game {
 					JOptionPane.showMessageDialog(mainFrame, "Unfortunately, your opponent declined"
 							+ " your withdrawal request.", "Withdrawal Declined",
 							JOptionPane.INFORMATION_MESSAGE);
+					infoBar.setText("Withdraw Declined");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_DECLINED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Your opponent has declined your tie proposal."
 							+ "\nGood luck next time!", "Tie Proposal Declined",
 							JOptionPane.INFORMATION_MESSAGE);
+					infoBar.setText("Tie Declined");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE_PROPOSED) + ",")) {
 					int response = JOptionPane.showConfirmDialog(mainFrame,
 									"Your opponent wants to tie the game."
@@ -321,10 +353,13 @@ public class NetworkGame extends Game {
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_TIE) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Tie! Game over!", "Game Over -- Tie",
 							JOptionPane.INFORMATION_MESSAGE);
+					statusBar.setText("Tie");
+					mainSocket.close();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_FAILED))) {
 					JOptionPane.showMessageDialog(mainFrame, "You have nothing to withdraw "
 							+ "or you cannot\nwithdraw twice.", "Withdraw Failed",
 							JOptionPane.WARNING_MESSAGE);
+					infoBar.setText("Withdraw Failed");
 				}
 				messageQueue.remove(0);
 			}
