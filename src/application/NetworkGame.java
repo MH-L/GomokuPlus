@@ -52,6 +52,10 @@ public class NetworkGame extends Game {
 	private JLabel statusBar;
 	private JLabel infoBar;
 	private JLabel actionBar;
+	private JLabel personalInfoBar;
+	private Thread coordinator;
+	private Thread gameThread;
+	private Thread socketListener;
 	/**
 	 * Player is only allowed to propose withdraw once in each round.
 	 */
@@ -60,6 +64,7 @@ public class NetworkGame extends Game {
 	public NetworkGame() throws InterruptedException {
 		super();
 		historyPanel.removeAll();
+		historyPanel.setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
 		btnProposeTie = Main.getPlainLookbtn("<html>Propose<br>Tie!</html>",
 				"Open Sans", 28, Font.ITALIC, Color.GREEN);
 		btnProposeTie.setMargin(new Insets(0, 0, 0, 0));
@@ -73,14 +78,21 @@ public class NetworkGame extends Game {
 		titlePanel.add(titleLabel);
 		statusBar = new JLabel("Peer Not Connected");
 		statusBar.setFont(smallGameFont);
+		statusBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		historyPanel.add(statusBar);
 //		historyPanel.add(new JSeparator());
 		infoBar = new JLabel("Turn Undetermined");
 		infoBar.setFont(smallGameFont);
+		infoBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		actionBar = new JLabel("");
 		actionBar.setFont(smallGameFont);
+		actionBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		personalInfoBar = new JLabel("Name Not Set");
+		personalInfoBar.setFont(smallGameFont);
+		personalInfoBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		historyPanel.add(infoBar);
 		historyPanel.add(actionBar);
+		historyPanel.add(personalInfoBar);
 		board = new NetworkBoard(boardPanel);
 		try {
 			mainSocket = new Socket(HOST, PORT);
@@ -94,12 +106,12 @@ public class NetworkGame extends Game {
 		}
 		initialSetUp2();
 		addCellsToBoard();
-		Thread coordinator = new Thread(new Runnable() {
+		coordinator = new Thread(new Runnable() {
 			@SuppressWarnings("deprecation")
 			@Override
 			synchronized public void run() {
 				System.out.println("Coordinator thread from game client up and running.");
-				Thread socketListener = new Thread(new Runnable() {
+				socketListener = new Thread(new Runnable() {
 					@Override
 					synchronized public void run() {
 						System.out.println("Socket listener up and running.");
@@ -125,7 +137,7 @@ public class NetworkGame extends Game {
 						}
 					}
 				});
-				Thread gameThread = new Thread(new Runnable() {
+				gameThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						System.err.println("Sending online request.");
@@ -256,12 +268,12 @@ public class NetworkGame extends Game {
 					JOptionPane.showMessageDialog(mainFrame, "Your opponent wins. Good luck next time!",
 							"Game Over -- You Lose", JOptionPane.INFORMATION_MESSAGE);
 					statusBar.setText("You Lose");
-					mainSocket.close();
+					cleanUp();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Congratulations! You win!",
 							"Game Over -- You Win", JOptionPane.INFORMATION_MESSAGE);
 					statusBar.setText("You Win");
-					mainSocket.close();
+					cleanUp();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "The square is occupied. Please check"
 							+ " your move.", "Re-move", JOptionPane.INFORMATION_MESSAGE);
@@ -291,9 +303,12 @@ public class NetworkGame extends Game {
 							"Your opponent quitted the game. Do you want to \n stay in the game?",
 							"Opponent Quit", JOptionPane.INFORMATION_MESSAGE);
 					if (choice == JOptionPane.YES_OPTION) {
-
+						cleanUp();
+						mainSocket = new Socket(HOST, PORT);
 					} else {
-
+						mainSocket.close();
+						mainFrame.dispose();
+						Main.displayWelcomeFrame();
 					}
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_YOUR_MOVE) + ",")) {
 					String[] coords = message.split(",");
@@ -318,18 +333,15 @@ public class NetworkGame extends Game {
 								"Congratulations!", JOptionPane.INFORMATION_MESSAGE);
 					}
 					String[] coordinates = message.split(",");
-					if (coordinates.length == 5) {
-						int firstX = Integer.parseInt(coordinates[1]);
-						int firstY = Integer.parseInt(coordinates[2]);
-						int secondX = Integer.parseInt(coordinates[3]);
-						int secondY = Integer.parseInt(coordinates[4]);
-						board.resetSquare(firstX, firstY);
+					int firstX = Integer.parseInt(coordinates[1]);
+					int firstY = Integer.parseInt(coordinates[2]);
+					int secondX = Integer.parseInt(coordinates[3]);
+					int secondY = Integer.parseInt(coordinates[4]);
+					board.resetSquare(firstX, firstY);
+					if (secondX != -1 && secondY != -1) {
 						board.resetSquare(secondX, secondY);
-					} else {
-						int firstX = Integer.parseInt(coordinates[1]);
-						int firstY = Integer.parseInt(coordinates[2]);
-						board.resetSquare(firstX, firstY);
 					}
+					withdrawProposed = false;
 					dirtyBit = false;
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_DECLINED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Unfortunately, your opponent declined"
@@ -429,6 +441,18 @@ public class NetworkGame extends Game {
 					return;
 				}
 			}
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private void cleanUp() {
+		socketListener.stop();
+		gameThread.stop();
+		coordinator.stop();
+		try {
+			mainSocket.close();
+		} catch (IOException e) {
+			return;
 		}
 	}
 }

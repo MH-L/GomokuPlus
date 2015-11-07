@@ -27,6 +27,7 @@ public class ServerGame {
 	private Move player1LastMove = null;
 	private Move player2LastMove = null;
 	volatile private boolean giveUpReceived = false;
+	private ArrayList<Move> moves = new ArrayList<Move>();
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException, InterruptedException {
 		board = new ServerBoard();
@@ -307,7 +308,7 @@ public class ServerGame {
 		private Thread gameThread;
 		private ArrayList<String> requestQueue = new ArrayList<String>();
 		private long lastReply = 0L;
-		private static final long RESPONSE_DELTA = 1200;
+		private static final long RESPONSE_DELTA = 20000;
 		private static final long CHECK_DELTA = 200;
 
 		private ServerPlayer(Socket playerSocket, final int turn) throws IOException {
@@ -411,13 +412,8 @@ public class ServerGame {
 		}
 
 		private void sendWithdrawMessage(int firstX, int firstY, int secondX, int secondY) {
-			if (secondX == -1 && secondY == -1) {
-				serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED +
-						String.format(",%d,%d", firstX, firstY));
-			} else {
-				serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED +
-						String.format(",%d,%d,%d,%d", firstX, firstY, secondX, secondY));
-			}
+			serverOut.println(ServerConstants.INT_WITHDRAW_APPROVED +
+					String.format(",%d,%d,%d,%d", firstX, firstY, secondX, secondY));
 		}
 
 		private void sendTurnMessage() {
@@ -560,23 +556,29 @@ public class ServerGame {
 						firstX = player2LastMove.x;
 						firstY = player2LastMove.y;
 						ServerGame.this.board.grid[firstY][firstX] = ServerBoard.EMPTY_SPOT;
-						updateActivePlayer();
+						player2LastMove = null;
 						if (activePlayer == GOTE) {
 							secondX = player1LastMove.x;
-							secondY = player2LastMove.y;
+							secondY = player1LastMove.y;
 							ServerGame.this.board.grid[secondY][secondX] = ServerBoard.EMPTY_SPOT;
+							player1LastMove = null;
+						} else {
+							updateActivePlayer();
 						}
 						sendWithdrawMessage(firstX, firstY, secondX, secondY);
 						ServerGame.this.promptOtherPlayerWithdraw(turn, firstX, firstY, secondX, secondY);
-					} else if (player1LastMove != null) {
+					} else if (turn == GOTE && player1LastMove != null) {
 						firstX = player1LastMove.x;
 						firstY = player1LastMove.y;
 						ServerGame.this.board.grid[firstY][firstX] = ServerBoard.EMPTY_SPOT;
-						updateActivePlayer();
+						player1LastMove = null;
 						if (activePlayer == SENTE) {
 							secondX = player2LastMove.x;
 							secondY = player2LastMove.y;
 							ServerGame.this.board.grid[secondY][secondX] = ServerBoard.EMPTY_SPOT;
+							player2LastMove = null;
+						} else {
+							updateActivePlayer();
 						}
 						sendWithdrawMessage(firstX, firstY, secondX, secondY);
 						ServerGame.this.promptOtherPlayerWithdraw(turn, firstX, firstY, secondX, secondY);
@@ -589,6 +591,10 @@ public class ServerGame {
 					if ((turn == SENTE && player1LastMove == null)
 							|| (turn == GOTE && player2LastMove == null)) {
 						serverOut.println(ServerConstants.INT_WITHDRAW_FAILED + ",");
+						synchronized(requestQueue) {
+							requestQueue.remove(0);
+						}
+						continue;
 					}
 					ServerGame.this.promptOtherPlayerForWithdraw(turn);
 				}
