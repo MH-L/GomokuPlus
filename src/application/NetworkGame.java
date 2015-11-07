@@ -2,16 +2,21 @@ package application;
 
 import Model.ServerConstants;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,6 +28,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+
 import Model.Board;
 import Model.Coordinate;
 import Model.NetworkBoard;
@@ -30,6 +37,9 @@ import Model.NetworkBoard;
 public class NetworkGame extends Game {
 	private JButton btnProposeTie;
 	private JButton btnTryWithdraw;
+	private JButton btnSendMessage;
+	private JPanel messageHistoryPanel;
+	private ArrayList<JLabel> messageHistory = new ArrayList<JLabel>();
 	private static NetworkBoard board;
 	private static BufferedReader serverReader;
 	private static PrintWriter serverWriter;
@@ -38,6 +48,7 @@ public class NetworkGame extends Game {
 	private static final String HOST = "104.236.97.57";
 	private static final int PORT = 1031;
 	private static final int MESSAGE_INTERVAL = 500;
+	private static final int NUM_MESSAGE_ITEM_DISPLAYED = 10;
 	private boolean peerConnected = true;
 	private boolean gameStarted = false;
 	private boolean messageReceived = false;
@@ -73,6 +84,11 @@ public class NetworkGame extends Game {
 				"Open Sans", 28, Font.PLAIN, Color.YELLOW);
 		btnTryWithdraw.setMargin(new Insets(0, 0, 0, 0));
 		buttonPanel.add(btnTryWithdraw);
+		btnSendMessage = Main.getPlainLookbtn("Send!", "Open Sans", 28, Font.PLAIN, Color.GREEN);
+		chatPanel.add(btnSendMessage, BorderLayout.SOUTH);
+		messageHistoryPanel = new JPanel(new GridLayout(10, 1));
+		chatPanel.add(messageHistoryPanel, BorderLayout.NORTH);
+//		chatPanel.add(new JLabel("Here will display all messages."));
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		titlePanel.add(titleLabel);
@@ -94,6 +110,29 @@ public class NetworkGame extends Game {
 		historyPanel.add(actionBar);
 		historyPanel.add(personalInfoBar);
 		board = new NetworkBoard(boardPanel);
+		messageArea.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					sendMessage();
+				}
+			}
+		});
+		btnSendMessage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sendMessage();
+			}
+		});
 		try {
 			mainSocket = new Socket(HOST, PORT);
 			System.out.println("Has successfully binded to that address and port.");
@@ -337,6 +376,8 @@ public class NetworkGame extends Game {
 					int firstY = Integer.parseInt(coordinates[2]);
 					int secondX = Integer.parseInt(coordinates[3]);
 					int secondY = Integer.parseInt(coordinates[4]);
+					System.out.println(String.format("The coordinates are: %d,%d,%d,%d.",
+							firstX, firstY, secondX, secondY));
 					board.resetSquare(firstX, firstY);
 					if (secondX != -1 && secondY != -1) {
 						board.resetSquare(secondX, secondY);
@@ -454,5 +495,11 @@ public class NetworkGame extends Game {
 		} catch (IOException e) {
 			return;
 		}
+	}
+
+	private void sendMessage() {
+		String messageText = messageArea.getText();
+		serverWriter.println(ServerConstants.STR_MESSAGE_REQUEST + "," + messageText);
+		messageArea.setText("");
 	}
 }

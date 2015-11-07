@@ -32,7 +32,7 @@ public final class NetworkBoard extends Board {
 	}
 
 	public void resetSquare(int xcoord, int ycoord) {
-		grid[ycoord][xcoord].setIcon(null);
+		grid[xcoord][ycoord].setIcon(null);
 	}
 
 }

@@ -479,6 +479,7 @@ public class ServerGame {
 							ServerGame.this.updateActivePlayer();
 							ServerGame.this.promptOtherPlayerOppnentMove(turn, xcoord, ycoord);
 							notifySelfMove(xcoord, ycoord);
+							moves.add(new Move(xcoord, ycoord));
 							int gameResult = board.gameOver();
 							if (gameResult != RESULT_UNDECIDED) {
 								if (gameResult == RESULT_SENTE) {
@@ -501,6 +502,7 @@ public class ServerGame {
 									serverOut.println(ServerConstants.INT_TIE + ",");
 									ServerGame.this.promptOtherPlayerForTie(turn);
 								}
+								onGameFinished();
 							}
 						} else {
 							serverOut.println(ServerConstants.INT_NOT_YOUR_TURN + ",");
@@ -556,11 +558,13 @@ public class ServerGame {
 						firstX = player2LastMove.x;
 						firstY = player2LastMove.y;
 						ServerGame.this.board.grid[firstY][firstX] = ServerBoard.EMPTY_SPOT;
+						moves.remove(moves.size() - 1);
 						player2LastMove = null;
 						if (activePlayer == GOTE) {
 							secondX = player1LastMove.x;
 							secondY = player1LastMove.y;
 							ServerGame.this.board.grid[secondY][secondX] = ServerBoard.EMPTY_SPOT;
+							moves.remove(moves.size() - 1);
 							player1LastMove = null;
 						} else {
 							updateActivePlayer();
@@ -571,11 +575,13 @@ public class ServerGame {
 						firstX = player1LastMove.x;
 						firstY = player1LastMove.y;
 						ServerGame.this.board.grid[firstY][firstX] = ServerBoard.EMPTY_SPOT;
+						moves.remove(moves.size() - 1);
 						player1LastMove = null;
 						if (activePlayer == SENTE) {
 							secondX = player2LastMove.x;
 							secondY = player2LastMove.y;
 							ServerGame.this.board.grid[secondY][secondX] = ServerBoard.EMPTY_SPOT;
+							moves.remove(moves.size() - 1);
 							player2LastMove = null;
 						} else {
 							updateActivePlayer();
@@ -731,5 +737,9 @@ public class ServerGame {
 		} else {
 			player1.sendPeerDisconnectedMessage();
 		}
+	}
+
+	private void onGameFinished() {
+
 	}
 }

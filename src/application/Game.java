@@ -23,6 +23,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
@@ -34,7 +35,9 @@ public abstract class Game {
 			Font.PLAIN, 28);
 	protected static final Font largeGameFont = new Font("Open Sans",
 			Font.PLAIN, 40);
-	public static final Dimension defaultFrameDimension = new Dimension(1000,
+	protected static final Font tinyGameFont = new Font("Open Sans",
+			Font.PLAIN, 16);
+	public static final Dimension defaultFrameDimension = new Dimension(1400,
 			760);
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
 	public static final int functionPanelWidth = 295;
@@ -42,6 +45,8 @@ public abstract class Game {
 	public static final int TURN_SENTE = 1;
 	public static final int TURN_GOTE = 2;
 	protected static JPanel mainPanel;
+	protected static JPanel parentPanel;
+	protected static JPanel chatPanel;
 	protected static JFrame mainFrame;
 	protected static JButton btnStart;
 	protected static JButton btnGiveUp;
@@ -52,6 +57,7 @@ public abstract class Game {
 	protected static JPanel buttonPanel;
 	protected static JPanel functionPanel;
 	private static JLabel gameStarted;
+	protected static JTextArea messageArea;
 	protected static Board board;
 
 	/**
@@ -66,6 +72,9 @@ public abstract class Game {
 	}
 
 	public Game() {
+		parentPanel = new JPanel(new BorderLayout());
+		chatPanel = new JPanel(new BorderLayout());
+		chatPanel.setPreferredSize(new Dimension(395, 700));
 		mainPanel = new JPanel(new BorderLayout());
 		mainFrame = new JFrame("Gomoku Plus");
 		mainFrame.setSize(defaultFrameDimension);
@@ -73,7 +82,9 @@ public abstract class Game {
 		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 23, Font.PLAIN, Color.RED);
 		btnStart.setMargin(new Insets(0,0,0,0));
 		btnGiveUp.setMargin(new Insets(0,0,0,0));
-		mainFrame.add(mainPanel);
+		parentPanel.add(mainPanel, BorderLayout.WEST);
+		parentPanel.add(chatPanel, BorderLayout.EAST);
+		mainFrame.add(parentPanel);
 		mainFrame.setVisible(true);
 		mainFrame.setResizable(false);
 		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -105,6 +116,10 @@ public abstract class Game {
 		mainPanel.add(boardPanel, BorderLayout.LINE_START);
 		mainPanel.add(new JSeparator(JSeparator.VERTICAL));
 		mainPanel.add(functionPanel, BorderLayout.LINE_END);
+
+		messageArea = new JTextArea(4, 40);
+		messageArea.setFont(smallGameFont);
+		chatPanel.add(messageArea, BorderLayout.CENTER);
 		initialSetUp();
 	}
 
