@@ -4,6 +4,7 @@ import Model.ServerConstants;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,9 +26,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
-
-import com.google.gwt.event.dom.client.KeyCodes;
 
 import Model.Board;
 import Model.Coordinate;
@@ -88,7 +85,7 @@ public class NetworkGame extends Game {
 		chatPanel.add(btnSendMessage, BorderLayout.SOUTH);
 		messageHistoryPanel = new JPanel(new GridLayout(10, 1));
 		chatPanel.add(messageHistoryPanel, BorderLayout.NORTH);
-//		chatPanel.add(new JLabel("Here will display all messages."));
+		messageHistoryPanel.setPreferredSize(new Dimension(395, 500));
 		JLabel titleLabel = new JLabel("<html>Network Game<br></html>");
 		titleLabel.setFont(Game.largeGameFont);
 		titlePanel.add(titleLabel);
@@ -96,7 +93,6 @@ public class NetworkGame extends Game {
 		statusBar.setFont(smallGameFont);
 		statusBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		historyPanel.add(statusBar);
-//		historyPanel.add(new JSeparator());
 		infoBar = new JLabel("Turn Undetermined");
 		infoBar.setFont(smallGameFont);
 		infoBar.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -122,11 +118,18 @@ public class NetworkGame extends Game {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+					String text = messageArea.getText();
+					messageArea.setText(text + "\n");
+					return;
+				}
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					sendMessage();
 				}
 			}
 		});
+		messageArea.setTabSize(4);
+		messageArea.setAutoscrolls(true);
 		btnSendMessage.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -145,6 +148,7 @@ public class NetworkGame extends Game {
 		}
 		initialSetUp2();
 		addCellsToBoard();
+		mainFrame.pack();
 		coordinator = new Thread(new Runnable() {
 			@SuppressWarnings("deprecation")
 			@Override
@@ -499,7 +503,9 @@ public class NetworkGame extends Game {
 
 	private void sendMessage() {
 		String messageText = messageArea.getText();
-		serverWriter.println(ServerConstants.STR_MESSAGE_REQUEST + "," + messageText);
+		if (!messageText.equals("")) {
+			serverWriter.println(ServerConstants.STR_MESSAGE_REQUEST + "," + messageText);
+		}
 		messageArea.setText("");
 	}
 }
