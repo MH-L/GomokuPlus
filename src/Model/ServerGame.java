@@ -28,6 +28,7 @@ public class ServerGame {
 	private Move player2LastMove = null;
 	volatile private boolean giveUpReceived = false;
 	private ArrayList<Move> moves = new ArrayList<Move>();
+	private boolean gameOver = false;
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException, InterruptedException {
 		board = new ServerBoard();
@@ -364,6 +365,11 @@ public class ServerGame {
 					socketListener.start();
 					gameThread.start();
 					while (true) {
+						if (ServerGame.this.gameOver) {
+							socketListener.interrupt();
+							gameThread.interrupt();
+							return;
+						}
 						if (!requestQueue.isEmpty()) {
 							lastReply = System.currentTimeMillis();
 							System.out.println("Received message from game client.");
@@ -516,6 +522,7 @@ public class ServerGame {
 						ServerGame.this.promptPlayerForVictory(turn);
 					}
 				} else if (req.startsWith(ServerConstants.STR_QUIT)) {
+					ServerGame.this.gameOver = true;
 					boolean isNecessary = false;
 					if (turn == SENTE) {
 						isNecessary = player2Alive;

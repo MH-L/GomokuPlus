@@ -13,13 +13,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import application.NetworkGame;
+import database.ConnectionManager;
 
 public final class NetworkBoard extends Board {
 
 
 	public NetworkBoard(JPanel boardPanel) {
 		super(boardPanel);
-
+		ConnectionManager.connect();
 	}
 
 	@Override

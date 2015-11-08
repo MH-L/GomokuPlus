@@ -349,7 +349,7 @@ public class NetworkGame extends Game {
 						cleanUp();
 						mainSocket = new Socket(HOST, PORT);
 					} else {
-						mainSocket.close();
+						cleanUp();
 						mainFrame.dispose();
 						Main.displayWelcomeFrame();
 					}
@@ -411,7 +411,7 @@ public class NetworkGame extends Game {
 					JOptionPane.showMessageDialog(mainFrame, "Tie! Game over!", "Game Over -- Tie",
 							JOptionPane.INFORMATION_MESSAGE);
 					statusBar.setText("Tie");
-					mainSocket.close();
+					cleanUp();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_FAILED))) {
 					JOptionPane.showMessageDialog(mainFrame, "You have nothing to withdraw "
 							+ "or you cannot\nwithdraw twice.", "Withdraw Failed",
@@ -489,12 +489,13 @@ public class NetworkGame extends Game {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private void cleanUp() {
-		socketListener.stop();
-		gameThread.stop();
-		coordinator.stop();
+		socketListener.interrupt();
+		gameThread.interrupt();
+		coordinator.interrupt();
 		try {
+			serverWriter.close();
+			serverReader.close();
 			mainSocket.close();
 		} catch (IOException e) {
 			return;
@@ -507,5 +508,10 @@ public class NetworkGame extends Game {
 			serverWriter.println(ServerConstants.STR_MESSAGE_REQUEST + "," + messageText);
 		}
 		messageArea.setText("");
+	}
+
+	@Override
+	protected void doSocketClose() {
+		cleanUp();
 	}
 }

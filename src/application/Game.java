@@ -83,6 +83,7 @@ public abstract class Game {
 		btnStart.setMargin(new Insets(0,0,0,0));
 		btnGiveUp.setMargin(new Insets(0,0,0,0));
 		parentPanel.add(mainPanel, BorderLayout.WEST);
+		parentPanel.add(new JSeparator());
 		parentPanel.add(chatPanel, BorderLayout.EAST);
 		mainFrame.add(parentPanel);
 		mainFrame.setVisible(true);
@@ -172,7 +173,7 @@ public abstract class Game {
 		gameStarted.setText("Game not yet started.");
 	}
 
-	private static JMenuBar createJMenuBar() {
+	private JMenuBar createJMenuBar() {
 		JMenuBar menus = new JMenuBar();
 		JMenu gameMenu = new JMenu("Game");
 		JMenuItem newGame = new JMenuItem("New Game (F12)");
@@ -200,6 +201,7 @@ public abstract class Game {
 			public void actionPerformed(ActionEvent e) {
 				mainFrame.dispose();
 				Main.displayWelcomeFrame();
+				doSocketClose();
 			}
 		});
 
@@ -282,6 +284,8 @@ public abstract class Game {
 		menus.setPreferredSize(new Dimension(500, 60));
 		return menus;
 	}
+
+	protected void doSocketClose() {}
 
 	private static void showStatsWindow() {
 		JFrame statsFrame = new JFrame("Stats");
