@@ -20,7 +20,6 @@ public final class NetworkBoard extends Board {
 
 	public NetworkBoard(JPanel boardPanel) {
 		super(boardPanel);
-		ConnectionManager.connect();
 	}
 
 	@Override

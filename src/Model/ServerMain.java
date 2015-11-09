@@ -27,13 +27,6 @@ public class ServerMain {
 									+ " cannot be started. Exiting...");
 							System.exit(1);
 						}
-						try {
-							clientSocket1.close();
-							clientSocket2.close();
-						} catch (IOException e) {
-							System.out.println("Fuck threading!");
-							e.printStackTrace();
-						}
 						System.out.println("Clients disconnected. Establishing new connection.");
 					}
 				});

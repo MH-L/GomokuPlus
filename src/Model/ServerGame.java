@@ -29,8 +29,12 @@ public class ServerGame {
 	volatile private boolean giveUpReceived = false;
 	private ArrayList<Move> moves = new ArrayList<Move>();
 	private boolean gameOver = false;
+	private Socket player1Socket;
+	private Socket player2Socket;
 
 	public ServerGame(Socket player1Socket, Socket player2Socket) throws IOException, InterruptedException {
+		this.player1Socket = player1Socket;
+		this.player2Socket = player2Socket;
 		board = new ServerBoard();
 		activePlayer = SENTE;
 		System.out.println("Game shall be started.");
@@ -290,7 +294,7 @@ public class ServerGame {
 		return ServerConstants.INT_REQUEST_OK;
 	}
 
-	private class Move {
+	public class Move {
 		private int x;
 		private int y;
 
@@ -298,6 +302,9 @@ public class ServerGame {
 			this.x = x;
 			this.y = y;
 		}
+
+		public int getX() { return x; }
+		public int getY() { return y; }
 	}
 
 	private class ServerPlayer {
@@ -356,6 +363,8 @@ public class ServerGame {
 								public void run() {
 									if (lastReply != 0 && System.currentTimeMillis()
 											- lastReply > RESPONSE_DELTA) {
+										// set the game to be over when one of the players is not reachable.
+										ServerGame.this.gameOver = true;
 										ServerGame.this.promptOtherPlayerPeerDisconnected(turn);
 									}
 								}
@@ -368,6 +377,15 @@ public class ServerGame {
 						if (ServerGame.this.gameOver) {
 							socketListener.interrupt();
 							gameThread.interrupt();
+							try {
+								if (turn == SENTE) {
+									ServerGame.this.player1Socket.close();
+								} else {
+									ServerGame.this.player2Socket.close();
+								}
+							} catch (IOException e) {
+								System.out.println("Fuck this is retarded.");
+							}
 							return;
 						}
 						if (!requestQueue.isEmpty()) {

@@ -170,12 +170,11 @@ public class NetworkGame extends Game {
 										messageQueue.add(line);
 									}
 								} else if (line == null) {
-									JOptionPane.showMessageDialog(mainFrame, "You are disconnected from the game server."
-											+ "\nPlease log on once again.", "Game Info -- Disconnected",
-											JOptionPane.INFORMATION_MESSAGE);
+									quitGameWhenDisconnected();
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
+								break;
 							}
 						}
 					}
@@ -221,6 +220,15 @@ public class NetworkGame extends Game {
 
 	public static void handleConnectionFailure() {
 		JOptionPane.showMessageDialog(mainFrame, "Connection failed. Return to main page.");
+	}
+
+	private void quitGameWhenDisconnected() {
+		JOptionPane.showMessageDialog(mainFrame, "You are disconnected from the game server."
+				+ "\nPlease log on once again.", "Game Info -- Disconnected",
+				JOptionPane.INFORMATION_MESSAGE);
+		cleanUp();
+		mainFrame.dispose();
+		Main.displayWelcomeFrame();
 	}
 
 	@Override
@@ -311,11 +319,13 @@ public class NetworkGame extends Game {
 					JOptionPane.showMessageDialog(mainFrame, "Your opponent wins. Good luck next time!",
 							"Game Over -- You Lose", JOptionPane.INFORMATION_MESSAGE);
 					statusBar.setText("You Lose");
+					System.out.println("cleaned up because of losing");
 					cleanUp();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_VICTORY) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "Congratulations! You win!",
 							"Game Over -- You Win", JOptionPane.INFORMATION_MESSAGE);
 					statusBar.setText("You Win");
+					System.out.println("cleaned up because of winning");
 					cleanUp();
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_MOVE_SQUARE_OCCUPIED) + ",")) {
 					JOptionPane.showMessageDialog(mainFrame, "The square is occupied. Please check"
@@ -353,6 +363,7 @@ public class NetworkGame extends Game {
 						mainFrame.dispose();
 						Main.displayWelcomeFrame();
 					}
+					System.out.println("Cleaned up because of opponent quitted the game.");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_YOUR_MOVE) + ",")) {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
@@ -412,6 +423,7 @@ public class NetworkGame extends Game {
 							JOptionPane.INFORMATION_MESSAGE);
 					statusBar.setText("Tie");
 					cleanUp();
+					System.out.println("cleaned up because of tie");
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_FAILED))) {
 					JOptionPane.showMessageDialog(mainFrame, "You have nothing to withdraw "
 							+ "or you cannot\nwithdraw twice.", "Withdraw Failed",
@@ -490,6 +502,7 @@ public class NetworkGame extends Game {
 	}
 
 	private void cleanUp() {
+		System.out.println("Clean Up!");
 		socketListener.interrupt();
 		gameThread.interrupt();
 		coordinator.interrupt();
@@ -512,6 +525,19 @@ public class NetworkGame extends Game {
 
 	@Override
 	protected void doSocketClose() {
+		System.out.println("In do socket close.");
 		cleanUp();
+	}
+
+	private String tryReadLine() {
+		try {
+			if (serverReader.ready()) {
+				String line = serverReader.readLine();
+				return line;
+			}
+		} catch (IOException e) {
+
+		}
+		return null;
 	}
 }
