@@ -63,6 +63,10 @@ public class XMLHelper {
 	}
 
 	public static XMLElement strToXML(String str) {
+		char[] array = str.toCharArray();
+		for (int i = 0; i < array.length; i++) {
 
+		}
+		return null;
 	}
 }

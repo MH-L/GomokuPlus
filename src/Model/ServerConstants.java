@@ -42,5 +42,8 @@ public final class ServerConstants {
 	public static final int INT_TIE_DECLINED = 21;
 	public static final int INT_WITHDRAW_FAILED = 22;
 
+	/**
+	 * Server capacity contraint constants (not used).
+	 */
 	public static final int MAX_CAPACITY = 10;
 }
