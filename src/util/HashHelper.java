@@ -23,7 +23,7 @@ public class HashHelper {
 		}
 	}
 
-	public static byte[] encrypt(String s) {
+	public byte[] encrypt(String s) {
 		digest.reset();
 		digest.update(s.getBytes());
 		return digest.digest();
