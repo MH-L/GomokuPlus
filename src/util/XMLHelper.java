@@ -4,26 +4,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XMLHelper {
-	private class XMLElement {
+	public class XMLElement {
 		private String name;
 		private List<XMLElement> childElements;
 		private String content;
-		private XMLElement(String name, String content) {
+		public XMLElement(String name, String content) {
 			this.name = name;
 			this.content = content;
 			childElements = new ArrayList<XMLElement>();
 		}
 
-		private void appendChild(XMLElement child) {
+		public void appendChild(XMLElement child) {
 			childElements.add(child);
+		}
+
+		public XMLElement getChild(String name) {
+			for (XMLElement child : childElements) {
+				if (child.name.equals(name)) {
+					return child;
+				}
+			}
+			return null;
+		}
+
+		public void setContent(String c) {
+			this.content = c;
 		}
 	}
 
-	public static String createStartTag(String tagName) {
+	public XMLHelper() {}
+
+	private static String createStartTag(String tagName) {
 		return "<" + tagName + ">";
 	}
 
-	public static String createEndTag(String tagName) {
+	private static String createEndTag(String tagName) {
 		return "</" + tagName + ">";
 	}
 
@@ -45,5 +60,9 @@ public class XMLHelper {
 		result += "\n";
 		result += createEndTag(ele.name);
 		return result;
+	}
+
+	public static XMLElement strToXML(String str) {
+
 	}
 }

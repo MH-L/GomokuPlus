@@ -27,8 +27,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
-import Model.Board;
-import Model.Coordinate;
+import model.Board;
+import model.Coordinate;
 
 public abstract class Game {
 	protected static final Font smallGameFont = new Font("Open Sans",

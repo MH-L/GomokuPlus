@@ -1,7 +1,5 @@
 package application;
 
-import Model.ServerConstants;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,9 +25,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import Model.Board;
-import Model.Coordinate;
-import Model.NetworkBoard;
+import model.Board;
+import model.Coordinate;
+import model.NetworkBoard;
+import model.ServerConstants;
 
 public class NetworkGame extends Game {
 	private JButton btnProposeTie;

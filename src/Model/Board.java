@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import Model.Coordinate.Stone;
+import model.Coordinate.Stone;
 import application.Game;
 import application.Game.Result;
 

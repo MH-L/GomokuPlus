@@ -11,8 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import Model.Board;
-import Model.Coordinate;
+import model.Board;
+import model.Coordinate;
 
 public class SingleplayerGame extends Game {
 	/**

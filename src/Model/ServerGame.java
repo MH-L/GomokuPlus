@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,9 +12,9 @@ import java.util.TimerTask;
 public class ServerGame {
 	private static final int SENTE = 1;
 	private static final int GOTE = 2;
-	private static final int RESULT_SENTE = 3;
-	private static final int RESULT_GOTE = 2;
-	private static final int RESULT_TIE = 4;
+	public static final int RESULT_SENTE = 3;
+	public static final int RESULT_GOTE = 2;
+	public static final int RESULT_TIE = 4;
 	private static final int RESULT_UNDECIDED = 1;
 	private static final int NUM_STONE_TO_WIN = 5;
 	private ServerBoard board;

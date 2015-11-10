@@ -3,7 +3,7 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 
-import Model.ServerGame.Move;
+import model.ServerGame.Move;
 
 public class ConnectionManager {
 	public static void connect() {
