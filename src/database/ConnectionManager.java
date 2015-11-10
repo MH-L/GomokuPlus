@@ -3,6 +3,7 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 
+import config.ConfHelper;
 import model.ServerGame.Move;
 
 public class ConnectionManager {
@@ -13,10 +14,11 @@ public class ConnectionManager {
 			System.out.println("Cannot find sql driver.");
 		}
 		Connection conn = null;
-		final String password = "password";
-		final String userName = "java";
+		final String password = ConfHelper.getPassword();
+		final String userName = ConfHelper.getDBUsername();
+		final String dbName = ConfHelper.getDBName();
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://104.236.97.57:3306/javabase",
+			conn = DriverManager.getConnection("jdbc:mysql://104.236.97.57:3306/" + dbName,
 					userName, password);
 			System.out.println("Connection succeeded.");
 		} catch (SQLException e) {
