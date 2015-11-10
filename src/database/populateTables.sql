@@ -17,7 +17,7 @@ CREATE TABLE Game
 (
 	gameID int NOT NULL AUTO_INCREMENT,
 	gameHash varchar(64) NOT NULL,
-	fileName varchar(32) NOT NULL,
+	fileName varchar(64) NOT NULL,
 	PRIMARY KEY (gameID),
 	UNIQUE (gameHash)
 );

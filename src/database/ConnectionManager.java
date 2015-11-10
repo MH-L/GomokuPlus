@@ -47,7 +47,8 @@ public class ConnectionManager {
 	public static void insertGameData(ArrayList<Move> moves, long curmillis,
 			int player1ID, int player2ID) {
 		String gameHash = getGameHash(curmillis, player1ID, player2ID);
-
+		String query = String.format("INSERT INTO Game (gameHash, fileName) VALUES"
+				+ " ('%s', 'Rec-%s')", gameHash, gameHash);
 	}
 
 	public static void createAccount(String username, String password) {
@@ -55,10 +56,10 @@ public class ConnectionManager {
 		 * First check that the username is valid (i.e. first of all it does not
 		 * have any invalid characters, and the database does not have that record)
 		 */
-		String query = String.format("SELECT FROM Credentials WHERE username=%s;", username);
+		String query = String.format("SELECT FROM Credentials WHERE username='%s';", username);
 		HashHelper hashInst = HashHelper.getInstance();
 		String encryptedPassword = new String(hashInst.encrypt(password));
-		query = String.format("INSERT INTO Credentials (username, userID) VALUES (%s, %s);",
+		query = String.format("INSERT INTO Credentials (username, userID) VALUES ('%s', '%s');",
 				username, encryptedPassword);
 	}
 
