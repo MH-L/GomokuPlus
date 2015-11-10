@@ -58,6 +58,9 @@ public class XMLHelper {
 			result += elementToString(ele.childElements.get(i), baseIndent + 1);
 		}
 		result += "\n";
+		for (int i = 0; i < baseIndent; i++) {
+			result += "\t";
+		}
 		result += createEndTag(ele.name);
 		return result;
 	}

@@ -7,7 +7,7 @@ import model.ServerGame;
 import model.ServerGame.Move;
 
 public class RecordCreator {
-	public static String createRecord(List<Move> moves, int result, int senteWithdrawals,
+	public static String generateRecordString(List<Move> moves, int result, int senteWithdrawals,
 			int goteWithdrawals) {
 		XMLHelper helper = new XMLHelper();
 		XMLElement game = helper.new XMLElement("Game", null);
