@@ -9,10 +9,12 @@ import model.ServerGame.Move;
 
 public class ConnectionManager {
 	private Connection conn = null;
+	private ConfHelper conf;
 	private static ConnectionManager instance = null;
 
 	private ConnectionManager() {
 		connect();
+		conf = ConfHelper.getInstance();
 	}
 
 	private ConnectionManager getInstance() {
@@ -29,9 +31,9 @@ public class ConnectionManager {
 		} catch (ClassNotFoundException e) {
 			System.out.println("Cannot find sql driver.");
 		}
-		final String password = ConfHelper.getPassword();
-		final String userName = ConfHelper.getDBUsername();
-		final String dbName = ConfHelper.getDBName();
+		final String password = conf.getPassword();
+		final String userName = conf.getDBUsername();
+		final String dbName = conf.getDBName();
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://104.236.97.57:3306/" + dbName,
 					userName, password);
@@ -42,7 +44,9 @@ public class ConnectionManager {
 		}
 	}
 
-	public static void insertGameData(ArrayList<Move> moves) {
+	public static void insertGameData(ArrayList<Move> moves, long curmillis,
+			int player1ID, int player2ID) {
+		String gameHash = getGameHash(curmillis, player1ID, player2ID);
 
 	}
 
@@ -58,7 +62,7 @@ public class ConnectionManager {
 				username, encryptedPassword);
 	}
 
-	public static String getGameHash(int curmillis, int player1ID, int player2ID) {
+	private static String getGameHash(long curmillis, int player1ID, int player2ID) {
 		String tohash = String.valueOf(curmillis) + player1ID;
 		tohash += player2ID;
 		HashHelper hashInstance = HashHelper.getInstance();

@@ -1,6 +1,7 @@
+DROP TABLE UserStats;
 DROP TABLE Credentials;
-DROP TABLE Game;
 DROP TABLE GameDetail;
+DROP TABLE Game;
 
 CREATE TABLE Credentials
 (
@@ -15,8 +16,10 @@ CREATE TABLE Credentials
 CREATE TABLE Game
 (
 	gameID int NOT NULL AUTO_INCREMENT,
+	gameHash varchar(64) NOT NULL,
 	fileName varchar(32) NOT NULL,
-	PRIMARY KEY (gameID)
+	PRIMARY KEY (gameID),
+	UNIQUE (gameHash)
 );
 
 CREATE TABLE GameDetail
@@ -29,4 +32,14 @@ CREATE TABLE GameDetail
 	player2Withdraw int NOT NULL,
 	FOREIGN KEY (gameID) REFERENCES Game (gameID),
 	PRIMARY KEY (gameID)
+);
+
+CREATE TABLE UserStats
+(
+	userID int NOT NULL,
+	totalGamePlayer int,
+	winnings int,
+	losses int,
+	FOREIGN KEY (userID) REFERENCES Credentials(userID),
+	PRIMARY KEY (userID)
 );
