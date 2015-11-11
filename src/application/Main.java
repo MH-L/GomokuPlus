@@ -1,8 +1,12 @@
 package application;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +23,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 public class Main {
@@ -116,7 +121,7 @@ public class Main {
 
 	public static void displayLoginPage() {
 		JFrame loginFrame = new JFrame("Login");
-		loginFrame.setSize(600, 800);
+		loginFrame.setSize(600, 500);
 		loginFrame.setVisible(true);
 		JPanel loginPanel = new JPanel();
 		loginPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
@@ -128,11 +133,13 @@ public class Main {
 		loginPanel.add(panelSeparator);
 		JLabel usernameHint = new JLabel("UserName");
 		JLabel passwordHint = new JLabel("Password");
-		usernameHint.setFont(new Font("Calibri", Font.PLAIN, 30));
-		passwordHint.setFont(new Font("Calibri", Font.PLAIN, 30));
-		JTextField usernameField = new JTextField(16);
+		usernameHint.setFont(new Font("Calibri", Font.PLAIN, 36));
+		passwordHint.setFont(new Font("Calibri", Font.PLAIN, 36));
+		usernameHint.setBorder(new EmptyBorder(20, 0, 20, 0));
+		passwordHint.setBorder(new EmptyBorder(20, 0, 20, 0));
+		JTextField usernameField = new JTextField(13);
 		usernameField.setPreferredSize(new Dimension(200, 44));
-		JTextField passwordField = new JPasswordField(16);
+		JTextField passwordField = new JPasswordField(13);
 		passwordField.setPreferredSize(new Dimension(200, 44));
 		passwordField.setFont(Game.smallGameFont);
 		usernameField.setFont(Game.smallGameFont);
@@ -142,5 +149,36 @@ public class Main {
 		loginPanel.add(passwordHint);
 		loginPanel.add(passwordField);
 		loginFrame.add(loginPanel);
+		JButton loginBtn = new JButton("Log In");
+		JButton signUpBtn = new JButton("Sign Up");
+		loginBtn.setFont(new Font("Calibri Light", Font.PLAIN, 40));
+		loginBtn.setPreferredSize(new Dimension(200, 70));
+		loginBtn.setBorder(new RoundedBorder(10));
+		loginBtn.setBackground(new Color(255, 255, 204));
+		signUpBtn.setFont(new Font("Calibri Light", Font.ITALIC, 40));
+		signUpBtn.setPreferredSize(new Dimension(200, 70));
+		signUpBtn.setBorder(new RoundedBorder(10));
+		signUpBtn.setBackground(new Color(204, 255, 255));
+		loginPanel.add(loginBtn);
+		loginPanel.add(signUpBtn);
+	}
+
+	private static class RoundedBorder implements Border {
+	    private int radius;
+	    private RoundedBorder(int radius) {
+	        this.radius = radius;
+	    }
+
+	    public Insets getBorderInsets(Component c) {
+	        return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
+	    }
+
+	    public boolean isBorderOpaque() {
+	        return true;
+	    }
+
+	    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+	        g.drawRoundRect(x, y, width-1, height-1, radius, radius);
+	    }
 	}
 }
