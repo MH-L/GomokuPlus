@@ -1,16 +1,25 @@
 package application;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 public class Main {
 	private static Game game;
@@ -64,15 +73,16 @@ public class Main {
 		networkBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					game = new NetworkGame();
-				} catch (InterruptedException e1) {
-					JOptionPane.showMessageDialog(frame, "Unable to process network game due to"
-							+ " internal error.\nSorry for the inconvenience.",
-							"Internal Error", JOptionPane.ERROR_MESSAGE);
-					e1.printStackTrace();
-				}
-				frame.dispose();
+				displayLoginPage();
+//				try {
+//					game = new NetworkGame();
+//				} catch (InterruptedException e1) {
+//					JOptionPane.showMessageDialog(frame, "Unable to process network game due to"
+//							+ " internal error.\nSorry for the inconvenience.",
+//							"Internal Error", JOptionPane.ERROR_MESSAGE);
+//					e1.printStackTrace();
+//				}
+//				frame.dispose();
 			}
 		});
 
@@ -102,5 +112,35 @@ public class Main {
 		btn.setBorderPainted(false);
 		btn.setFocusPainted(false);
 		return btn;
+	}
+
+	public static void displayLoginPage() {
+		JFrame loginFrame = new JFrame("Login");
+		loginFrame.setSize(600, 800);
+		loginFrame.setVisible(true);
+		JPanel loginPanel = new JPanel();
+		loginPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
+		JLabel label = new JLabel("Log In");
+		label.setFont(new Font("Calibri", Font.PLAIN, 58));
+		loginPanel.add(label);
+		JSeparator panelSeparator = new JSeparator(SwingConstants.HORIZONTAL);
+		panelSeparator.setPreferredSize(new Dimension(450, 3));
+		loginPanel.add(panelSeparator);
+		JLabel usernameHint = new JLabel("UserName");
+		JLabel passwordHint = new JLabel("Password");
+		usernameHint.setFont(new Font("Calibri", Font.PLAIN, 30));
+		passwordHint.setFont(new Font("Calibri", Font.PLAIN, 30));
+		JTextField usernameField = new JTextField(16);
+		usernameField.setPreferredSize(new Dimension(200, 44));
+		JTextField passwordField = new JPasswordField(16);
+		passwordField.setPreferredSize(new Dimension(200, 44));
+		passwordField.setFont(Game.smallGameFont);
+		usernameField.setFont(Game.smallGameFont);
+		loginPanel.add(usernameHint);
+		loginPanel.add(usernameField);
+		loginPanel.add(Box.createVerticalStrut(20));
+		loginPanel.add(passwordHint);
+		loginPanel.add(passwordField);
+		loginFrame.add(loginPanel);
 	}
 }
