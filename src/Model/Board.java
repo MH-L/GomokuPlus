@@ -40,7 +40,7 @@ public class Board {
 		for (int i = 0; i < Board.height; i++) {
 			for (int j = 0; j < Board.width; j++) {
 				Coordinate square = new Coordinate(i, j);
-				square.setBackground(Color.YELLOW);
+				square.setBackground(Game.boardColor);
 				square.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				square.addActionListener(new ActionListener() {
 					@Override

@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -28,6 +29,7 @@ import javax.swing.border.EmptyBorder;
 
 public class Main {
 	private static Game game;
+	private static final Dimension textFieldDimension = new Dimension(200, 54);
 	public static void main(String args[]) {
 		UIManager.put("OptionPane.messageFont", Game.smallGameFont);
 		UIManager.put("OptionPane.buttonFont", Game.smallGameFont);
@@ -78,16 +80,7 @@ public class Main {
 		networkBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				displayLoginPage();
-//				try {
-//					game = new NetworkGame();
-//				} catch (InterruptedException e1) {
-//					JOptionPane.showMessageDialog(frame, "Unable to process network game due to"
-//							+ " internal error.\nSorry for the inconvenience.",
-//							"Internal Error", JOptionPane.ERROR_MESSAGE);
-//					e1.printStackTrace();
-//				}
-//				frame.dispose();
+				displayLoginPage(frame);
 			}
 		});
 
@@ -119,7 +112,7 @@ public class Main {
 		return btn;
 	}
 
-	public static void displayLoginPage() {
+	public static void displayLoginPage(JFrame welcomeFrame) {
 		JFrame loginFrame = new JFrame("Login");
 		loginFrame.setSize(600, 500);
 		loginFrame.setVisible(true);
@@ -138,14 +131,15 @@ public class Main {
 		usernameHint.setBorder(new EmptyBorder(20, 0, 20, 0));
 		passwordHint.setBorder(new EmptyBorder(20, 0, 20, 0));
 		JTextField usernameField = new JTextField(13);
-		usernameField.setPreferredSize(new Dimension(200, 44));
+		usernameField.setPreferredSize(textFieldDimension);
 		JTextField passwordField = new JPasswordField(13);
-		passwordField.setPreferredSize(new Dimension(200, 44));
+		passwordField.setPreferredSize(textFieldDimension);
 		passwordField.setFont(Game.smallGameFont);
 		usernameField.setFont(Game.smallGameFont);
+		passwordField.setBorder(new RoundedBorder(8));
+		usernameField.setBorder(new RoundedBorder(8));
 		loginPanel.add(usernameHint);
 		loginPanel.add(usernameField);
-		loginPanel.add(Box.createVerticalStrut(20));
 		loginPanel.add(passwordHint);
 		loginPanel.add(passwordField);
 		loginFrame.add(loginPanel);
@@ -161,6 +155,108 @@ public class Main {
 		signUpBtn.setBackground(new Color(204, 255, 255));
 		loginPanel.add(loginBtn);
 		loginPanel.add(signUpBtn);
+
+		loginBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+				game = new NetworkGame();
+			} catch (InterruptedException e1) {
+				JOptionPane.showMessageDialog(welcomeFrame, "Unable to process network game due to"
+						+ " internal error.\nSorry for the inconvenience.",
+						"Internal Error", JOptionPane.ERROR_MESSAGE);
+				e1.printStackTrace();
+			}
+			welcomeFrame.dispose();
+			}
+		});
+
+		signUpBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				loginFrame.dispose();
+				displaySignUpFrame();
+			}
+		});
+	}
+
+	private static void displaySignUpFrame() {
+		JFrame signUpFrame = new JFrame("Sign Up");
+		signUpFrame.setVisible(true);
+		signUpFrame.setSize(new Dimension(650, 650));
+		JPanel signUpPanel = new JPanel();
+		signUpPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
+		signUpFrame.add(signUpPanel);
+		JLabel signUpText = new JLabel("Sign Up");
+		signUpText.setBorder(new EmptyBorder(0, 0, 20, 0));
+		signUpText.setFont(new Font("Tahoma", Font.PLAIN, 48));
+		signUpPanel.add(signUpText);
+		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+		sep.setPreferredSize(new Dimension(500, 3));
+		signUpPanel.add(sep);
+		JLabel usernameLabel = new JLabel("UserName");
+		usernameLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		JLabel emailLabel = new JLabel("Email");
+		emailLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		JLabel passwordLabel = new JLabel("Password");
+		passwordLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		JLabel credentialLabel = new JLabel("Invitation Code");
+		credentialLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		JTextField usernameField = new JTextField(10);
+		usernameField.setMaximumSize(textFieldDimension);
+		usernameField.setFont(Game.smallGameFont);
+		JTextField emailField = new JTextField(10);
+		emailField.setMaximumSize(textFieldDimension);
+		emailField.setFont(Game.smallGameFont);
+		JTextField passwordField = new JPasswordField(10);
+		passwordField.setMaximumSize(textFieldDimension);
+		passwordField.setFont(Game.smallGameFont);
+		JTextField invitationField = new JPasswordField(10);
+		invitationField.setMaximumSize(textFieldDimension);
+		invitationField.setFont(Game.smallGameFont);
+		usernameField.setBorder(new RoundedBorder(8));
+		emailField.setBorder(new RoundedBorder(8));
+		passwordField.setBorder(new RoundedBorder(8));
+		invitationField.setBorder(new RoundedBorder(8));
+		JPanel gridPanel = new JPanel(new GridLayout(4, 2, 20, 15));
+		gridPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+		gridPanel.add(usernameLabel);
+		gridPanel.add(usernameField);
+		gridPanel.add(emailLabel);
+		gridPanel.add(emailField);
+		gridPanel.add(passwordLabel);
+		gridPanel.add(passwordField);
+		gridPanel.add(credentialLabel);
+		gridPanel.add(invitationField);
+		signUpPanel.add(gridPanel);
+		JButton signUpBtn = new JButton("Register");
+		JButton helpBtn = new JButton("Help");
+		signUpBtn.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		helpBtn.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		signUpPanel.add(signUpBtn);
+		signUpPanel.add(helpBtn);
+		signUpBtn.setPreferredSize(new Dimension(200, 70));
+		signUpBtn.setBackground(new Color(204, 255, 204));
+		signUpBtn.setBorder(new EmptyBorder(20, 20, 20, 20));
+		helpBtn.setPreferredSize(new Dimension(200, 70));
+		helpBtn.setBackground(new Color(255, 229, 204));
+		helpBtn.setBorder(new EmptyBorder(20, 20, 20, 20));
+		helpBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String helpMessage = String.format(
+						"%s\n%s\n%s\n%s\n%s\n%s\n%s",
+						"An invitation code is needed to ensure",
+						"nobody is registering his/her account",
+						"for fun. You do have a better chance to",
+						"get the invitation code if you know the",
+						"author of the game very well. So, buy him",
+						"food and ask him for it. I am sure he will",
+						"give it to you.");
+				JOptionPane.showMessageDialog(null, helpMessage, "Help",
+						JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 	}
 
 	private static class RoundedBorder implements Border {

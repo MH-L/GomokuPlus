@@ -35,8 +35,11 @@ public abstract class Game {
 			Font.PLAIN, 28);
 	protected static final Font largeGameFont = new Font("Open Sans",
 			Font.PLAIN, 40);
+	protected static final Font mediumGameFont = new Font("Open Sans",
+			Font.PLAIN, 35);
 	protected static final Font tinyGameFont = new Font("Open Sans",
 			Font.PLAIN, 16);
+	public static final Color boardColor = new Color(204, 204, 0);
 	public static final Dimension defaultFrameDimension = new Dimension(1400,
 			760);
 	public static final Dimension defaultFrameSmall = new Dimension(700, 500);
