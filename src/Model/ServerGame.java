@@ -9,13 +9,27 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * This class is the server-side game engine
+ * which deals with server-side game logics.
+ * @author Minghao
+ *
+ */
 public class ServerGame {
 	private static final int SENTE = 1;
 	private static final int GOTE = 2;
+	/**
+	 * Different type of game results.
+	 * "Undecided" means the game is still in progress.
+	 */
 	public static final int RESULT_SENTE = 3;
 	public static final int RESULT_GOTE = 2;
 	public static final int RESULT_TIE = 4;
 	private static final int RESULT_UNDECIDED = 1;
+	/**
+	 * A player has to have 5 stones in a row/column/diagonal
+	 * in order to win.
+	 */
 	private static final int NUM_STONE_TO_WIN = 5;
 	private ServerBoard board;
 	private int activePlayer;
@@ -765,6 +779,8 @@ public class ServerGame {
 	}
 
 	private void onGameFinished() {
-
+		// TODO To be implemented.
+		// This method will store game data (Moves, results, etc...)
+		// to the game database, and it also updates the users' stats.
 	}
 }

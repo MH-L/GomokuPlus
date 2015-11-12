@@ -7,6 +7,11 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Authentication service for the gomoku game.
+ * Date: 2015/11/11
+ * @author Minghao
+ */
 public class AuthService {
 	public static final int PORT = 1993;
 

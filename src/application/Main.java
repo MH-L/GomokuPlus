@@ -30,6 +30,14 @@ import javax.swing.border.EmptyBorder;
 import exceptions.StorageException;
 import localStorage.StorageManager;
 
+/**
+ * Main class and entry point of the gomoku game
+ * (Other main classes are for game server and
+ * authentication services). Do note that some of
+ * the game's functionalities are not exposed.
+ * @author Minghao
+ *
+ */
 public class Main {
 	private static Game game;
 	/**
@@ -45,6 +53,7 @@ public class Main {
 	private static final Font loginHintFont = new Font("Calibri", Font.PLAIN, 36);
 	private static final Font signUpHintFont = new Font("Tahoma", Font.PLAIN, 36);
 	private static final Font signUpBtnFont = new Font("Tahoma", Font.PLAIN, 40);
+	private static final Border panelEmptyBorder = new EmptyBorder(20, 20, 20, 20);
 	/**
 	 * The reason why we need different lengths for the text fields is that
 	 * each grid in GridLayout always has the same grid width. Since the text
@@ -91,14 +100,16 @@ public class Main {
 			JOptionPane.showMessageDialog(null,
 					"Unable to initialize game storage. Stats services and online\n"
 					+ "authentication services will not be available. The game\n"
-					+ "directory should be in C:\\Program Files\\Gomoku Plus.\n"
+					+ "directory should be in C:\\Users\\<YOUR-NAME>\\Gomoku Plus\n"
 					+ "Please check your disk.");
 		}
 		singleplayerBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game = new SingleplayerGame(4);
-				frame.dispose();
+//				game = new SingleplayerGame(4);
+//				frame.dispose();
+				// to be implemented later.
+				displayUnimplementedMessage();
 			}
 		});
 
@@ -120,8 +131,10 @@ public class Main {
 		aiGameBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game = new AIGame();
-				frame.dispose();
+				// to be implemented later.
+//				game = new AIGame();
+//				frame.dispose();
+				displayUnimplementedMessage();
 			}
 		});
 	}
@@ -145,12 +158,19 @@ public class Main {
 		return btn;
 	}
 
+	/**
+	 * Constructs a user login frame for the network game.
+	 * In order to start a network game, the user has to
+	 * have a game account. This also prevents the game from
+	 * being hacked.
+	 * @param welcomeFrame The frame to display login message.
+	 */
 	public static void displayLoginPage(JFrame welcomeFrame) {
 		JFrame loginFrame = new JFrame("Login");
 		loginFrame.setSize(600, 500);
 		loginFrame.setVisible(true);
 		JPanel loginPanel = new JPanel();
-		loginPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
+		loginPanel.setBorder(panelEmptyBorder);
 		JLabel label = new JLabel("Log In");
 		label.setFont(new Font("Calibri", Font.PLAIN, 58));
 		loginPanel.add(label);
@@ -213,6 +233,13 @@ public class Main {
 		});
 	}
 
+	/**
+	 * This method displays the signup frame. A user
+	 * has to have a invitation code in order to sign up.
+	 * The reason why that is done is because it prevents
+	 * people from registering too many game accounts.
+	 * (The server capacity is too limited TBH.)
+	 */
 	private static void displaySignUpFrame() {
 		JFrame signUpFrame = new JFrame("Sign Up");
 		signUpFrame.setVisible(true);
@@ -252,7 +279,9 @@ public class Main {
 		passwordField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
 		invitationField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
 		JPanel gridPanel = new JPanel(new GridLayout(4, 2, 20, 15));
-		gridPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+		// Add elements to the grid panel. The panel is 2*4.
+		gridPanel.setBorder(panelEmptyBorder);
 		gridPanel.add(usernameLabel);
 		gridPanel.add(usernameField);
 		gridPanel.add(emailLabel);
@@ -292,6 +321,11 @@ public class Main {
 		});
 	}
 
+	/**
+	 * Custom class for round-cornered borders for textfields and buttons.
+	 * @author Minghao
+	 *
+	 */
 	private static class RoundedBorder implements Border {
 	    private int radius;
 	    private RoundedBorder(int radius) {
@@ -311,6 +345,10 @@ public class Main {
 	    }
 	}
 
+	/**
+	 * This message is used when the functionality is under development or
+	 * there are bugs in it.
+	 */
 	public static void displayUnimplementedMessage() {
 		JOptionPane.showMessageDialog(null, "The functionality is not implemented yet."
 				+ "Our developers\nare working hard on it! Stay tuned!", "Sorry -- Unimplemented",
