@@ -41,9 +41,9 @@ public class MultiplayerGame extends Game {
 		btnTie.setMargin(new Insets(0,0,0,0));
 		buttonPanel.add(btnWithdrawal);
 		buttonPanel.add(btnTie);
-		withdrawals = new JLabel("Withdrawals:");
-		blackWithdrawals = new JLabel("Black -- 0");
-		whiteWithdrawals = new JLabel("White -- 0");
+		withdrawals = new JLabel("Withdrawals Left:");
+		blackWithdrawals = new JLabel("Black -- 2");
+		whiteWithdrawals = new JLabel("White -- 2");
 		withdrawals.setFont(Game.smallGameFont);
 		blackWithdrawals.setFont(Game.smallGameFont);
 		whiteWithdrawals.setFont(Game.smallGameFont);
@@ -61,8 +61,10 @@ public class MultiplayerGame extends Game {
 		} else if (this.board.withdraw()) {
 			if (board.getActivePlayer() == 1) {
 				p1WithdrawalLeft --;
+				blackWithdrawals.setText("Black -- " + p1WithdrawalLeft);
 			} else {
 				p2WithdrawalLeft --;
+				whiteWithdrawals.setText("White -- " + p2WithdrawalLeft);
 			}
 		} else {
 			displayWithdrawFailed();

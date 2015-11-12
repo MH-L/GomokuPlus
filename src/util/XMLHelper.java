@@ -24,13 +24,14 @@ public class XMLHelper {
 			child.parentElement = this;
 		}
 
-		public XMLElement getChild(String name) {
+		public List<XMLElement> getChild(String name) {
+			List<XMLElement> retVal = new ArrayList<XMLElement>();
 			for (XMLElement child : childElements) {
 				if (child.name.equals(name)) {
-					return child;
+					retVal.add(child);
 				}
 			}
-			return null;
+			return retVal;
 		}
 
 		public XMLElement getParent() {
@@ -77,7 +78,6 @@ public class XMLHelper {
 
 	public static XMLElement strToXML(String str) throws XMLException {
 		Stack<String> openedTags = new Stack<String>();
-		Stack<Boolean> tagsHasContent = new Stack<Boolean>();
 		char[] array = str.toCharArray();
 		char prev = ' ';
 		String nameBuffer = "";
@@ -89,9 +89,13 @@ public class XMLHelper {
 		XMLElement curElement = null;
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] == '<') {
+				// start of tag (no matter whether or not it is an opening tag)
 				if (nameStarted == true) {
+					// Cannot have "<" inside an XML tag.
 					throw new XMLException("Invalid XML tag.");
-				} else if (contentStarted == true) {
+				} else if (contentBuffer.length() > 0) {
+					// as the exception suggests, if there is already some contents,
+					// then the nested tag is not valid.
 					if (i == array.length || array[i+1] != '/') {
 						throw new XMLException("Contents inside XML element with nested XML elements.");
 					}

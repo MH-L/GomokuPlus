@@ -404,7 +404,7 @@ public abstract class Game {
 
 	public void displayWithdrawFailed() {
 		JOptionPane.showMessageDialog(mainFrame, "You have run out of your withdrawals"
-				+ " or there is nothing to withdraw.",
+				+ " or there is\n nothing to withdraw.",
 				"Error", JOptionPane.ERROR_MESSAGE);
 	}
 

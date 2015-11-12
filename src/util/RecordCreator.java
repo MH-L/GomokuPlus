@@ -1,7 +1,9 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.XMLException;
 import util.XMLHelper.XMLElement;
 import model.IMove;
 import model.ServerGame;
@@ -73,5 +75,21 @@ public class RecordCreator {
 
 	public static String generateRecordString(List<? extends IMove> moves) {
 		return generateRecordString(moves, 0, -1, -1);
+	}
+
+	public static ArrayList<IMove> generateMovesFromXML(XMLElement gameXML) throws XMLException {
+		List<XMLElement> moves = gameXML.getChild("Moves");
+		if (!(moves.size() == 1)) {
+			throw new XMLException("Game XML does not contain moves.");
+		}
+
+		List<XMLElement> rounds = moves.get(0).getChild("Round");
+		if (rounds.isEmpty()) {
+			throw new XMLException("No rounds in move XML element.");
+		}
+
+		// TODO finish this method. it should be rather simple...
+
+		return null;
 	}
 }
