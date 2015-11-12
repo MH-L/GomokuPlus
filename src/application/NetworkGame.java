@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,12 +29,13 @@ import javax.swing.JPanel;
 import localStorage.StorageManager;
 import model.Board;
 import model.Coordinate;
+import model.IMove;
 import model.NetworkBoard;
 import model.ServerConstants;
 import model.ServerGame.Move;
 
 public class NetworkGame extends Game {
-	private ArrayList<Move> moves = new ArrayList<Move>();
+	private ArrayList<PortableMove> moves = new ArrayList<PortableMove>();
 	private JButton btnProposeTie;
 	private JButton btnTryWithdraw;
 	private JButton btnSendMessage;
@@ -107,7 +109,7 @@ public class NetworkGame extends Game {
 		historyPanel.add(infoBar);
 		historyPanel.add(actionBar);
 		historyPanel.add(personalInfoBar);
-		board = new NetworkBoard(boardPanel);
+		board = new NetworkBoard(boardPanel, this);
 		messageArea.addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -221,7 +223,7 @@ public class NetworkGame extends Game {
 	}
 
 	public static void handleConnectionFailure() {
-		JOptionPane.showMessageDialog(mainFrame, "Connection failed. Return to main page.");
+		JOptionPane.showMessageDialog(null, "Connection failed. Return to main page.");
 	}
 
 	private void quitGameWhenDisconnected() {
@@ -373,6 +375,7 @@ public class NetworkGame extends Game {
 					dirtyBit = true;
 					board.setSquareByTurn(ycoord, xcoord, turn);
 					actionBar.setText("Opponent's Turn");
+					moves.add(new PortableMove(xcoord, ycoord));
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE) + ",")) {
 					String[] coords = message.split(",");
 					int xcoord = Integer.parseInt(coords[1]);
@@ -382,6 +385,7 @@ public class NetworkGame extends Game {
 					board.setSquareByTurn(ycoord, xcoord, otherTurn);
 					withdrawProposed = false;
 					actionBar.setText("Your Turn");
+					moves.add(new PortableMove(xcoord, ycoord));
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_WITHDRAW_APPROVED) + ",")) {
 					if (withdrawProposed) {
 						JOptionPane.showMessageDialog(mainFrame, "Your withdrawal"
@@ -396,8 +400,10 @@ public class NetworkGame extends Game {
 					System.out.println(String.format("The coordinates are: %d,%d,%d,%d.",
 							firstX, firstY, secondX, secondY));
 					board.resetSquare(firstX, firstY);
+					moves.remove(moves.size() - 1);
 					if (secondX != -1 && secondY != -1) {
 						board.resetSquare(secondX, secondY);
+						moves.remove(moves.size() - 1);
 					}
 					withdrawProposed = false;
 					dirtyBit = false;
@@ -459,7 +465,7 @@ public class NetworkGame extends Game {
 		@Override
 		synchronized public void actionPerformed(ActionEvent e) {
 			if (!gameStarted) {
-				Game.warnGameFrozen();
+				NetworkGame.this.warnGameFrozen();
 				return;
 			}
 			if (dirtyBit == true) {
@@ -472,7 +478,7 @@ public class NetworkGame extends Game {
 
 	}
 
-	private static void multiClickWarning() {
+	private void multiClickWarning() {
 		JOptionPane.showMessageDialog(mainFrame, "Please do not click a square multiple times"
 				+ " or click on multiple squares when making move.",
 				"Warning", JOptionPane.WARNING_MESSAGE);
@@ -546,5 +552,24 @@ public class NetworkGame extends Game {
 
 		}
 		return null;
+	}
+
+	public class PortableMove implements IMove {
+		private int x;
+		private int y;
+		private PortableMove(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		@Override
+		public int getX() {
+			return x;
+		}
+
+		@Override
+		public int getY() {
+			return y;
+		}
 	}
 }

@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
+import application.NetworkGame.PortableMove;
 import database.ConnectionManager;
 import util.RecordCreator;
 import util.XMLHelper;
+import model.IMove;
 import model.ServerGame.Move;
 import exceptions.StorageException;
 
@@ -115,7 +118,7 @@ public class StorageManager {
 		writer.close();
 	}
 
-	public static void storeGameRecord(ArrayList<Move> moves) throws IOException {
+	public static void storeGameRecord(List<? extends IMove> moves) throws IOException {
 		String moveStr = RecordCreator.generateRecordString(moves);
 		String gameHash = ConnectionManager.getGameHash(System.currentTimeMillis(), 1, 2);
 		gameHash = new String(Base64.getEncoder().encode(gameHash.getBytes()));

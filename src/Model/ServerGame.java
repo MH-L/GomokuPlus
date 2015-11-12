@@ -308,11 +308,11 @@ public class ServerGame {
 		return ServerConstants.INT_REQUEST_OK;
 	}
 
-	public class Move {
+	public class Move implements IMove {
 		private int x;
 		private int y;
 
-		private Move(int x, int y) {
+		public Move(int x, int y) {
 			this.x = x;
 			this.y = y;
 		}

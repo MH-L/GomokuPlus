@@ -9,12 +9,14 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -26,6 +28,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileFilter;
 
 import model.Board;
 import model.Coordinate;
@@ -39,6 +42,7 @@ public abstract class Game {
 			Font.PLAIN, 35);
 	protected static final Font tinyGameFont = new Font("Open Sans",
 			Font.PLAIN, 16);
+	public static final Insets emptyMargin = new Insets(0, 0, 0, 0);
 	public static final Color boardColor = new Color(204, 204, 0);
 	public static final Dimension defaultFrameDimension = new Dimension(1400,
 			760);
@@ -47,21 +51,21 @@ public abstract class Game {
 	public static final int NUM_STONE_TO_WIN = 5;
 	public static final int TURN_SENTE = 1;
 	public static final int TURN_GOTE = 2;
-	protected static JPanel mainPanel;
-	protected static JPanel parentPanel;
-	protected static JPanel chatPanel;
-	protected static JFrame mainFrame;
-	protected static JButton btnStart;
-	protected static JButton btnGiveUp;
-	protected static JPanel titlePanel;
-	protected static JMenuBar menuBar;
-	protected static JPanel boardPanel;
-	protected static JPanel historyPanel;
-	protected static JPanel buttonPanel;
-	protected static JPanel functionPanel;
-	private static JLabel gameStarted;
-	protected static JTextArea messageArea;
-	protected static Board board;
+	protected JPanel mainPanel;
+	protected JPanel parentPanel;
+	protected JPanel chatPanel;
+	protected JFrame mainFrame;
+	protected JButton btnStart;
+	protected JButton btnGiveUp;
+	protected JPanel titlePanel;
+	protected JMenuBar menuBar;
+	protected JPanel boardPanel;
+	protected JPanel historyPanel;
+	protected JPanel buttonPanel;
+	protected JPanel functionPanel;
+	private JLabel gameStarted;
+	protected JTextArea messageArea;
+	protected Board board;
 
 	/**
 	 * Sente -- first player
@@ -83,8 +87,8 @@ public abstract class Game {
 		mainFrame.setSize(defaultFrameDimension);
 		btnStart = Main.getPlainLookbtn("Start!", "Open Sans", 23, Font.PLAIN, Color.CYAN);
 		btnGiveUp = Main.getPlainLookbtn("Give UP!", "Open Sans", 23, Font.PLAIN, Color.RED);
-		btnStart.setMargin(new Insets(0,0,0,0));
-		btnGiveUp.setMargin(new Insets(0,0,0,0));
+		btnStart.setMargin(emptyMargin);
+		btnGiveUp.setMargin(emptyMargin);
 		parentPanel.add(mainPanel, BorderLayout.WEST);
 		parentPanel.add(new JSeparator());
 		parentPanel.add(chatPanel, BorderLayout.EAST);
@@ -130,7 +134,7 @@ public abstract class Game {
 	protected void initialSetUp() {
 		addStartButtonListener(btnStart);
 		addGiveUpButtonListener();
-		board = new Board(boardPanel);
+		board = new Board(boardPanel, this);
 	}
 
 	protected void addGiveUpButtonListener() {
@@ -164,13 +168,13 @@ public abstract class Game {
 		});
 	}
 
-	private static void gameStart() {
+	private void gameStart() {
 		board.resetBoard();
 		board.activate();
 		gameStarted.setText("Game Started.");
 	}
 
-	private static void gameEnd() {
+	public void gameEnd() {
 		board.resetBoard();
 		board.freeze();
 		gameStarted.setText("Game not yet started.");
@@ -244,17 +248,64 @@ public abstract class Game {
 		JMenu analysisMenu = new JMenu("Analysis");
 		analysisMenu.setPreferredSize(new Dimension(166, 60));
 		analysisMenu.setFont(smallGameFont);
+		JMenuItem chooseFile = new JMenuItem("Choose File...");
 		JMenuItem stepForward = new JMenuItem("Step Forward");
 		JMenuItem stepBackward = new JMenuItem("Step Backward");
 		JMenuItem animate = new JMenuItem("Animate");
+		chooseFile.setFont(smallGameFont);
 		stepForward.setFont(smallGameFont);
 		stepBackward.setFont(smallGameFont);
 		animate.setFont(smallGameFont);
+		analysisMenu.add(chooseFile);
+		analysisMenu.addSeparator();
 		analysisMenu.add(stepForward);
 		analysisMenu.addSeparator();
 		analysisMenu.add(stepBackward);
 		analysisMenu.addSeparator();
 		analysisMenu.add(animate);
+
+		chooseFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fc = new JFileChooser();
+				fc.setFileFilter(new FileFilter() {
+					@Override
+					public String getDescription() {
+						return ".xml";
+					}
+
+					@Override
+					public boolean accept(File f) {
+						if (f.isDirectory()) {
+							return true;
+						}
+
+						String extension = getExtension(f);
+						if (extension != null && extension.equals("xml")) {
+							return true;
+						}
+						return false;
+					}
+
+					public String getExtension(File f) {
+				        String ext = null;
+				        String s = f.getName();
+				        int i = s.lastIndexOf('.');
+
+				        if (i > 0 &&  i < s.length() - 1) {
+				            ext = s.substring(i+1).toLowerCase();
+				        }
+				        return ext;
+				    }
+				});
+				int result = fc.showOpenDialog(mainPanel);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					File fl = fc.getSelectedFile();
+					Game g = new AnalysisGame();
+					mainFrame.dispose();
+				}
+			}
+		});
 
 		JMenu statsMenu = new JMenu("Stats");
 		statsMenu.setPreferredSize(new Dimension(168, 60));
@@ -312,32 +363,30 @@ public abstract class Game {
 		}
 	}
 
-	public static void displayOccupiedWarning() {
+	public void displayOccupiedWarning() {
 		JOptionPane.showMessageDialog(mainFrame, "The square is already occupied.",
 				"Error", JOptionPane.ERROR_MESSAGE);
 	}
 
-	public static void errorRendering() {
+	public void errorRendering() {
 		JOptionPane.showMessageDialog(mainFrame, "Unable to render board image. Fatal error!",
 				"Error", JOptionPane.ERROR_MESSAGE);
 	}
 
-	public static void displayWinnerInfo(boolean isSente) {
+	public void displayWinnerInfo(boolean isSente) {
 		String winnerInfo = isSente ? "Black" : "White";
-		JOptionPane.showMessageDialog(mainFrame, winnerInfo + " wins!",
+		JOptionPane.showMessageDialog(null, winnerInfo + " wins!",
 				"Game Over", JOptionPane.INFORMATION_MESSAGE);
-		gameEnd();
 	}
 
-	public static void warnGameFrozen() {
+	public void warnGameFrozen() {
 		JOptionPane.showMessageDialog(mainFrame, "Game is not yet started or has finished.\nPlease start new game by pressing"
 				+ " start\nor go to menu bar.", "Game Status Info", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	public static void displayTieMessage() {
+	public void displayTieMessage() {
 		JOptionPane.showMessageDialog(mainFrame, "Board Full. Game comes to a tie.",
 				"Game Over", JOptionPane.INFORMATION_MESSAGE);
-		gameEnd();
 	}
 
 	public static void addCloseConfirmation(JFrame frame) {
@@ -354,7 +403,7 @@ public abstract class Game {
 		});
 	}
 
-	public static void displayWithdrawFailed() {
+	public void displayWithdrawFailed() {
 		JOptionPane.showMessageDialog(mainFrame, "You have run out of your withdrawals"
 				+ " or there is nothing to withdraw.",
 				"Error", JOptionPane.ERROR_MESSAGE);

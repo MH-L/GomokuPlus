@@ -3,12 +3,13 @@ package util;
 import java.util.List;
 
 import util.XMLHelper.XMLElement;
+import model.IMove;
 import model.ServerGame;
 import model.ServerGame.Move;
 
 public class RecordCreator {
 	public static final String RECORD_FILE_TYPE_SUFFIX = ".xml";
-	public static String generateRecordString(List<Move> moves, int result, int senteWithdrawals,
+	public static String generateRecordString(List<? extends IMove> moves, int result, int senteWithdrawals,
 			int goteWithdrawals) {
 		XMLHelper helper = new XMLHelper();
 		XMLElement game = helper.new XMLElement("Game", null);
@@ -45,7 +46,7 @@ public class RecordCreator {
 		XMLElement steps = helper.new XMLElement("Moves", null);
 
 		for (int i = 0; i < moves.size(); i += 2) {
-			Move m = moves.get(i);
+			IMove m = moves.get(i);
 			XMLElement round = helper.new XMLElement("Round", null);
 			XMLElement senteMove = helper.new XMLElement("Move", null);
 			XMLElement senteMoveX = helper.new XMLElement("X", String.valueOf(m.getX()));
@@ -55,6 +56,7 @@ public class RecordCreator {
 			round.appendChild(senteMove);
 
 			if (i + 1 < moves.size()) {
+				m = moves.get(i + 1);
 				XMLElement goteMove = helper.new XMLElement("Move", null);
 				XMLElement goteMoveX = helper.new XMLElement("X", String.valueOf(m.getX()));
 				XMLElement goteMoveY = helper.new XMLElement("Y", String.valueOf(m.getY()));
@@ -69,7 +71,7 @@ public class RecordCreator {
 		return XMLHelper.elementToString(game, 0);
 	}
 
-	public static String generateRecordString(List<Move> moves) {
+	public static String generateRecordString(List<? extends IMove> moves) {
 		return generateRecordString(moves, 0, -1, -1);
 	}
 }

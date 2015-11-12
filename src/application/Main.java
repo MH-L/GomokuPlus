@@ -213,14 +213,15 @@ public class Main {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-				game = new NetworkGame();
-			} catch (InterruptedException e1) {
-				JOptionPane.showMessageDialog(welcomeFrame, "Unable to process network game due to"
-						+ " internal error.\nSorry for the inconvenience.",
-						"Internal Error", JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
-			}
-			welcomeFrame.dispose();
+					loginFrame.dispose();
+					game = new NetworkGame();
+				} catch (InterruptedException e1) {
+					JOptionPane.showMessageDialog(welcomeFrame, "Unable to process network game due to"
+							+ " internal error.\nSorry for the inconvenience.",
+							"Internal Error", JOptionPane.ERROR_MESSAGE);
+					e1.printStackTrace();
+				}
+				welcomeFrame.dispose();
 			}
 		});
 

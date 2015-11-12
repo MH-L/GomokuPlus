@@ -23,13 +23,15 @@ public class Board {
 	protected static Coordinate[][] grid;
 	public static final int width = 15;
 	public static final int height = 15;
-	private static int activePlayer;
-	private static boolean isFrozen = true;
-	private static Coordinate lastMove1 = null;
-	private static Coordinate lastMove2 = null;
-	private static int stoneCount = 0;
+	private int activePlayer;
+	private boolean isFrozen = true;
+	private Coordinate lastMove1 = null;
+	private Coordinate lastMove2 = null;
+	private int stoneCount = 0;
+	private Game g;
 
-	public Board(JPanel boardPanel) {
+	public Board(JPanel boardPanel, Game g) {
+		this.g = g;
 		grid = new Coordinate[height][width];
 		activePlayer = 1;
 		addCellsToBoard(boardPanel);
@@ -46,11 +48,12 @@ public class Board {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						if (isFrozen) {
-							Game.warnGameFrozen();
+							g.warnGameFrozen();
 							return;
 						}
 						if (isBoardFull()) {
-							Game.displayTieMessage();
+							g.displayTieMessage();
+							g.gameEnd();
 							return;
 						}
 						if (square.isUnoccupied()) {
@@ -59,7 +62,7 @@ public class Board {
 									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
 									square.setIcon(new ImageIcon(img));
 								} catch (IOException e1) {
-									Game.errorRendering();
+									g.errorRendering();
 								}
 								square.setStone(true);
 								updateActivePlayer();
@@ -68,7 +71,7 @@ public class Board {
 									Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
 									square.setIcon(new ImageIcon(img));
 								} catch (IOException e1) {
-									Game.errorRendering();
+									g.errorRendering();
 								}
 								square.setStone(false);
 								updateActivePlayer();
@@ -76,16 +79,17 @@ public class Board {
 							lastMove2 = lastMove1;
 							lastMove1 = square;
 						} else {
-							Game.displayOccupiedWarning();
+							g.displayOccupiedWarning();
 						}
 						Result currentGameResult = checkWinning();
 						if (currentGameResult != Result.UNDECIDED) {
 							isFrozen = true;
 							if (currentGameResult == Result.SENTE) {
-								Game.displayWinnerInfo(true);
+								g.displayWinnerInfo(true);
 							} else {
-								Game.displayWinnerInfo(false);
+								g.displayWinnerInfo(false);
 							}
+							g.gameEnd();
 						}
 					}
 				});
@@ -322,14 +326,14 @@ public class Board {
 				Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
 				grid[y][x].setIcon(new ImageIcon(img));
 			} catch (IOException e1) {
-				Game.errorRendering();
+				g.errorRendering();
 			}
 		} else if (turn == Game.TURN_GOTE) {
 			try {
 				Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
 				grid[y][x].setIcon(new ImageIcon(img));
 			} catch (IOException e1) {
-				Game.errorRendering();
+				g.errorRendering();
 			}
 		} else {
 			// Something went wrong apparently.
