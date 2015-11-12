@@ -2,6 +2,9 @@ package util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
+
+import exceptions.XMLException;
 
 public class XMLHelper {
 	public class XMLElement {
@@ -65,10 +68,32 @@ public class XMLHelper {
 		return result;
 	}
 
-	public static XMLElement strToXML(String str) {
+	public static XMLElement strToXML(String str) throws XMLException {
+		Stack<String> openedTags = new Stack<String>();
 		char[] array = str.toCharArray();
+		char prev = ' ';
+		String nameBuffer = "";
+		String contentBuffer = "";
+		boolean nameStarted = false;
+		boolean contentStarted = false;
 		for (int i = 0; i < array.length; i++) {
+			if (array[i] == '<') {
 
+			} else if (array[i] == '>') {
+				openedTags.add(nameBuffer);
+				nameBuffer = "";
+			} else if (array[i] == '/') {
+
+			} else if (array[i] == ' ' ||
+					array[i] == '\n' || array[i] == '\r') {
+
+			} else {
+
+			}
+		}
+
+		if (!openedTags.empty()) {
+			throw new XMLException("Malformed XML document.");
 		}
 		return null;
 	}

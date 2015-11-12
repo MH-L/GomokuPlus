@@ -6,22 +6,26 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
+import model.IMove;
+
 public class AnalysisGame extends Game {
 	private JButton stepForwardBtn;
 	private JButton stepBackwardBtn;
 	private JButton jumpToEndBtn;
 	private JButton jumpToBeginningBtn;
-	private File gameFile;
+	private ArrayList<IMove> moves;
+	private int curMoveIndex;
 
 	public AnalysisGame(File gameFile) {
 		super();
-		this.gameFile = gameFile;
+		getAllMoves(gameFile);
 		JLabel analysisGameLabel = new JLabel("Analysis Game");
 		analysisGameLabel.setFont(Game.largeGameFont);
 		titlePanel.setPreferredSize(new Dimension(Game.functionPanelWidth, 150));
@@ -77,5 +81,9 @@ public class AnalysisGame extends Game {
 
 			}
 		});
+	}
+
+	public void getAllMoves(File record) {
+
 	}
 }
