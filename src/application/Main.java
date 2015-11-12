@@ -27,9 +27,33 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import exceptions.StorageException;
+import localStorage.StorageManager;
+
 public class Main {
 	private static Game game;
+	/**
+	 * IMPORTANT!!!
+	 * Please follow this convention (for this project):
+	 * if the constant is a primitive type, then use all
+	 * caps with underscore, if the constant is an object,
+	 * use camelCase.
+	 */
 	private static final Dimension textFieldDimension = new Dimension(200, 54);
+	private static final Dimension horizontalLineDimension = new Dimension(500, 3);
+	private static final Dimension signUpLoginBtnDimension = new Dimension(200, 70);
+	private static final Font loginHintFont = new Font("Calibri", Font.PLAIN, 36);
+	private static final Font signUpHintFont = new Font("Tahoma", Font.PLAIN, 36);
+	private static final Font signUpBtnFont = new Font("Tahoma", Font.PLAIN, 40);
+	/**
+	 * The reason why we need different lengths for the text fields is that
+	 * each grid in GridLayout always has the same grid width. Since the text
+	 * is not long enough, setting the length of the textfield too long will
+	 * create too much blank space.
+	 */
+	private static final int TEXTFIELD_LENGTH_BORDER_LAYOUT = 13;
+	private static final int TEXTFIELD_LENGTH_GRID_LAYOUT = 10;
+	private static final int ROUND_CORNOR_RADIUS = 8;
 	public static void main(String args[]) {
 		UIManager.put("OptionPane.messageFont", Game.smallGameFont);
 		UIManager.put("OptionPane.buttonFont", Game.smallGameFont);
@@ -61,6 +85,15 @@ public class Main {
 		btnPanel.add(multiplayerBtn);
 		btnPanel.add(networkBtn);
 		btnPanel.add(aiGameBtn);
+		try {
+			StorageManager.initializeStorage();
+		} catch (StorageException e1) {
+			JOptionPane.showMessageDialog(null,
+					"Unable to initialize game storage. Stats services and online\n"
+					+ "authentication services will not be available. The game\n"
+					+ "directory should be in C:\\Program Files\\Gomoku Plus.\n"
+					+ "Please check your disk.");
+		}
 		singleplayerBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -122,22 +155,22 @@ public class Main {
 		label.setFont(new Font("Calibri", Font.PLAIN, 58));
 		loginPanel.add(label);
 		JSeparator panelSeparator = new JSeparator(SwingConstants.HORIZONTAL);
-		panelSeparator.setPreferredSize(new Dimension(450, 3));
+		panelSeparator.setPreferredSize(horizontalLineDimension);
 		loginPanel.add(panelSeparator);
 		JLabel usernameHint = new JLabel("UserName");
 		JLabel passwordHint = new JLabel("Password");
-		usernameHint.setFont(new Font("Calibri", Font.PLAIN, 36));
-		passwordHint.setFont(new Font("Calibri", Font.PLAIN, 36));
+		usernameHint.setFont(loginHintFont);
+		passwordHint.setFont(loginHintFont);
 		usernameHint.setBorder(new EmptyBorder(20, 0, 20, 0));
 		passwordHint.setBorder(new EmptyBorder(20, 0, 20, 0));
-		JTextField usernameField = new JTextField(13);
+		JTextField usernameField = new JTextField(TEXTFIELD_LENGTH_BORDER_LAYOUT);
 		usernameField.setPreferredSize(textFieldDimension);
-		JTextField passwordField = new JPasswordField(13);
+		JTextField passwordField = new JPasswordField(TEXTFIELD_LENGTH_BORDER_LAYOUT);
 		passwordField.setPreferredSize(textFieldDimension);
 		passwordField.setFont(Game.smallGameFont);
 		usernameField.setFont(Game.smallGameFont);
-		passwordField.setBorder(new RoundedBorder(8));
-		usernameField.setBorder(new RoundedBorder(8));
+		passwordField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+		usernameField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
 		loginPanel.add(usernameHint);
 		loginPanel.add(usernameField);
 		loginPanel.add(passwordHint);
@@ -147,11 +180,11 @@ public class Main {
 		JButton signUpBtn = new JButton("Sign Up");
 		loginBtn.setFont(new Font("Calibri Light", Font.PLAIN, 40));
 		loginBtn.setPreferredSize(new Dimension(200, 70));
-		loginBtn.setBorder(new RoundedBorder(10));
+		loginBtn.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
 		loginBtn.setBackground(new Color(255, 255, 204));
 		signUpBtn.setFont(new Font("Calibri Light", Font.ITALIC, 40));
 		signUpBtn.setPreferredSize(new Dimension(200, 70));
-		signUpBtn.setBorder(new RoundedBorder(10));
+		signUpBtn.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
 		signUpBtn.setBackground(new Color(204, 255, 255));
 		loginPanel.add(loginBtn);
 		loginPanel.add(signUpBtn);
@@ -192,32 +225,32 @@ public class Main {
 		signUpText.setFont(new Font("Tahoma", Font.PLAIN, 48));
 		signUpPanel.add(signUpText);
 		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-		sep.setPreferredSize(new Dimension(500, 3));
+		sep.setPreferredSize(horizontalLineDimension);
 		signUpPanel.add(sep);
 		JLabel usernameLabel = new JLabel("UserName");
-		usernameLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		usernameLabel.setFont(signUpHintFont);
 		JLabel emailLabel = new JLabel("Email");
-		emailLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		emailLabel.setFont(signUpHintFont);
 		JLabel passwordLabel = new JLabel("Password");
-		passwordLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
+		passwordLabel.setFont(signUpHintFont);
 		JLabel credentialLabel = new JLabel("Invitation Code");
-		credentialLabel.setFont(new Font("Tahoma", Font.PLAIN, 36));
-		JTextField usernameField = new JTextField(10);
+		credentialLabel.setFont(signUpHintFont);
+		JTextField usernameField = new JTextField(TEXTFIELD_LENGTH_GRID_LAYOUT);
 		usernameField.setMaximumSize(textFieldDimension);
 		usernameField.setFont(Game.smallGameFont);
-		JTextField emailField = new JTextField(10);
+		JTextField emailField = new JTextField(TEXTFIELD_LENGTH_GRID_LAYOUT);
 		emailField.setMaximumSize(textFieldDimension);
 		emailField.setFont(Game.smallGameFont);
-		JTextField passwordField = new JPasswordField(10);
+		JTextField passwordField = new JPasswordField(TEXTFIELD_LENGTH_GRID_LAYOUT);
 		passwordField.setMaximumSize(textFieldDimension);
 		passwordField.setFont(Game.smallGameFont);
-		JTextField invitationField = new JPasswordField(10);
+		JTextField invitationField = new JPasswordField(TEXTFIELD_LENGTH_GRID_LAYOUT);
 		invitationField.setMaximumSize(textFieldDimension);
 		invitationField.setFont(Game.smallGameFont);
-		usernameField.setBorder(new RoundedBorder(8));
-		emailField.setBorder(new RoundedBorder(8));
-		passwordField.setBorder(new RoundedBorder(8));
-		invitationField.setBorder(new RoundedBorder(8));
+		usernameField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+		emailField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+		passwordField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+		invitationField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
 		JPanel gridPanel = new JPanel(new GridLayout(4, 2, 20, 15));
 		gridPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 		gridPanel.add(usernameLabel);
@@ -231,14 +264,14 @@ public class Main {
 		signUpPanel.add(gridPanel);
 		JButton signUpBtn = new JButton("Register");
 		JButton helpBtn = new JButton("Help");
-		signUpBtn.setFont(new Font("Tahoma", Font.PLAIN, 40));
-		helpBtn.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		signUpBtn.setFont(signUpBtnFont);
+		helpBtn.setFont(signUpBtnFont);
 		signUpPanel.add(signUpBtn);
 		signUpPanel.add(helpBtn);
-		signUpBtn.setPreferredSize(new Dimension(200, 70));
+		signUpBtn.setPreferredSize(signUpLoginBtnDimension);
 		signUpBtn.setBackground(new Color(204, 255, 204));
 		signUpBtn.setBorder(new EmptyBorder(20, 20, 20, 20));
-		helpBtn.setPreferredSize(new Dimension(200, 70));
+		helpBtn.setPreferredSize(signUpLoginBtnDimension);
 		helpBtn.setBackground(new Color(255, 229, 204));
 		helpBtn.setBorder(new EmptyBorder(20, 20, 20, 20));
 		helpBtn.addActionListener(new ActionListener() {
@@ -276,5 +309,11 @@ public class Main {
 	    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 	        g.drawRoundRect(x, y, width-1, height-1, radius, radius);
 	    }
+	}
+
+	public static void displayUnimplementedMessage() {
+		JOptionPane.showMessageDialog(null, "The functionality is not implemented yet."
+				+ "Our developers\nare working hard on it! Stay tuned!", "Sorry -- Unimplemented",
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 }
