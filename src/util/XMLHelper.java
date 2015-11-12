@@ -10,15 +10,18 @@ public class XMLHelper {
 	public class XMLElement {
 		private String name;
 		private List<XMLElement> childElements;
+		private XMLElement parentElement;
 		private String content;
 		public XMLElement(String name, String content) {
 			this.name = name;
 			this.content = content;
 			childElements = new ArrayList<XMLElement>();
+			parentElement = null;
 		}
 
 		public void appendChild(XMLElement child) {
 			childElements.add(child);
+			child.parentElement = this;
 		}
 
 		public XMLElement getChild(String name) {
@@ -28,6 +31,10 @@ public class XMLHelper {
 				}
 			}
 			return null;
+		}
+
+		public XMLElement getParent() {
+			return parentElement;
 		}
 
 		public void setContent(String c) {
@@ -70,31 +77,75 @@ public class XMLHelper {
 
 	public static XMLElement strToXML(String str) throws XMLException {
 		Stack<String> openedTags = new Stack<String>();
+		Stack<Boolean> tagsHasContent = new Stack<Boolean>();
 		char[] array = str.toCharArray();
 		char prev = ' ';
 		String nameBuffer = "";
 		String contentBuffer = "";
 		boolean nameStarted = false;
 		boolean contentStarted = false;
+		boolean isOpening = false;
+		XMLElement retVal = null;
+		XMLElement curElement = null;
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] == '<') {
-
+				if (nameStarted == true) {
+					throw new XMLException("Invalid XML tag.");
+				} else if (contentStarted == true) {
+					if (i == array.length || array[i+1] != '/') {
+						throw new XMLException("Contents inside XML element with nested XML elements.");
+					}
+				}
+				nameStarted = true;
+				contentStarted = false;
+				isOpening = true;
 			} else if (array[i] == '>') {
-				openedTags.add(nameBuffer);
-				nameBuffer = "";
+				if (!nameStarted) {
+					throw new XMLException("Closing tag inside content.");
+				}
+				nameStarted = false;
+				if (isOpening) {
+					openedTags.add(nameBuffer);
+					nameBuffer = "";
+					contentStarted = true;
+				} else {
+					String tag = openedTags.pop();
+					if (!nameBuffer.equals(tag)) {
+						throw new XMLException("No closing tags match some opened tags.");
+					}
+					nameBuffer = "";
+					contentStarted = false;
+				}
 			} else if (array[i] == '/') {
-
+				if (prev == '<') {
+					isOpening = false;
+				} else if (nameStarted) {
+					throw new XMLException("\"/\" Symbol in XML tags.");
+				} else if (contentStarted) {
+					contentBuffer += '/';
+				} else {
+					throw new XMLException("Content outside tag");
+				}
 			} else if (array[i] == ' ' ||
 					array[i] == '\n' || array[i] == '\r') {
-
+				if (nameStarted) {
+					throw new XMLException("Space characters inside name tag.");
+				}
 			} else {
-
+				if (nameStarted) {
+					nameBuffer += array[i];
+				} else if (contentStarted) {
+					contentBuffer += array[i];
+				} else {
+					throw new XMLException("Content outside tag");
+				}
 			}
+			prev = array[i];
 		}
 
 		if (!openedTags.empty()) {
 			throw new XMLException("Malformed XML document.");
 		}
-		return null;
+		return retVal;
 	}
 }
