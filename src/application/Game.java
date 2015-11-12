@@ -102,11 +102,10 @@ public abstract class Game {
 		functionPanel.setPreferredSize(new Dimension(functionPanelWidth, 700));
 		buttonPanel = new JPanel(new GridLayout(2, 2));
 		buttonPanel.setPreferredSize(new Dimension(functionPanelWidth, 200));
-		titlePanel = new JPanel(new BorderLayout());
+		titlePanel = new JPanel();
 		titlePanel.setPreferredSize(new Dimension(functionPanelWidth, 100));
 		historyPanel = new JPanel(new GridLayout(4, 1));
 		functionPanel.add(titlePanel, BorderLayout.NORTH);
-		titlePanel.add(new JSeparator());
 		functionPanel.add(historyPanel, BorderLayout.CENTER);
 		functionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -301,7 +300,7 @@ public abstract class Game {
 				int result = fc.showOpenDialog(mainPanel);
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File fl = fc.getSelectedFile();
-					Game g = new AnalysisGame();
+					Game g = new AnalysisGame(fl);
 					mainFrame.dispose();
 				}
 			}
