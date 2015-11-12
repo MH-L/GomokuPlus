@@ -25,12 +25,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import localStorage.StorageManager;
 import model.Board;
 import model.Coordinate;
 import model.NetworkBoard;
 import model.ServerConstants;
+import model.ServerGame.Move;
 
 public class NetworkGame extends Game {
+	private ArrayList<Move> moves = new ArrayList<Move>();
 	private JButton btnProposeTie;
 	private JButton btnTryWithdraw;
 	private JButton btnSendMessage;
@@ -505,6 +508,11 @@ public class NetworkGame extends Game {
 		socketListener.interrupt();
 		gameThread.interrupt();
 		coordinator.interrupt();
+		try {
+			StorageManager.storeGameRecord(moves);
+		} catch (IOException e1) {
+			JOptionPane.showMessageDialog(null, "Sorry, game record cannot be created.");
+		}
 		try {
 			serverWriter.close();
 			serverReader.close();

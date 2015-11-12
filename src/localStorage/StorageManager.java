@@ -4,9 +4,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Base64;
 
+import database.ConnectionManager;
+import util.RecordCreator;
+import util.XMLHelper;
+import model.ServerGame.Move;
 import exceptions.StorageException;
 
+/**
+ * Class for local game storage. This class is not for server.
+ * @author Minghao
+ *
+ */
 public class StorageManager {
 	/**
 	 * The game's root directory.
@@ -93,7 +104,36 @@ public class StorageManager {
 
 	}
 
-	public static void storeGameRecord(String record, String gameHash) {
+	private static void storeGameRecord(String record, String gameHash) throws IOException {
+		String fileNameStr = String.format("%s%s%s%s", RECORD, "\\", gameHash,
+				RecordCreator.RECORD_FILE_TYPE_SUFFIX);
+		System.out.println(fileNameStr);
+		File f = new File(fileNameStr);
+		f.createNewFile();
+		PrintWriter writer = new PrintWriter(fileNameStr, "UTF-8");
+		writer.print(record);
+		writer.close();
+	}
 
+	public static void storeGameRecord(ArrayList<Move> moves) throws IOException {
+		String moveStr = RecordCreator.generateRecordString(moves);
+		String gameHash = ConnectionManager.getGameHash(System.currentTimeMillis(), 1, 2);
+		gameHash = new String(Base64.getEncoder().encode(gameHash.getBytes()));
+		gameHash = escapeBase64Str(gameHash);
+		storeGameRecord(moveStr, gameHash);
+	}
+
+	private static String escapeBase64Str(String str) {
+		char[] arr = str.toCharArray();
+		String retVal = "";
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] == '/') {
+				retVal += '_';
+			} else {
+				retVal += arr[i];
+			}
+		}
+
+		return retVal;
 	}
 }

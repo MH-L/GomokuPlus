@@ -63,7 +63,7 @@ public class ConnectionManager {
 				username, encryptedPassword);
 	}
 
-	private static String getGameHash(long curmillis, int player1ID, int player2ID) {
+	public static String getGameHash(long curmillis, int player1ID, int player2ID) {
 		String tohash = String.valueOf(curmillis) + player1ID;
 		tohash += player2ID;
 		HashHelper hashInstance = HashHelper.getInstance();

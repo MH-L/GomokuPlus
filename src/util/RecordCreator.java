@@ -7,6 +7,7 @@ import model.ServerGame;
 import model.ServerGame.Move;
 
 public class RecordCreator {
+	public static final String RECORD_FILE_TYPE_SUFFIX = ".xml";
 	public static String generateRecordString(List<Move> moves, int result, int senteWithdrawals,
 			int goteWithdrawals) {
 		XMLHelper helper = new XMLHelper();
@@ -23,11 +24,22 @@ public class RecordCreator {
 		case ServerGame.RESULT_TIE:
 			gameResult.setContent("Tie");
 			break;
+		default:
+			gameResult.setContent("Not Applicable");
 		}
 
 		XMLElement withdrawals = helper.new XMLElement("Withdrawals", null);
-		withdrawals.appendChild(helper.new XMLElement("Black", String.valueOf(senteWithdrawals)));
-		withdrawals.appendChild(helper.new XMLElement("White", String.valueOf(goteWithdrawals)));
+		if (senteWithdrawals >= 0) {
+			withdrawals.appendChild(helper.new XMLElement("Black", String.valueOf(senteWithdrawals)));
+		} else {
+			withdrawals.appendChild(helper.new XMLElement("Black", "Not Applicable"));
+		}
+
+		if (goteWithdrawals >= 0) {
+			withdrawals.appendChild(helper.new XMLElement("White", String.valueOf(goteWithdrawals)));
+		} else {
+			withdrawals.appendChild(helper.new XMLElement("White", "Not Applicable"));
+		}
 		game.appendChild(gameResult);
 		game.appendChild(withdrawals);
 		XMLElement steps = helper.new XMLElement("Moves", null);
@@ -55,5 +67,9 @@ public class RecordCreator {
 
 		game.appendChild(steps);
 		return XMLHelper.elementToString(game, 0);
+	}
+
+	public static String generateRecordString(List<Move> moves) {
+		return generateRecordString(moves, 0, -1, -1);
 	}
 }
