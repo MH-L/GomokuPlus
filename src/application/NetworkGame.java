@@ -554,10 +554,10 @@ public class NetworkGame extends Game {
 		return null;
 	}
 
-	public class PortableMove implements IMove {
+	public static class PortableMove implements IMove {
 		private int x;
 		private int y;
-		private PortableMove(int x, int y) {
+		public PortableMove(int x, int y) {
 			this.x = x;
 			this.y = y;
 		}
