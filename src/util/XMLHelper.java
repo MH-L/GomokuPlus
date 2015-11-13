@@ -1,13 +1,26 @@
 package util;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import exceptions.XMLException;
 
 public class XMLHelper {
-	public class XMLElement {
+	public static class XMLElement {
 		private String name;
 		private List<XMLElement> childElements;
 		private XMLElement parentElement;
@@ -77,79 +90,56 @@ public class XMLHelper {
 	}
 
 	public static XMLElement strToXML(String str) throws XMLException {
-		Stack<String> openedTags = new Stack<String>();
-		char[] array = str.toCharArray();
-		char prev = ' ';
-		String nameBuffer = "";
-		String contentBuffer = "";
-		boolean nameStarted = false;
-		boolean contentStarted = false;
-		boolean isOpening = false;
-		XMLElement retVal = null;
-		XMLElement curElement = null;
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] == '<') {
-				// start of tag (no matter whether or not it is an opening tag)
-				if (nameStarted == true) {
-					// Cannot have "<" inside an XML tag.
-					throw new XMLException("Invalid XML tag.");
-				} else if (contentBuffer.length() > 0) {
-					// as the exception suggests, if there is already some contents,
-					// then the nested tag is not valid.
-					if (i == array.length || array[i+1] != '/') {
-						throw new XMLException("Contents inside XML element with nested XML elements.");
-					}
-				}
-				nameStarted = true;
-				contentStarted = false;
-				isOpening = true;
-			} else if (array[i] == '>') {
-				if (!nameStarted) {
-					throw new XMLException("Closing tag inside content.");
-				}
-				nameStarted = false;
-				if (isOpening) {
-					openedTags.add(nameBuffer);
-					nameBuffer = "";
-					contentStarted = true;
-				} else {
-					String tag = openedTags.pop();
-					if (!nameBuffer.equals(tag)) {
-						throw new XMLException("No closing tags match some opened tags.");
-					}
-					nameBuffer = "";
-					contentStarted = false;
-				}
-			} else if (array[i] == '/') {
-				if (prev == '<') {
-					isOpening = false;
-				} else if (nameStarted) {
-					throw new XMLException("\"/\" Symbol in XML tags.");
-				} else if (contentStarted) {
-					contentBuffer += '/';
-				} else {
-					throw new XMLException("Content outside tag");
-				}
-			} else if (array[i] == ' ' ||
-					array[i] == '\n' || array[i] == '\r') {
-				if (nameStarted) {
-					throw new XMLException("Space characters inside name tag.");
-				}
-			} else {
-				if (nameStarted) {
-					nameBuffer += array[i];
-				} else if (contentStarted) {
-					contentBuffer += array[i];
-				} else {
-					throw new XMLException("Content outside tag");
-				}
-			}
-			prev = array[i];
+		Document retVal = loadXMLFromString(str);
+		Element gameElement = retVal.getDocumentElement();
+		return createXMLElementFromElement(gameElement);
+	}
+
+	private static XMLElement createXMLElementFromElement(Element e) {
+		NodeList gameNodes = e.getChildNodes();
+		ArrayList<XMLElement> retVal = createElements(gameNodes);
+		XMLElement gameEle = new XMLElement(e.getNodeName(), null);
+		for (int i = 0; i < retVal.size(); i++) {
+			gameEle.appendChild(retVal.get(i));
 		}
 
-		if (!openedTags.empty()) {
-			throw new XMLException("Malformed XML document.");
+		return gameEle;
+	}
+
+	private static ArrayList<XMLElement> createElements(NodeList nodes) {
+		if (nodes.getLength() == 0)
+			return new ArrayList<XMLElement>();
+		ArrayList<XMLElement> retVal = new ArrayList<XMLElement>();
+		for (int i = 0; i < nodes.getLength(); i++) {
+			retVal.add(createXMLElementFromElement((Element) nodes.item(i)));
 		}
+
 		return retVal;
+	}
+
+	private static Document loadXMLFromString(String xml) throws XMLException {
+	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder builder;
+		try {
+			builder = factory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			throw new XMLException("XML document mal-formed.");
+		}
+	    InputSource is = new InputSource(new StringReader(xml));
+	    try {
+			return builder.parse(is);
+		} catch (SAXException | IOException e) {
+			throw new XMLException("XML document mal-formed.");
+		}
+	}
+
+	private static boolean whitespaceOnly(String s) {
+		for (int i = 0; i < s.length(); i++) {
+			char cur = s.charAt(i);
+			if (cur != ' ' && cur != '\n' && cur != '\r') {
+				return false;
+			}
+		}
+		return true;
 	}
 }
