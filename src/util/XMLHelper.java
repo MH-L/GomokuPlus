@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -114,7 +116,12 @@ public class XMLHelper {
 			return new ArrayList<XMLElement>();
 		ArrayList<XMLElement> retVal = new ArrayList<XMLElement>();
 		for (int i = 0; i < nodes.getLength(); i++) {
-			retVal.add(createXMLElementFromElement((Element) nodes.item(i)));
+			if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				retVal.add(createXMLElementFromElement((Element) nodes.item(i)));
+			} else {
+				retVal.add(new XMLElement(nodes.item(i).getNodeName(),
+						nodes.item(i).getNodeValue()));
+			}
 		}
 
 		return retVal;

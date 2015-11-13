@@ -2,12 +2,30 @@ package test;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import org.junit.Before;
 import org.junit.Test;
 
+import exceptions.XMLException;
 import util.XMLHelper;
 import util.XMLHelper.XMLElement;
 
 public class XMLTest {
+	private String contents;
+
+	@Before
+	public void initialize() {
+		File sampleFile = new File("sample.xml");
+		try {
+			byte[] allContentsBytes = Files.readAllBytes(sampleFile.toPath());
+			contents = new String(allContentsBytes, "UTF-8");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Test
 	public void testXMLElementToString() {
@@ -34,8 +52,9 @@ public class XMLTest {
 	}
 
 	@Test
-	public void testStringToXML() {
-		// Method not implemented yet.
+	public void testStringToXML() throws XMLException {
+		System.out.println(contents);
+		XMLElement ele = XMLHelper.strToXML(contents);
 	}
 
 }

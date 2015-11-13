@@ -116,10 +116,25 @@ public class RecordCreator {
 					throw new XMLException("Only one move in non-last round.");
 				}
 			} else {
-				// two moves in the round.
+				for (int j = 0; j < movesInRound.size(); j++) {
+					XMLElement onlyMove = movesInRound.get(j);
+					List<XMLElement> Xs = onlyMove.getChild("X");
+					List<XMLElement> Ys = onlyMove.getChild("Y");
+					if (Xs.size() != 1 || Ys.size() != 1) {
+						throw new XMLException("Incorrect X or Y coordinate in move.");
+					}
+					try {
+						int xcoord = Integer.parseInt(Xs.get(0).getContent());
+						int ycoord = Integer.parseInt(Ys.get(0).getContent());
+						IMove mv = new PortableMove(xcoord, ycoord);
+						retVal.add(mv);
+					} catch (Exception e) {
+						throw new XMLException("X-coordinates and Y-coordinates should be numbers.");
+					}
+				}
 			}
 		}
 
-		return null;
+		return retVal;
 	}
 }
