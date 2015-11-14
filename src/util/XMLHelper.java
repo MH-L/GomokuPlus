@@ -57,6 +57,14 @@ public class XMLHelper {
 		public String getContent() {
 			return content;
 		}
+
+		public String getName() {
+			return name;
+		}
+
+		public List<XMLElement> getAllChildren() {
+			return childElements;
+		}
 	}
 
 	public XMLHelper() {}

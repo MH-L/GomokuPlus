@@ -9,7 +9,15 @@ echo "$(tail -n +3 HashHelper.java)" > HashHelper.java
 echo "$(tail -n +3 LoggingHelper.java)" > LoggingHelper.java
 echo "$(tail -n +3 RecordCreator.java)" > RecordCreator.java
 echo "$(tail -n +3 XMLException.java)" > XMLException.java
+echo "$(tail -n +3 AuthConstants.java)" > AuthConstants.java
+echo "$(tail -n +3 AuthService.java)" > AuthService.java
+echo "$(tail -n +3 IMove.java)" > IMove.java
 echo "$(tail -n +3 ConfHelper.java)" > ConfHelper.java
+
+# find package declaration in file imports (for self-defined classes only)
+# and then remove them
+
+# Maybe add a C file to do this??
 
 # Kills the process running on port 1031 (Which is the default port for the game server)
 kill -9 $(lsof -i:1031 -t)

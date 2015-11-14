@@ -4,7 +4,10 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
+
+import javax.imageio.stream.FileImageOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +20,8 @@ public class XMLTest {
 	private String contents;
 
 	@Before
-	public void initialize() {
-		File sampleFile = new File("sample.xml");
+	public void initialize() throws URISyntaxException {
+		File sampleFile = new File(getClass().getResource("/xml/sample.xml").toURI());
 		try {
 			byte[] allContentsBytes = Files.readAllBytes(sampleFile.toPath());
 			contents = new String(allContentsBytes, "UTF-8");
@@ -55,6 +58,7 @@ public class XMLTest {
 	public void testStringToXML() throws XMLException {
 		System.out.println(contents);
 		XMLElement ele = XMLHelper.strToXML(contents);
+		assertEquals(ele.getName(), "Game");
 	}
 
 }
