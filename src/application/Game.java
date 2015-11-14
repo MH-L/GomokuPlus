@@ -9,9 +9,11 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -262,6 +264,9 @@ public abstract class Game {
 		analysisMenu.add(stepBackward);
 		analysisMenu.addSeparator();
 		analysisMenu.add(animate);
+		addAnimateMenuItemListener(animate);
+		addStepBackwardMenuItemListener(stepBackward);
+		addStepForwardMenuItemListener(stepForward);
 
 		chooseFile.addActionListener(new ActionListener() {
 			@Override
@@ -336,6 +341,28 @@ public abstract class Game {
 		menus.add(statsMenu);
 		menus.setPreferredSize(new Dimension(500, 60));
 		return menus;
+	}
+
+	protected void addAnimateMenuItemListener(JMenuItem item) {
+		item.setEnabled(false);
+	}
+
+	protected void addStepForwardMenuItemListener(JMenuItem item) {
+		item.setEnabled(false);
+	}
+
+	protected void addStepBackwardMenuItemListener(JMenuItem item) {
+		item.setEnabled(false);
+	}
+
+	private void addActionListenerAnalysisOnly(JMenuItem item) {
+		item.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(mainFrame,
+						"This option is only available for analysis game.");
+			}
+		});
 	}
 
 	protected void doSocketClose() {}

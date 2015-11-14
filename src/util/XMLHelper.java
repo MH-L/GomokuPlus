@@ -111,7 +111,9 @@ public class XMLHelper {
 	private static XMLElement createXMLElementFromElement(Element e) {
 		NodeList gameNodes = e.getChildNodes();
 		ArrayList<XMLElement> retVal = createElements(gameNodes);
-		XMLElement gameEle = new XMLElement(e.getNodeName(), null);
+		String textContent = e.getTextContent();
+		String content = whitespaceOnly(textContent) ? null : textContent;
+		XMLElement gameEle = new XMLElement(e.getNodeName(), content);
 		for (int i = 0; i < retVal.size(); i++) {
 			gameEle.appendChild(retVal.get(i));
 		}
@@ -126,9 +128,6 @@ public class XMLHelper {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
 				retVal.add(createXMLElementFromElement((Element) nodes.item(i)));
-			} else {
-				retVal.add(new XMLElement(nodes.item(i).getNodeName(),
-						nodes.item(i).getNodeValue()));
 			}
 		}
 

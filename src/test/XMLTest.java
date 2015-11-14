@@ -6,13 +6,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 
 import javax.imageio.stream.FileImageOutputStream;
+
+import model.IMove;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import exceptions.XMLException;
+import util.RecordCreator;
 import util.XMLHelper;
 import util.XMLHelper.XMLElement;
 
@@ -56,9 +60,24 @@ public class XMLTest {
 
 	@Test
 	public void testStringToXML() throws XMLException {
-		System.out.println(contents);
 		XMLElement ele = XMLHelper.strToXML(contents);
 		assertEquals(ele.getName(), "Game");
+		assertEquals(1, ele.getChild("Result").size());
+		assertEquals(1, ele.getChild("Moves").size());
+		assertEquals(1, ele.getChild("Withdrawals").size());
+		assertEquals(10, ele.getChild("Moves").get(0).getChild("Round").size());
+		assertEquals(3, ele.getAllChildren().size());
+		XMLElement moveElement = ele.getChild("Moves").get(0).
+				getAllChildren().get(0).getAllChildren().get(0);
+		assertEquals(7, Integer.parseInt(moveElement.getChild("X").get(0).getContent()));
+		assertEquals(6, Integer.parseInt(moveElement.getChild("Y").get(0).getContent()));
+	}
+
+	@Test
+	public void testGenerateRecordFromXML() throws XMLException {
+		XMLElement elem = XMLHelper.strToXML(contents);
+		ArrayList<IMove> moves = RecordCreator.generateMovesFromXML(elem);
+		assertEquals(moves.size(), 19);
 	}
 
 }

@@ -97,7 +97,7 @@ public class RecordCreator {
 			} else if (movesInRound.size() > 2) {
 				throw new XMLException("Move than two moves in round.");
 			} else if (movesInRound.size() == 1) {
-				if (i == rounds.size()) {
+				if (i == rounds.size() - 1) {
 					XMLElement onlyMove = movesInRound.get(0);
 					List<XMLElement> Xs = onlyMove.getChild("X");
 					List<XMLElement> Ys = onlyMove.getChild("Y");

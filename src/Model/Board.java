@@ -340,4 +340,8 @@ public class Board {
 			grid[y][x].setBackground(Color.RED);
 		}
 	}
+
+	public void resetSquare(int x, int y) {
+		grid[y][x].reset();
+	}
 }
