@@ -219,6 +219,16 @@ public class AnalysisGame extends Game {
 		});
 	}
 
+	@Override
+	protected void addAnimationConfigurationMenuItemListener(JMenuItem item) {
+		item.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+	}
+
 	private void addStopAndStartAnimationBtnListener() {
 		stopAnimationBtn.addActionListener(new ActionListener() {
 			@Override

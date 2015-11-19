@@ -267,6 +267,7 @@ public abstract class Game {
 		addAnimateMenuItemListener(animate);
 		addStepBackwardMenuItemListener(stepBackward);
 		addStepForwardMenuItemListener(stepForward);
+		addAnimationConfigurationMenuItemListener(animationOption);
 
 		chooseFile.addActionListener(new ActionListener() {
 			@Override
@@ -352,6 +353,10 @@ public abstract class Game {
 	}
 
 	protected void addStepBackwardMenuItemListener(JMenuItem item) {
+		item.setEnabled(false);
+	}
+
+	protected void addAnimationConfigurationMenuItemListener(JMenuItem item) {
 		item.setEnabled(false);
 	}
 
