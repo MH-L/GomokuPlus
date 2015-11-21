@@ -1,7 +1,9 @@
-package application;
+package lmh.gomoku.application;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+
+import lmh.gomoku.application.Game;
 
 public class AIGame extends Game {
 	/**

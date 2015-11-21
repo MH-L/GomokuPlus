@@ -1,4 +1,4 @@
-package application;
+package lmh.gomoku.application;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -28,6 +28,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import exceptions.StorageException;
+import lmh.gomoku.application.Game;
 import localStorage.StorageManager;
 
 /**

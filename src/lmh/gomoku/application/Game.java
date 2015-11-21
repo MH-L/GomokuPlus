@@ -1,4 +1,4 @@
-package application;
+package lmh.gomoku.application;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,6 +33,9 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 import model.Board;
+
+import lmh.gomoku.application.Game;
+import lmh.gomoku.application.Main;
 import model.Coordinate;
 
 public abstract class Game {

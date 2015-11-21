@@ -8,8 +8,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
-import javax.imageio.stream.FileImageOutputStream;
-
 import model.IMove;
 
 import org.junit.Before;

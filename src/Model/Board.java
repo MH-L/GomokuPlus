@@ -15,9 +15,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import model.Board;
+
+import lmh.gomoku.application.Game;
+import lmh.gomoku.application.Game.Result;
 import model.Coordinate.Stone;
-import application.Game;
-import application.Game.Result;
 
 public class Board {
 	protected static Coordinate[][] grid;

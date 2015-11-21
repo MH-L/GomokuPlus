@@ -1,4 +1,4 @@
-package application;
+package lmh.gomoku.application;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,6 +11,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+
+import lmh.gomoku.application.Game;
+import lmh.gomoku.application.Main;
 
 public class MultiplayerGame extends Game {
 	private static int p1WithdrawalLeft = 2;

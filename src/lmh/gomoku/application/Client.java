@@ -1,4 +1,4 @@
-package application;
+package lmh.gomoku.application;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;

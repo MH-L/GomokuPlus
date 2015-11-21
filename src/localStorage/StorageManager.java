@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import application.NetworkGame.PortableMove;
 import database.ConnectionManager;
 import util.RecordCreator;
 import util.XMLHelper;
+import lmh.gomoku.application.NetworkGame.PortableMove;
 import model.IMove;
 import model.ServerGame.Move;
 import exceptions.StorageException;

@@ -1,4 +1,4 @@
-package application;
+package lmh.gomoku.application;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,6 +26,8 @@ import exceptions.XMLException;
 import util.RecordCreator;
 import util.XMLHelper;
 import util.XMLHelper.XMLElement;
+import lmh.gomoku.application.Game;
+import lmh.gomoku.application.Main;
 import model.IMove;
 import model.ServerConstants;
 import model.ServerGame.Move;

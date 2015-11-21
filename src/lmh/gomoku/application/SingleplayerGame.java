@@ -1,4 +1,4 @@
-package application;
+package lmh.gomoku.application;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,6 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import model.Board;
+
+import lmh.gomoku.application.Game;
+import lmh.gomoku.application.Main;
 import model.Coordinate;
 
 public class SingleplayerGame extends Game {

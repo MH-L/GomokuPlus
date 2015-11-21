@@ -1,4 +1,4 @@
-package application;
+package lmh.gomoku.application;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,8 +26,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import localStorage.StorageManager;
 import model.Board;
+
+import lmh.gomoku.application.Game;
+import lmh.gomoku.application.Main;
+import localStorage.StorageManager;
 import model.Coordinate;
 import model.IMove;
 import model.NetworkBoard;

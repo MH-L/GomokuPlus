@@ -3,12 +3,12 @@ package util;
 import java.util.ArrayList;
 import java.util.List;
 
-import application.NetworkGame;
 import exceptions.XMLException;
 import util.XMLHelper.XMLElement;
+import lmh.gomoku.application.NetworkGame;
+import lmh.gomoku.application.NetworkGame.PortableMove;
 import model.IMove;
 import model.ServerGame;
-import application.NetworkGame.PortableMove;;
 
 public class RecordCreator {
 	public static final String RECORD_FILE_TYPE_SUFFIX = ".xml";
