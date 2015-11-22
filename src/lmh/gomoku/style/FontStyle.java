@@ -1,4 +1,4 @@
-package style;
+package lmh.gomoku.style;
 
 import java.awt.GraphicsEnvironment;
 

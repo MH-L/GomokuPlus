@@ -1,4 +1,4 @@
-package auth;
+package lmh.gomoku.auth;
 
 import java.io.BufferedReader;
 import java.io.IOException;

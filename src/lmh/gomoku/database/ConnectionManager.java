@@ -1,11 +1,11 @@
-package database;
+package lmh.gomoku.database;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-import util.HashHelper;
-import config.ConfHelper;
-import model.ServerGame.Move;
+import lmh.gomoku.config.ConfHelper;
+import lmh.gomoku.model.ServerGame.Move;
+import lmh.gomoku.util.HashHelper;
 
 public class ConnectionManager {
 	private Connection conn = null;

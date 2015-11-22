@@ -1,4 +1,4 @@
-package model;
+package lmh.gomoku.model;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -15,11 +15,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import model.Board;
-
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Game.Result;
-import model.Coordinate.Stone;
+import lmh.gomoku.model.Board;
+import lmh.gomoku.model.Coordinate.Stone;
 
 public class Board {
 	protected static Coordinate[][] grid;

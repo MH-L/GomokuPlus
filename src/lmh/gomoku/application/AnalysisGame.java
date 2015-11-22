@@ -22,15 +22,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import exceptions.XMLException;
-import util.RecordCreator;
-import util.XMLHelper;
-import util.XMLHelper.XMLElement;
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
-import model.IMove;
-import model.ServerConstants;
-import model.ServerGame.Move;
+import lmh.gomoku.exception.XMLException;
+import lmh.gomoku.model.IMove;
+import lmh.gomoku.model.ServerConstants;
+import lmh.gomoku.model.ServerGame.Move;
+import lmh.gomoku.util.RecordCreator;
+import lmh.gomoku.util.XMLHelper;
+import lmh.gomoku.util.XMLHelper.XMLElement;
 
 public class AnalysisGame extends Game {
 	private static final int ANIMATION_INTERVAL_DEFAULT = 1000;

@@ -1,4 +1,4 @@
-package util;
+package lmh.gomoku.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

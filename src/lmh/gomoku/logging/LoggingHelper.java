@@ -1,4 +1,4 @@
-package logging;
+package lmh.gomoku.logging;
 
 public class LoggingHelper {
 	private static LoggingHelper instance;

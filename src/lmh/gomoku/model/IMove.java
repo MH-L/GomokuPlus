@@ -1,4 +1,4 @@
-package model;
+package lmh.gomoku.model;
 
 public interface IMove {
 

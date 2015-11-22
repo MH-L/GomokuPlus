@@ -1,4 +1,4 @@
-package test;
+package lmh.gomoku.test;
 
 import static org.junit.Assert.*;
 
@@ -8,15 +8,14 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
-import model.IMove;
+import lmh.gomoku.exception.XMLException;
+import lmh.gomoku.model.IMove;
+import lmh.gomoku.util.RecordCreator;
+import lmh.gomoku.util.XMLHelper;
+import lmh.gomoku.util.XMLHelper.XMLElement;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import exceptions.XMLException;
-import util.RecordCreator;
-import util.XMLHelper;
-import util.XMLHelper.XMLElement;
 
 public class XMLTest {
 	private String contents;

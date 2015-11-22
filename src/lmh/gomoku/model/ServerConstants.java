@@ -1,4 +1,4 @@
-package model;
+package lmh.gomoku.model;
 
 public final class ServerConstants {
 	/**

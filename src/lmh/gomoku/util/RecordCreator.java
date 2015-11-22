@@ -1,14 +1,14 @@
-package util;
+package lmh.gomoku.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import exceptions.XMLException;
-import util.XMLHelper.XMLElement;
 import lmh.gomoku.application.NetworkGame;
 import lmh.gomoku.application.NetworkGame.PortableMove;
-import model.IMove;
-import model.ServerGame;
+import lmh.gomoku.exception.XMLException;
+import lmh.gomoku.model.IMove;
+import lmh.gomoku.model.ServerGame;
+import lmh.gomoku.util.XMLHelper.XMLElement;
 
 public class RecordCreator {
 	public static final String RECORD_FILE_TYPE_SUFFIX = ".xml";

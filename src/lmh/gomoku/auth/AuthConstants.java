@@ -1,4 +1,4 @@
-package auth;
+package lmh.gomoku.auth;
 
 public class AuthConstants {
 	/**

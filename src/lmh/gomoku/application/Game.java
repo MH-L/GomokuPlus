@@ -32,11 +32,10 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
-import model.Board;
-
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
-import model.Coordinate;
+import lmh.gomoku.model.Board;
+import lmh.gomoku.model.Coordinate;
 
 public abstract class Game {
 	protected static final Font smallGameFont = new Font("Open Sans",

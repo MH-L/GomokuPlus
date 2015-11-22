@@ -1,4 +1,4 @@
-package exceptions;
+package lmh.gomoku.exception;
 
 /**
  * Thrown when config helper cannot find config specified by the key

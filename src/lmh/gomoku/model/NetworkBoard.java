@@ -1,10 +1,9 @@
-package model;
+package lmh.gomoku.model;
 
 import javax.swing.JPanel;
 
 import lmh.gomoku.application.Game;
-
-import model.Board;
+import lmh.gomoku.model.Board;
 
 public final class NetworkBoard extends Board {
 

@@ -11,11 +11,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import model.Board;
-
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
-import model.Coordinate;
+import lmh.gomoku.model.Board;
+import lmh.gomoku.model.Coordinate;
 
 public class SingleplayerGame extends Game {
 	/**
@@ -26,9 +25,13 @@ public class SingleplayerGame extends Game {
 	private static int withdrawalLeft;
 	private JButton btnWithdrawal;
 	private JButton btnHint;
+	private GameEngine engine;
+	private int activePlayer;
+	private int playerTurn;
 
-	public SingleplayerGame(int max_num_withdrawal) {
+	public SingleplayerGame(int max_num_withdrawal, int playerTurn) {
 		super();
+		this.playerTurn = playerTurn;
 		withdrawalLeft = max_num_withdrawal;
 		this.btnWithdrawal = Main.getPlainLookbtn("Withdraw!", "Open Sans", 23,
 				Font.PLAIN, Color.GRAY);
@@ -81,5 +84,9 @@ public class SingleplayerGame extends Game {
 		} else {
 			displayWithdrawFailed();
 		}
+	}
+
+	public void AIMakeMove() {
+
 	}
 }

@@ -1,4 +1,4 @@
-package exceptions;
+package lmh.gomoku.exception;
 
 public class StorageException extends Exception {
 	/**

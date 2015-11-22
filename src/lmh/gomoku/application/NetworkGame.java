@@ -26,16 +26,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import model.Board;
-
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
-import localStorage.StorageManager;
-import model.Coordinate;
-import model.IMove;
-import model.NetworkBoard;
-import model.ServerConstants;
-import model.ServerGame.Move;
+import lmh.gomoku.localStorage.StorageManager;
+import lmh.gomoku.model.Board;
+import lmh.gomoku.model.Coordinate;
+import lmh.gomoku.model.IMove;
+import lmh.gomoku.model.NetworkBoard;
+import lmh.gomoku.model.ServerConstants;
+import lmh.gomoku.model.ServerGame.Move;
 
 public class NetworkGame extends Game {
 	private ArrayList<PortableMove> moves = new ArrayList<PortableMove>();

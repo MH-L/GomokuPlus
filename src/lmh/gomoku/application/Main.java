@@ -27,9 +27,9 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-import exceptions.StorageException;
 import lmh.gomoku.application.Game;
-import localStorage.StorageManager;
+import lmh.gomoku.exception.StorageException;
+import lmh.gomoku.localStorage.StorageManager;
 
 /**
  * Main class and entry point of the gomoku game
