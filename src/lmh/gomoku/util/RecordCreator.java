@@ -3,7 +3,6 @@ package lmh.gomoku.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import lmh.gomoku.application.NetworkGame;
 import lmh.gomoku.application.NetworkGame.PortableMove;
 import lmh.gomoku.exception.XMLException;
 import lmh.gomoku.model.IMove;

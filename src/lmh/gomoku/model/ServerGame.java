@@ -317,7 +317,9 @@ public class ServerGame {
 			this.y = y;
 		}
 
+		@Override
 		public int getX() { return x; }
+		@Override
 		public int getY() { return y; }
 	}
 

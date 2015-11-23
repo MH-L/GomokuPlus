@@ -1,8 +1,6 @@
 package lmh.gomoku.model;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,12 +8,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import lmh.gomoku.application.Game;
+import lmh.gomoku.application.SingleplayerGame;
 import lmh.gomoku.application.Game.Result;
 import lmh.gomoku.model.Board;
 import lmh.gomoku.model.Coordinate.Stone;
@@ -30,6 +27,7 @@ public class Board {
 	private Coordinate lastMove2 = null;
 	private int stoneCount = 0;
 	private Game g;
+	private boolean suspensionRequired = false;
 
 	public Board(JPanel boardPanel, Game g) {
 		this.g = g;
@@ -38,7 +36,14 @@ public class Board {
 		addCellsToBoard(boardPanel);
 	}
 
+	public Board(JPanel boardPanel, Game g, boolean suspensionRequired) {
+		this(boardPanel, g);
+		this.suspensionRequired = suspensionRequired;
+	}
+
 	protected void addCellsToBoard(JPanel boardPanel) {
+		// TODO implement the case where suspension is required (for
+		// single player game exclusively).
 		boardPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 		for (int i = 0; i < Board.height; i++) {
 			for (int j = 0; j < Board.width; j++) {
@@ -58,6 +63,12 @@ public class Board {
 							return;
 						}
 						if (square.isUnoccupied()) {
+							if (suspensionRequired) {
+								if (!((SingleplayerGame) g).playerCanMove(activePlayer)) {
+									g.warnNotYourTurn();
+									return;
+								}
+							}
 							if (activePlayer == 1) {
 								try {
 									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));

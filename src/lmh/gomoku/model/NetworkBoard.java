@@ -21,6 +21,7 @@ public final class NetworkBoard extends Board {
 		grid[xcoord][ycoord] = square;
 	}
 
+	@Override
 	public void resetSquare(int xcoord, int ycoord) {
 		grid[xcoord][ycoord].setIcon(null);
 	}

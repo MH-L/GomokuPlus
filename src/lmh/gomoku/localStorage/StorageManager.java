@@ -1,20 +1,15 @@
 package lmh.gomoku.localStorage;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import lmh.gomoku.application.NetworkGame.PortableMove;
 import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.model.IMove;
-import lmh.gomoku.model.ServerGame.Move;
 import lmh.gomoku.util.RecordCreator;
-import lmh.gomoku.util.XMLHelper;
 
 /**
  * Class for local game storage. This class is not for server.

@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedReader;
@@ -16,7 +17,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,7 +34,6 @@ import lmh.gomoku.model.Coordinate;
 import lmh.gomoku.model.IMove;
 import lmh.gomoku.model.NetworkBoard;
 import lmh.gomoku.model.ServerConstants;
-import lmh.gomoku.model.ServerGame.Move;
 
 public class NetworkGame extends Game {
 	private ArrayList<PortableMove> moves = new ArrayList<PortableMove>();
@@ -124,7 +123,7 @@ public class NetworkGame extends Game {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
+				if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
 					String text = messageArea.getText();
 					messageArea.setText(text + "\n");
 					return;

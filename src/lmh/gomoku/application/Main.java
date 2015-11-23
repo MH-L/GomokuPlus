@@ -7,12 +7,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,10 +17,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -79,7 +76,7 @@ public class Main {
 		frame.setSize(Game.defaultFrameDimension);
 		frame.setVisible(true);
 		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		Game.addCloseConfirmation(frame);
 		JPanel btnPanel = new JPanel();
 		frame.add(btnPanel);
@@ -334,15 +331,18 @@ public class Main {
 	        this.radius = radius;
 	    }
 
-	    public Insets getBorderInsets(Component c) {
+	    @Override
+		public Insets getBorderInsets(Component c) {
 	        return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
 	    }
 
-	    public boolean isBorderOpaque() {
+	    @Override
+		public boolean isBorderOpaque() {
 	        return true;
 	    }
 
-	    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+	    @Override
+		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 	        g.drawRoundRect(x, y, width-1, height-1, radius, radius);
 	    }
 	}

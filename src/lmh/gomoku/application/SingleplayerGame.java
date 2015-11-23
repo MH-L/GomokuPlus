@@ -8,9 +8,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import renju.com.lmh.application.Game.Difficulty;
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
 import lmh.gomoku.model.Board;
@@ -26,12 +26,13 @@ public class SingleplayerGame extends Game {
 	private JButton btnWithdrawal;
 	private JButton btnHint;
 	private GameEngine engine;
-	private int activePlayer;
-	private int playerTurn;
+	private HumanPlayer player;
+	private renju.com.lmh.model.Board analysisBoard;
 
 	public SingleplayerGame(int max_num_withdrawal, int playerTurn) {
 		super();
-		this.playerTurn = playerTurn;
+		this.player = new HumanPlayer(playerTurn);
+		this.engine = new GameEngine(Difficulty.INTERMEDIATE, new Board(), isFirst)
 		withdrawalLeft = max_num_withdrawal;
 		this.btnWithdrawal = Main.getPlainLookbtn("Withdraw!", "Open Sans", 23,
 				Font.PLAIN, Color.GRAY);
@@ -74,6 +75,7 @@ public class SingleplayerGame extends Game {
 		titlePanel.add(titleLabel);
 	}
 
+	@Override
 	public void withdraw() {
 		if (withdrawalLeft <= 0) {
 			displayWithdrawFailed();
@@ -88,5 +90,9 @@ public class SingleplayerGame extends Game {
 
 	public void AIMakeMove() {
 
+	}
+
+	public boolean playerCanMove(int activePlayer) {
+		 return player.getTurn() == activePlayer;
 	}
 }

@@ -6,18 +6,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,13 +24,12 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
 import lmh.gomoku.model.Board;
-import lmh.gomoku.model.Coordinate;
 
 public abstract class Game {
 	protected static final Font smallGameFont = new Font("Open Sans",
@@ -99,7 +93,7 @@ public abstract class Game {
 		mainFrame.add(parentPanel);
 		mainFrame.setVisible(true);
 		mainFrame.setResizable(false);
-		mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		addCloseConfirmation(mainFrame);
 
 		functionPanel = new JPanel(new BorderLayout());
@@ -125,7 +119,7 @@ public abstract class Game {
 		buttonPanel.add(btnStart);
 		buttonPanel.add(btnGiveUp);
 		mainPanel.add(boardPanel, BorderLayout.LINE_START);
-		mainPanel.add(new JSeparator(JSeparator.VERTICAL));
+		mainPanel.add(new JSeparator(SwingConstants.VERTICAL));
 		mainPanel.add(functionPanel, BorderLayout.LINE_END);
 
 		messageArea = new JTextArea(4, 40);
@@ -332,15 +326,15 @@ public abstract class Game {
 		});
 
 		menus.add(gameMenu);
-		menus.add(new JSeparator(JSeparator.VERTICAL));
+		menus.add(new JSeparator(SwingConstants.VERTICAL));
 		menus.add(helpMenu);
-		menus.add(new JSeparator(JSeparator.VERTICAL));
+		menus.add(new JSeparator(SwingConstants.VERTICAL));
 		menus.add(optionsMenu);
-		menus.add(new JSeparator(JSeparator.VERTICAL));
+		menus.add(new JSeparator(SwingConstants.VERTICAL));
 		menus.add(exportMenu);
-		menus.add(new JSeparator(JSeparator.VERTICAL));
+		menus.add(new JSeparator(SwingConstants.VERTICAL));
 		menus.add(analysisMenu);
-		menus.add(new JSeparator(JSeparator.VERTICAL));
+		menus.add(new JSeparator(SwingConstants.VERTICAL));
 		menus.add(statsMenu);
 		menus.setPreferredSize(new Dimension(500, 60));
 		return menus;
@@ -420,6 +414,11 @@ public abstract class Game {
 	public void displayTieMessage() {
 		JOptionPane.showMessageDialog(mainFrame, "Board Full. Game comes to a tie.",
 				"Game Over", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public void warnNotYourTurn() {
+		JOptionPane.showMessageDialog(mainFrame, "Not Your Turn!",
+				"Computer Making Move", JOptionPane.WARNING_MESSAGE);
 	}
 
 	public static void addCloseConfirmation(JFrame frame) {
