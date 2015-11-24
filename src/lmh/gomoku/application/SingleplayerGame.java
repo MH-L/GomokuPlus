@@ -11,10 +11,13 @@ import javax.swing.JLabel;
 import javax.swing.Timer;
 
 import renju.com.lmh.application.Game.Difficulty;
+import renju.com.lmh.exception.InvalidIndexException;
+import renju.com.lmh.model.BoardLocation;
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
 import lmh.gomoku.model.Board;
 import lmh.gomoku.model.Coordinate;
+import lmh.gomoku.model.ServerGame.Move;
 
 public class SingleplayerGame extends Game {
 	/**
@@ -30,9 +33,11 @@ public class SingleplayerGame extends Game {
 	private renju.com.lmh.model.Board analysisBoard;
 
 	public SingleplayerGame(int max_num_withdrawal, int playerTurn) {
-		super();
+		super(true);
+		this.analysisBoard = new renju.com.lmh.model.Board(Board.width);
 		this.player = new HumanPlayer(playerTurn);
-		this.engine = new GameEngine(Difficulty.INTERMEDIATE, new Board(), isFirst)
+		this.engine = new GameEngine(Difficulty.INTERMEDIATE, analysisBoard,
+				playerTurn == Game.TURN_GOTE);
 		withdrawalLeft = max_num_withdrawal;
 		this.btnWithdrawal = Main.getPlainLookbtn("Withdraw!", "Open Sans", 23,
 				Font.PLAIN, Color.GRAY);
@@ -88,11 +93,27 @@ public class SingleplayerGame extends Game {
 		}
 	}
 
-	public void AIMakeMove() {
-
+	public BoardLocation AIMakeMove() {
+		try {
+			BoardLocation aiMove = engine.makeMove();
+			System.out.println("The Board has num of stones: " + this.engine.getSolver().getBoard().getTotalStones());
+			return aiMove;
+		} catch (InvalidIndexException e) {
+			return null;
+		}
 	}
 
 	public boolean playerCanMove(int activePlayer) {
 		 return player.getTurn() == activePlayer;
+	}
+
+	public boolean updateBoardForAI(int xcoord, int ycoord) {
+		try {
+			this.engine.getSolver().getBoard().updateBoard(new BoardLocation(ycoord, xcoord),
+					player.getTurn() == Game.TURN_SENTE);
+		} catch (InvalidIndexException e) {
+			return false;
+		}
+		return true;
 	}
 }

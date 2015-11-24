@@ -77,6 +77,10 @@ public abstract class Game {
 	}
 
 	public Game() {
+		this(false);
+	}
+
+	public Game(boolean setupAI) {
 		parentPanel = new JPanel(new BorderLayout());
 		chatPanel = new JPanel(new BorderLayout());
 		chatPanel.setPreferredSize(new Dimension(395, 700));
@@ -125,7 +129,13 @@ public abstract class Game {
 		messageArea = new JTextArea(4, 40);
 		messageArea.setFont(smallGameFont);
 		chatPanel.add(messageArea, BorderLayout.CENTER);
-		initialSetUp();
+		if (!setupAI) {
+			initialSetUp();
+		} else {
+			addStartButtonListener(btnStart);
+			addGiveUpButtonListener();
+			this.board = new Board(boardPanel, this, true);
+		}
 	}
 
 	protected void initialSetUp() {

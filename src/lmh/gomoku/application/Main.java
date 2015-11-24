@@ -104,10 +104,10 @@ public class Main {
 		singleplayerBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				game = new SingleplayerGame(4);
-//				frame.dispose();
+				game = new SingleplayerGame(4, Game.TURN_SENTE);
+				frame.dispose();
 				// to be implemented later.
-				displayUnimplementedMessage();
+//				displayUnimplementedMessage();
 			}
 		});
 

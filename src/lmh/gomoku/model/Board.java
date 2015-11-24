@@ -11,11 +11,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import renju.com.lmh.model.BoardLocation;
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.SingleplayerGame;
 import lmh.gomoku.application.Game.Result;
 import lmh.gomoku.model.Board;
 import lmh.gomoku.model.Coordinate.Stone;
+import lmh.gomoku.model.ServerGame.Move;
 
 public class Board {
 	protected static Coordinate[][] grid;
@@ -68,8 +70,32 @@ public class Board {
 									g.warnNotYourTurn();
 									return;
 								}
+								if (!((SingleplayerGame) g).updateBoardForAI
+										(square.getXCoord(), square.getYCoord())) {
+									g.errorRendering();
+								}
+								updateActivePlayer();
+								BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
+								if (!((SingleplayerGame) g).updateBoardForAI(aiMove.getXPos(), aiMove.getYPos())) {
+									g.errorRendering();
+								}
+								Board.this.setSquareByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+								Image img;
+								try {
+									if (activePlayer == Game.TURN_GOTE) {
+										img = ImageIO.read(getClass().getResource("/images/occupied.png"));
+									} else {
+										img = ImageIO.read(getClass().getResource("/images/occ.png"));
+									}
+									square.setIcon(new ImageIcon(img));
+									updateActivePlayer();
+								} catch (IOException ee) {
+									g.errorRendering();
+								}
+
+								return;
 							}
-							if (activePlayer == 1) {
+							if (activePlayer == Game.TURN_SENTE) {
 								try {
 									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
 									square.setIcon(new ImageIcon(img));
