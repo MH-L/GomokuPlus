@@ -266,7 +266,7 @@ public class AnalysisGame extends Game {
 		for (int i = 0; i < moves.size(); i++) {
 			IMove m = moves.get(i);
 			int turn = (i % 2 == 0) ? TURN_SENTE : TURN_GOTE;
-			this.board.setSquareByTurn(m.getX(), m.getY(), turn);
+			this.board.setSquareIconByTurn(m.getX(), m.getY(), turn);
 		}
 	}
 
@@ -282,7 +282,7 @@ public class AnalysisGame extends Game {
 
 	private void renderOneMore() {
 		int turn = (curMoveIndex % 2 == 0) ? TURN_SENTE : TURN_GOTE;
-		board.setSquareByTurn(moves.get(curMoveIndex).getX(),
+		board.setSquareIconByTurn(moves.get(curMoveIndex).getX(),
 				moves.get(curMoveIndex).getY(), turn);
 	}
 }

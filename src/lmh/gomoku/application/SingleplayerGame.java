@@ -96,6 +96,7 @@ public class SingleplayerGame extends Game {
 	public BoardLocation AIMakeMove() {
 		try {
 			BoardLocation aiMove = engine.makeMove();
+			updateBoardForAI(aiMove.getXPos(), aiMove.getYPos(), false);
 			System.out.println("The Board has num of stones: " + this.engine.getSolver().getBoard().getTotalStones());
 			return aiMove;
 		} catch (InvalidIndexException e) {
@@ -107,10 +108,11 @@ public class SingleplayerGame extends Game {
 		 return player.getTurn() == activePlayer;
 	}
 
-	public boolean updateBoardForAI(int xcoord, int ycoord) {
+	public boolean updateBoardForAI(int xcoord, int ycoord, boolean isForPlayer) {
 		try {
 			this.engine.getSolver().getBoard().updateBoard(new BoardLocation(ycoord, xcoord),
-					player.getTurn() == Game.TURN_SENTE);
+					isForPlayer ? (player.getTurn() == Game.TURN_SENTE) :
+						(player.getTurn() == Game.TURN_GOTE));
 		} catch (InvalidIndexException e) {
 			return false;
 		}

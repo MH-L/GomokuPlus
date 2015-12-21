@@ -374,7 +374,7 @@ public class NetworkGame extends Game {
 					int xcoord = Integer.parseInt(coords[1]);
 					int ycoord = Integer.parseInt(coords[2]);
 					dirtyBit = true;
-					board.setSquareByTurn(ycoord, xcoord, turn);
+					board.setSquareIconByTurn(ycoord, xcoord, turn);
 					actionBar.setText("Opponent's Turn");
 					moves.add(new PortableMove(xcoord, ycoord));
 				} else if (message.startsWith(String.valueOf(ServerConstants.INT_OPPONENT_MOVE) + ",")) {
@@ -383,7 +383,7 @@ public class NetworkGame extends Game {
 					int ycoord = Integer.parseInt(coords[2]);
 					dirtyBit = false;
 					int otherTurn = (turn == Game.TURN_SENTE) ? Game.TURN_GOTE : Game.TURN_SENTE;
-					board.setSquareByTurn(ycoord, xcoord, otherTurn);
+					board.setSquareIconByTurn(ycoord, xcoord, otherTurn);
 					withdrawProposed = false;
 					actionBar.setText("Your Turn");
 					moves.add(new PortableMove(xcoord, ycoord));

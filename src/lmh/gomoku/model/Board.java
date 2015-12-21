@@ -66,69 +66,80 @@ public class Board {
 						}
 						if (square.isUnoccupied()) {
 							if (suspensionRequired) {
+								// First check if it is player's turn
 								if (!((SingleplayerGame) g).playerCanMove(activePlayer)) {
 									g.warnNotYourTurn();
 									return;
 								}
+								// Second, if player is allowed to take turn, update the board.
+								// TODO now the player can only be SENTE, not gote.
 								if (!((SingleplayerGame) g).updateBoardForAI
-										(square.getXCoord(), square.getYCoord())) {
+										(square.getXCoord(), square.getYCoord(),
+												activePlayer == Game.TURN_SENTE)) {
 									g.errorRendering();
 								}
-								updateActivePlayer();
-								BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
-								if (!((SingleplayerGame) g).updateBoardForAI(aiMove.getXPos(), aiMove.getYPos())) {
-									g.errorRendering();
-								}
-								Board.this.setSquareByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
 								Image img;
 								try {
-									if (activePlayer == Game.TURN_GOTE) {
+									if (activePlayer == Game.TURN_SENTE) {
 										img = ImageIO.read(getClass().getResource("/images/occupied.png"));
 									} else {
 										img = ImageIO.read(getClass().getResource("/images/occ.png"));
 									}
+									square.setStone(activePlayer == Game.TURN_SENTE);
 									square.setIcon(new ImageIcon(img));
-									updateActivePlayer();
+									stoneCount++;
 								} catch (IOException ee) {
 									g.errorRendering();
 								}
+								if (endGameCheck()) {
+									return;
+								}
+								updateActivePlayer();
 
+								// AI makes move and the board is updated
+								BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
+								// TODO now the AI could only be GOTE.
+								if (!((SingleplayerGame) g).updateBoardForAI
+										(aiMove.getXPos(), aiMove.getYPos(),
+												activePlayer == Game.TURN_SENTE)) {
+									g.errorRendering();
+								}
+								// Place icon onto board
+								Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+								Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+//								square.setStone(activePlayer == Game.TURN_SENTE);
+								stoneCount++;
+								endGameCheck();
+								updateActivePlayer();
 								return;
-							}
-							if (activePlayer == Game.TURN_SENTE) {
-								try {
-									Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
-									square.setIcon(new ImageIcon(img));
-								} catch (IOException e1) {
-									g.errorRendering();
-								}
-								square.setStone(true);
-								updateActivePlayer();
 							} else {
-								try {
-									Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
-									square.setIcon(new ImageIcon(img));
-								} catch (IOException e1) {
-									g.errorRendering();
+								if (activePlayer == Game.TURN_SENTE) {
+									try {
+										Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
+										square.setIcon(new ImageIcon(img));
+									} catch (IOException e1) {
+										g.errorRendering();
+									}
+									square.setStone(true);
+									updateActivePlayer();
+								} else {
+									try {
+										Image img = ImageIO.read(getClass().getResource("/images/occ.png"));
+										square.setIcon(new ImageIcon(img));
+									} catch (IOException e1) {
+										g.errorRendering();
+									}
+									square.setStone(false);
+									updateActivePlayer();
 								}
-								square.setStone(false);
-								updateActivePlayer();
+								lastMove2 = lastMove1;
+								lastMove1 = square;
+								stoneCount++;
 							}
-							lastMove2 = lastMove1;
-							lastMove1 = square;
 						} else {
 							g.displayOccupiedWarning();
 						}
-						Result currentGameResult = checkWinning();
-						if (currentGameResult != Result.UNDECIDED) {
-							isFrozen = true;
-							if (currentGameResult == Result.SENTE) {
-								g.displayWinnerInfo(true);
-							} else {
-								g.displayWinnerInfo(false);
-							}
-							g.gameEnd();
-						}
+						endGameCheck();
 					}
 				});
 				boardPanel.add(square);
@@ -141,7 +152,7 @@ public class Board {
 		activePlayer = activePlayer == 1 ? 2 : 1;
 	}
 
-	private Result checkRowColWinning() {
+	private static Result checkRowColWinning() {
 		// Check for rows.
 		for (int i = 0; i < height; i++) {
 			int counter = 0;
@@ -200,7 +211,7 @@ public class Board {
 	 * hard to read. (Oh, this passed on my first attempt.)
 	 * @return
 	 */
-	private Result checkDiagWinning() {
+	private static Result checkDiagWinning() {
 		int i = 0;
 		int j = 0;
 		int iStartIndex = 0;
@@ -276,7 +287,7 @@ public class Board {
 		return Result.UNDECIDED;
 	}
 
-	public Result checkWinning() {
+	public static Result checkWinning() {
 		Result rowsAndCols = checkRowColWinning();
 		if (rowsAndCols != Result.UNDECIDED) {
 			return rowsAndCols;
@@ -324,6 +335,11 @@ public class Board {
 		return stoneCount >= width * height;
 	}
 
+	/**
+	 * Spiraling from the center to its edge, find the first empty spot
+	 * on the board. (For elementary hints.)
+	 * @return the first unoccupied square
+	 */
 	public static Coordinate findEmptyLocSpiral() {
 		int curX = width / 2;
 		int curY = height / 2;
@@ -358,7 +374,13 @@ public class Board {
 		return x < width && y < height && x >= 0 && y >= 0;
 	}
 
-	public void setSquareByTurn(int x, int y, int turn) {
+	/**
+	 * Places the icon of stone onto the board.
+	 * @param x stone's x coordinate
+	 * @param y stone's y coordinate
+	 * @param turn player's turn -- 1 is gote and 2 is sente
+	 */
+	public void setSquareIconByTurn(int x, int y, int turn) {
 		if (turn == Game.TURN_SENTE) {
 			try {
 				Image img = ImageIO.read(getClass().getResource("/images/occupied.png"));
@@ -379,7 +401,31 @@ public class Board {
 		}
 	}
 
+	public void setSquareStoneByTurn(int x, int y, int turn) {
+		grid[y][x].setStone(turn == Game.TURN_SENTE);
+	}
+
 	public void resetSquare(int x, int y) {
 		grid[y][x].reset();
+	}
+
+	public boolean endGameCheck() {
+		Result currentGameResult = checkWinning();
+		if (currentGameResult != Result.UNDECIDED) {
+			isFrozen = true;
+			if (currentGameResult == Result.SENTE) {
+				g.displayWinnerInfo(true);
+			} else {
+				g.displayWinnerInfo(false);
+			}
+			g.gameEnd();
+			return true;
+		}
+
+		return false;
+	}
+
+	public int getTotalNumStones() {
+		return stoneCount;
 	}
 }
