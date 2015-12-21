@@ -20,4 +20,8 @@ public class GameEngine extends AI {
 		return this.getSolver().getBoard().updateBoard
 				(new BoardLocation(mv.getY(), mv.getX()), isFirst);
 	}
+
+	public void endGameCleanup() {
+		this.getSolver().getBoard().reset();
+	}
 }

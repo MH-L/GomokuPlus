@@ -118,4 +118,10 @@ public class SingleplayerGame extends Game {
 		}
 		return true;
 	}
+
+	@Override
+	public void gameEnd() {
+		super.gameEnd();
+		engine.endGameCleanup();
+	}
 }

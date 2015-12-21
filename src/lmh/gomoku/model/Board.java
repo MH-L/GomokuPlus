@@ -106,8 +106,8 @@ public class Board {
 								}
 								// Place icon onto board
 								Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+								// update corresponding square as well
 								Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
-//								square.setStone(activePlayer == Game.TURN_SENTE);
 								stoneCount++;
 								endGameCheck();
 								updateActivePlayer();
@@ -401,14 +401,29 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Set the stone on the square by specified turn.
+	 * @param x x coordinate of square on board
+	 * @param y y coordinate of square on board
+	 * @param turn turn of player
+	 */
 	public void setSquareStoneByTurn(int x, int y, int turn) {
 		grid[y][x].setStone(turn == Game.TURN_SENTE);
 	}
 
+	/**
+	 * Set square icon to null and mark the square as unoccupied.
+	 * @param x x coordinate of square on board
+	 * @param y y coordinate of square on board
+	 */
 	public void resetSquare(int x, int y) {
 		grid[y][x].reset();
 	}
 
+	/**
+	 * Checks if the game is ended and, if so, display winner info.
+	 * @return true if the game is ended
+	 */
 	public boolean endGameCheck() {
 		Result currentGameResult = checkWinning();
 		if (currentGameResult != Result.UNDECIDED) {
@@ -425,6 +440,9 @@ public class Board {
 		return false;
 	}
 
+	/**
+	 * Gets the total number of stones on board.
+	 */
 	public int getTotalNumStones() {
 		return stoneCount;
 	}
