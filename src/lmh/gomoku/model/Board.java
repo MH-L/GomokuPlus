@@ -446,4 +446,10 @@ public class Board {
 	public int getTotalNumStones() {
 		return stoneCount;
 	}
+	
+	public void cleanUp() {
+		resetBoard();
+		freeze();
+		stoneCount = 0;
+	}
 }

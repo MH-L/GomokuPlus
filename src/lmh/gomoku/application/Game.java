@@ -179,11 +179,13 @@ public abstract class Game {
 		board.resetBoard();
 		board.activate();
 		gameStarted.setText("Game Started.");
+		makeAIMoveIfNecessary();
 	}
 
+	protected void makeAIMoveIfNecessary() {}
+
 	public void gameEnd() {
-		board.resetBoard();
-		board.freeze();
+		board.cleanUp();
 		gameStarted.setText("Game not yet started.");
 	}
 
