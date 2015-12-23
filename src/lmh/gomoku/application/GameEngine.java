@@ -15,7 +15,7 @@ public class GameEngine extends AI {
 		this.turn = isFirst ? Game.TURN_SENTE : Game.TURN_GOTE;
 	}
 
-	public boolean updateBoard(Move mv) throws InvalidIndexException {
+	public boolean updateBoardForAnalysis(Move mv) throws InvalidIndexException {
 		boolean isFirst = turn == Game.TURN_SENTE;
 		return this.getSolver().getBoard().updateBoard
 				(new BoardLocation(mv.getY(), mv.getX()), isFirst);
