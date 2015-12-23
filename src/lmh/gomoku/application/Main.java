@@ -104,7 +104,7 @@ public class Main {
 		singleplayerBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game = new SingleplayerGame(4, Game.TURN_SENTE);
+				popSinglePlayerGameOptionWindow();
 				frame.dispose();
 				// to be implemented later.
 //				displayUnimplementedMessage();
@@ -355,5 +355,61 @@ public class Main {
 		JOptionPane.showMessageDialog(null, "The functionality is not implemented yet."
 				+ "Our developers\nare working hard on it! Stay tuned!", "Sorry -- Unimplemented",
 				JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	/**
+	 * Displays the option frame for singleplayer game.
+	 * Prompt the user for turn and difficulty of the game.
+	 * If choices valid then start singlePlayerGame and dispose the
+	 * welcome frame.
+	 */
+	private static void popSinglePlayerGameOptionWindow() {
+		JFrame singlePlayerOptionFrame = new JFrame("Options");
+		singlePlayerOptionFrame.setVisible(true);
+		// TODO Start game if valid choices entered.
+//		game = new SingleplayerGame(4, Game.TURN_SENTE);
+		singlePlayerOptionFrame.setSize(500, 800);
+		JPanel singlePlayerOptionPanel = new JPanel();
+		singlePlayerOptionFrame.add(singlePlayerOptionPanel);
+		singlePlayerOptionPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
+		JLabel titleLabel = new JLabel("Options");
+		titleLabel.setBorder(new EmptyBorder(0,0,20,0));
+		titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 48));
+		singlePlayerOptionPanel.add(titleLabel);
+
+//		signUpPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
+//		signUpFrame.add(signUpPanel);
+//		JLabel signUpText = new JLabel("Sign Up");
+//		signUpText.setBorder(new EmptyBorder(0, 0, 20, 0));
+//		signUpText.setFont(new Font("Tahoma", Font.PLAIN, 48));
+//		signUpPanel.add(signUpText);
+//		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+//		sep.setPreferredSize(horizontalLineDimension);
+//		signUpPanel.add(sep);
+//		JLabel usernameLabel = new JLabel("UserName");
+//		usernameLabel.setFont(signUpHintFont);
+//		JLabel emailLabel = new JLabel("Email");
+//		emailLabel.setFont(signUpHintFont);
+//		JLabel passwordLabel = new JLabel("Password");
+//		passwordLabel.setFont(signUpHintFont);
+//		JLabel credentialLabel = new JLabel("Invitation Code");
+//		credentialLabel.setFont(signUpHintFont);
+//		JTextField usernameField = new JTextField(TEXTFIELD_LENGTH_GRID_LAYOUT);
+//		usernameField.setMaximumSize(textFieldDimension);
+//		usernameField.setFont(Game.smallGameFont);
+//		JTextField emailField = new JTextField(TEXTFIELD_LENGTH_GRID_LAYOUT);
+//		emailField.setMaximumSize(textFieldDimension);
+//		emailField.setFont(Game.smallGameFont);
+//		JTextField passwordField = new JPasswordField(TEXTFIELD_LENGTH_GRID_LAYOUT);
+//		passwordField.setMaximumSize(textFieldDimension);
+//		passwordField.setFont(Game.smallGameFont);
+//		JTextField invitationField = new JPasswordField(TEXTFIELD_LENGTH_GRID_LAYOUT);
+//		invitationField.setMaximumSize(textFieldDimension);
+//		invitationField.setFont(Game.smallGameFont);
+//		usernameField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+//		emailField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+//		passwordField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+//		invitationField.setBorder(new RoundedBorder(ROUND_CORNOR_RADIUS));
+//		JPanel gridPanel = new JPanel(new GridLayout(4, 2, 20, 15));
 	}
 }
