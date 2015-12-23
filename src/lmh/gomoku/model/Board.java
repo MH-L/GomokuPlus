@@ -100,7 +100,7 @@ public class Board {
 							return;
 						}
 						if (isBoardFull()) {
-							g.displayTieMessage();
+							g.displayTieMessageBoardFull();
 							g.gameEnd();
 							return;
 						}

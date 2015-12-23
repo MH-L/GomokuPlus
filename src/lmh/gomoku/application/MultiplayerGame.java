@@ -61,7 +61,8 @@ public class MultiplayerGame extends Game {
 						JOptionPane.WARNING_MESSAGE);
 
 				if (choice == JOptionPane.YES_OPTION) {
-
+					displayTieMessageTieAgreed();
+					gameEnd();
 				} else {
 
 				}
@@ -98,5 +99,11 @@ public class MultiplayerGame extends Game {
 		} else {
 			displayWithdrawFailed();
 		}
+	}
+
+	@Override
+	public void restoreWithdrawals() {
+		p1WithdrawalLeft = 2;
+		p2WithdrawalLeft = 2;
 	}
 }
