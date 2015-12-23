@@ -170,6 +170,13 @@ public abstract class Game {
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (gameStarted.getText().equals("Game Started.")) {
+					if (board.isFrozen()) {
+						JOptionPane.showMessageDialog(mainFrame, "The game already started.",
+								"Warning", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
+				}
 				gameStart();
 			}
 		});
@@ -186,8 +193,11 @@ public abstract class Game {
 
 	public void gameEnd() {
 		board.cleanUp();
+		restoreWithdrawals();
 		gameStarted.setText("Game not yet started.");
 	}
+
+	protected void restoreWithdrawals() {}
 
 	private JMenuBar createJMenuBar() {
 		JMenuBar menus = new JMenuBar();
@@ -423,8 +433,13 @@ public abstract class Game {
 				+ " start\nor go to menu bar.", "Game Status Info", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	public void displayTieMessage() {
+	public void displayTieMessageBoardFull() {
 		JOptionPane.showMessageDialog(mainFrame, "Board Full. Game comes to a tie.",
+				"Game Over", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public void displayTieMessageTieAgreed() {
+		JOptionPane.showMessageDialog(mainFrame, "Tie Agreed. Game comes to a tie.",
 				"Game Over", JOptionPane.INFORMATION_MESSAGE);
 	}
 

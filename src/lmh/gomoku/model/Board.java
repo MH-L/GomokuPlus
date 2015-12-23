@@ -17,7 +17,6 @@ import lmh.gomoku.application.SingleplayerGame;
 import lmh.gomoku.application.Game.Result;
 import lmh.gomoku.model.Board;
 import lmh.gomoku.model.Coordinate.Stone;
-import lmh.gomoku.model.ServerGame.Move;
 
 public class Board {
 	protected static Coordinate[][] grid;
@@ -79,7 +78,7 @@ public class Board {
 					}
 				}
 			};
-			
+
 			AIThread.start();
 		}
 	}
@@ -101,7 +100,7 @@ public class Board {
 							return;
 						}
 						if (isBoardFull()) {
-							g.displayTieMessage();
+							g.displayTieMessageBoardFull();
 							g.gameEnd();
 							return;
 						}
@@ -475,13 +474,13 @@ public class Board {
 	public int getTotalNumStones() {
 		return stoneCount;
 	}
-	
+
 	public void cleanUp() {
 		resetBoard();
 		freeze();
 		stoneCount = 0;
 	}
-	
+
 	public void updateIsAITurn(boolean isAITurn) {
 		synchronized(lock) {
 			this.isAITurn = isAITurn;
