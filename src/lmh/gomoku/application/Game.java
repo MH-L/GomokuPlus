@@ -171,11 +171,9 @@ public abstract class Game {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (gameStarted.getText().equals("Game Started.")) {
-					if (board.isFrozen()) {
-						JOptionPane.showMessageDialog(mainFrame, "The game already started.",
-								"Warning", JOptionPane.WARNING_MESSAGE);
-						return;
-					}
+					JOptionPane.showMessageDialog(mainFrame, "The game already started.",
+							"Warning", JOptionPane.WARNING_MESSAGE);
+					return;
 				}
 				gameStart();
 			}
