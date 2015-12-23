@@ -136,16 +136,16 @@ public class SingleplayerGame extends Game {
 		engine.endGameCleanup();
 	}
 
-	@Override
-	protected void makeAIMoveIfNecessary() {
-		int playerTurn = player.getTurn();
-		if (playerTurn == Game.TURN_GOTE) {
-			BoardLocation AIMove = AIMakeMove();
-			board.setSquareStoneByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
-			board.setSquareIconByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
-		}
-		board.updateActivePlayer();
-	}
+//	@Override
+//	protected void makeAIMoveIfNecessary() {
+//		int playerTurn = player.getTurn();
+//		if (playerTurn == Game.TURN_GOTE) {
+//			BoardLocation AIMove = AIMakeMove();
+//			board.setSquareStoneByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
+//			board.setSquareIconByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
+//		}
+//		board.updateActivePlayer();
+//	}
 
 	public HumanPlayer getPlayer() {
 		return player;
