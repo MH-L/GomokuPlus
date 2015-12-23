@@ -33,10 +33,10 @@ public class SingleplayerGame extends Game {
 	private renju.com.lmh.model.Board analysisBoard;
 	
 	public SingleplayerGame(int max_num_withdrawal, int playerTurn) {
-		super(true);
+		super(true, playerTurn);
 		this.analysisBoard = new renju.com.lmh.model.Board(Board.width);
 		this.player = new HumanPlayer(playerTurn);
-		this.engine = new GameEngine(Difficulty.ADVANCED, analysisBoard,
+		this.engine = new GameEngine(Difficulty.INTERMEDIATE, analysisBoard,
 				playerTurn == Game.TURN_GOTE);
 		withdrawalLeft = max_num_withdrawal;
 		this.btnWithdrawal = Main.getPlainLookbtn("Withdraw!", "Open Sans", 23,
@@ -119,6 +119,13 @@ public class SingleplayerGame extends Game {
 		}
 		return true;
 	}
+	
+	@Override
+	public void gameStart() {
+		super.gameStart();
+		if (player.getTurn() == Game.TURN_GOTE)
+			board.updateIsAITurn(true);
+	}
 
 	@Override
 	public void gameEnd() {
@@ -135,5 +142,9 @@ public class SingleplayerGame extends Game {
 			board.setSquareIconByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
 		}
 		board.updateActivePlayer();
+	}
+	
+	public HumanPlayer getPlayer() {
+		return player;
 	}
 }

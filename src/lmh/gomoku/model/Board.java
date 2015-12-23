@@ -30,6 +30,9 @@ public class Board {
 	private int stoneCount = 0;
 	private Game g;
 	private boolean suspensionRequired = false;
+	private boolean isAITurn = false;
+	private Object lock = new Object();
+	private Thread AIThread;
 
 	public Board(JPanel boardPanel, Game g) {
 		this.g = g;
@@ -38,9 +41,47 @@ public class Board {
 		addCellsToBoard(boardPanel);
 	}
 
-	public Board(JPanel boardPanel, Game g, boolean suspensionRequired) {
+	public Board(JPanel boardPanel, Game g, boolean suspensionRequired, int playerTurn) {
 		this(boardPanel, g);
 		this.suspensionRequired = suspensionRequired;
+		if (suspensionRequired) {
+			AIThread = new Thread() {
+				@Override
+				public void run() {
+					System.out.println("Made move.");
+					while (true) {
+						if (isAITurn) {
+							// AI makes move and the board is updated
+							BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
+							System.out.println("Made move.");
+							// TODO now the AI could only be GOTE.
+							if (!((SingleplayerGame) g).updateBoardForAI
+									(aiMove.getXPos(), aiMove.getYPos(),
+											activePlayer == Game.TURN_SENTE)) {
+								g.errorRendering();
+							}
+							// Place icon onto board
+							Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+							// update corresponding square as well
+							Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+							stoneCount++;
+							endGameCheck();
+							updateActivePlayer();
+							synchronized(lock) {
+								isAITurn = false;
+							}
+						}
+//						try {
+//							Thread.sleep(100);
+//						} catch (InterruptedException e) {
+//							return;
+//						}
+					}
+				}
+			};
+			
+			AIThread.start();
+		}
 	}
 
 	protected void addCellsToBoard(JPanel boardPanel) {
@@ -95,22 +136,9 @@ public class Board {
 									return;
 								}
 								updateActivePlayer();
-
-								// AI makes move and the board is updated
-								BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
-								// TODO now the AI could only be GOTE.
-								if (!((SingleplayerGame) g).updateBoardForAI
-										(aiMove.getXPos(), aiMove.getYPos(),
-												activePlayer == Game.TURN_SENTE)) {
-									g.errorRendering();
+								synchronized(lock) {
+									isAITurn = true;
 								}
-								// Place icon onto board
-								Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
-								// update corresponding square as well
-								Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
-								stoneCount++;
-								endGameCheck();
-								updateActivePlayer();
 								return;
 							} else {
 								if (activePlayer == Game.TURN_SENTE) {
@@ -427,6 +455,7 @@ public class Board {
 	public boolean endGameCheck() {
 		Result currentGameResult = checkWinning();
 		if (currentGameResult != Result.UNDECIDED) {
+			AIThread.interrupt();
 			isFrozen = true;
 			if (currentGameResult == Result.SENTE) {
 				g.displayWinnerInfo(true);
@@ -451,5 +480,11 @@ public class Board {
 		resetBoard();
 		freeze();
 		stoneCount = 0;
+	}
+	
+	public void updateIsAITurn(boolean isAITurn) {
+		synchronized(lock) {
+			this.isAITurn = isAITurn;
+		}
 	}
 }

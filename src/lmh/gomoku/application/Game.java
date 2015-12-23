@@ -77,10 +77,10 @@ public abstract class Game {
 	}
 
 	public Game() {
-		this(false);
+		this(false, 0);
 	}
 
-	public Game(boolean setupAI) {
+	public Game(boolean setupAI, int playerTurn) {
 		parentPanel = new JPanel(new BorderLayout());
 		chatPanel = new JPanel(new BorderLayout());
 		chatPanel.setPreferredSize(new Dimension(395, 700));
@@ -134,7 +134,7 @@ public abstract class Game {
 		} else {
 			addStartButtonListener(btnStart);
 			addGiveUpButtonListener();
-			this.board = new Board(boardPanel, this, true);
+			this.board = new Board(boardPanel, this, true, playerTurn);
 		}
 	}
 
@@ -175,7 +175,7 @@ public abstract class Game {
 		});
 	}
 
-	private void gameStart() {
+	protected void gameStart() {
 		board.resetBoard();
 		board.activate();
 		gameStarted.setText("Game Started.");
