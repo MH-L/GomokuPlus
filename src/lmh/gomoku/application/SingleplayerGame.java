@@ -31,9 +31,9 @@ public class SingleplayerGame extends Game {
 	private GameEngine engine;
 	private HumanPlayer player;
 	private renju.com.lmh.model.Board analysisBoard;
-
+	
 	public SingleplayerGame(int max_num_withdrawal, int playerTurn) {
-		super(true);
+		super(true, playerTurn);
 		this.analysisBoard = new renju.com.lmh.model.Board(Board.width);
 		this.player = new HumanPlayer(playerTurn);
 		this.engine = new GameEngine(Difficulty.INTERMEDIATE, analysisBoard,
@@ -113,15 +113,38 @@ public class SingleplayerGame extends Game {
 			this.engine.getSolver().getBoard().updateBoard(new BoardLocation(ycoord, xcoord),
 					isForPlayer ? (player.getTurn() == Game.TURN_SENTE) :
 						(player.getTurn() == Game.TURN_GOTE));
+//			this.engine.getSolver().printBoardStats();
 		} catch (InvalidIndexException e) {
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public void gameStart() {
+		super.gameStart();
+		if (player.getTurn() == Game.TURN_GOTE)
+			board.updateIsAITurn(true);
 	}
 
 	@Override
 	public void gameEnd() {
 		super.gameEnd();
 		engine.endGameCleanup();
+	}
+	
+	@Override
+	protected void makeAIMoveIfNecessary() {
+		int playerTurn = player.getTurn();
+		if (playerTurn == Game.TURN_GOTE) {
+			BoardLocation AIMove = AIMakeMove();
+			board.setSquareStoneByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
+			board.setSquareIconByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
+		}
+		board.updateActivePlayer();
+	}
+	
+	public HumanPlayer getPlayer() {
+		return player;
 	}
 }
