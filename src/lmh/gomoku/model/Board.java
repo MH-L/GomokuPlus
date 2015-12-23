@@ -49,9 +49,10 @@ public class Board {
 		this.suspensionRequired = suspensionRequired;
 		// Need to let AI make its first move if the player is second.
 		if (suspensionRequired) {
-			AIThread = new Thread() {
+			AIThread = new Thread() {			
 				@Override
 				public void run() {
+					System.out.println("SinglePlayer thread running!");
 					System.out.println("Made move.");
 					long lastPrinted = System.currentTimeMillis();
 					while (true) {
@@ -450,7 +451,8 @@ public class Board {
 	public boolean doEndGameCheck() {
 		Result currentGameResult = checkWinning();
 		if (currentGameResult != Result.UNDECIDED) {
-			AIThread.interrupt();
+			if (AIThread != null)
+				AIThread.interrupt();
 			isFrozen = true;
 			if (currentGameResult == Result.SENTE) {
 				g.displayWinnerInfo(true);

@@ -140,33 +140,44 @@ public class AIGame extends Game {
 			@Override
 			public void run() {
 				while (true) {
-					if (senteLastMove != null) {
+					if (!isNullMove(senteLastMove)) {
 						try {
 							senteEngine.updateBoardForAnalysis(senteLastMove, true);
 							goteEngine.updateBoardForAnalysis(senteLastMove, false);
 							synchronized(senteLastMove) {
 								senteLastMove = getNullMove();
 							}
-							AIGame.this.board.doEndGameCheck();
+							if (AIGame.this.board.doEndGameCheck()) {
+								return;
+							}
 							// active player should only be updated when lastMoves are made onto 
 							// the analysis boards of each game engine.
-							updateActivePlayerWithLock();
+							updateActivePlayerWithLock(false);
 						} catch (InvalidIndexException e) {
 							// still check to see why the board update failed
 							e.printStackTrace();
 						}
-					} else if (goteLastMove != null) {
+					} else if (!isNullMove(goteLastMove)) {
+						System.out.println("Is not null!");
 						try {
 							senteEngine.updateBoardForAnalysis(goteLastMove, false);
 							goteEngine.updateBoardForAnalysis(goteLastMove, true);
 							synchronized(goteLastMove) {
 								goteLastMove = getNullMove();
 							}
-							AIGame.this.board.doEndGameCheck();
-							updateActivePlayerWithLock();
+							if (AIGame.this.board.doEndGameCheck()) {
+								return;
+							}
+							updateActivePlayerWithLock(true);
 						} catch (InvalidIndexException e) {
 							e.printStackTrace();
 						}
+					}
+					
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						continue;
 					}
 				}
 			}
@@ -174,6 +185,7 @@ public class AIGame extends Game {
 		
 		senteThread.start();
 		goteThread.start();
+		coordinator.start();
 	}
 
 	@Override
@@ -185,13 +197,17 @@ public class AIGame extends Game {
 	/**
 	 * Updates the active player when there exists lock on it.
 	 */
-	private void updateActivePlayerWithLock() {
+	private void updateActivePlayerWithLock(boolean active) {
 		synchronized(lock) {
-			activePlayer = !activePlayer;
+			activePlayer = active;
 		}
 	}
 	
 	private BoardLocation getNullMove() {
 		return new BoardLocation(-1, -1);
+	}
+	
+	private boolean isNullMove(BoardLocation move) {
+		return move.getXPos() == -1 && move.getYPos() == -1;
 	}
 }
