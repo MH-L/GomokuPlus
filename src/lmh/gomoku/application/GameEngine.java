@@ -1,6 +1,5 @@
 package lmh.gomoku.application;
 
-import lmh.gomoku.model.ServerGame.Move;
 import renju.com.lmh.application.AI;
 import renju.com.lmh.application.Game.Difficulty;
 import renju.com.lmh.exception.InvalidIndexException;
@@ -15,10 +14,12 @@ public class GameEngine extends AI {
 		this.turn = isFirst ? Game.TURN_SENTE : Game.TURN_GOTE;
 	}
 
-	public boolean updateBoardForAnalysis(Move mv) throws InvalidIndexException {
-		boolean isFirst = turn == Game.TURN_SENTE;
-		return this.getSolver().getBoard().updateBoard
-				(new BoardLocation(mv.getY(), mv.getX()), isFirst);
+	public boolean updateBoardForAnalysis(BoardLocation senteLastMove, boolean isForSelf)
+			throws InvalidIndexException {
+		boolean isFirst = isForSelf ? (turn == Game.TURN_SENTE)
+				: (turn == Game.TURN_GOTE);
+		return this.getSolver().getBoard()
+				.updateBoard(new BoardLocation(senteLastMove.getYPos(), senteLastMove.getXPos()), isFirst);
 	}
 
 	public void endGameCleanup() {

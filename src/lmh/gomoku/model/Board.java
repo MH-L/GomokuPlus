@@ -70,7 +70,7 @@ public class Board {
 							// update corresponding square as well
 							Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
 							stoneCount++;
-							endGameCheck();
+							doEndGameCheck();
 							updateActivePlayer();
 						}
 					}
@@ -128,7 +128,7 @@ public class Board {
 								} catch (IOException ee) {
 									g.errorRendering();
 								}
-								if (endGameCheck()) {
+								if (doEndGameCheck()) {
 									return;
 								}
 								updateActivePlayer();
@@ -162,7 +162,7 @@ public class Board {
 						} else {
 							g.displayOccupiedWarning();
 						}
-						endGameCheck();
+						doEndGameCheck();
 					}
 				});
 				boardPanel.add(square);
@@ -447,7 +447,7 @@ public class Board {
 	 * Checks if the game is ended and, if so, display winner info.
 	 * @return true if the game is ended
 	 */
-	public boolean endGameCheck() {
+	public boolean doEndGameCheck() {
 		Result currentGameResult = checkWinning();
 		if (currentGameResult != Result.UNDECIDED) {
 			AIThread.interrupt();

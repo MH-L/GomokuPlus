@@ -124,7 +124,6 @@ public class SingleplayerGame extends Game {
 			this.engine.getSolver().getBoard().updateBoard(new BoardLocation(ycoord, xcoord),
 					isForPlayer ? (player.getTurn() == Game.TURN_SENTE) :
 						(player.getTurn() == Game.TURN_GOTE));
-//			this.engine.getSolver().printBoardStats();
 		} catch (InvalidIndexException e) {
 			return false;
 		}
@@ -145,17 +144,6 @@ public class SingleplayerGame extends Game {
 		super.gameEnd();
 		engine.endGameCleanup();
 	}
-
-//	@Override
-//	protected void makeAIMoveIfNecessary() {
-//		int playerTurn = player.getTurn();
-//		if (playerTurn == Game.TURN_GOTE) {
-//			BoardLocation AIMove = AIMakeMove();
-//			board.setSquareStoneByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
-//			board.setSquareIconByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
-//		}
-//		board.updateActivePlayer();
-//	}
 
 	public HumanPlayer getPlayer() {
 		return player;
