@@ -124,8 +124,10 @@ public class SingleplayerGame extends Game {
 	@Override
 	public void gameStart() {
 		super.gameStart();
-		if (player.getTurn() == Game.TURN_GOTE)
+		if (player.getTurn() == Game.TURN_GOTE) {
 			board.updateIsAITurn(true);
+			System.out.println("Set ai turn to true!");
+		}
 	}
 
 	@Override

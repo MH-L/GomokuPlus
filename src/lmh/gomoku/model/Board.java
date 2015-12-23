@@ -40,9 +40,14 @@ public class Board {
 		addCellsToBoard(boardPanel);
 	}
 
+	/**
+	 * Board constructor for single player game.
+	 * @param playerTurn turn of player -- sente or gote
+	 */
 	public Board(JPanel boardPanel, Game g, boolean suspensionRequired, int playerTurn) {
 		this(boardPanel, g);
 		this.suspensionRequired = suspensionRequired;
+		// Need to let AI make its first move if the player is second.
 		if (suspensionRequired) {
 			AIThread = new Thread() {
 				@Override
@@ -66,9 +71,7 @@ public class Board {
 							stoneCount++;
 							endGameCheck();
 							updateActivePlayer();
-							synchronized(lock) {
-								isAITurn = false;
-							}
+							updateIsAITurn(false);
 						}
 //						try {
 //							Thread.sleep(100);
@@ -135,9 +138,8 @@ public class Board {
 									return;
 								}
 								updateActivePlayer();
-								synchronized(lock) {
-									isAITurn = true;
-								}
+								System.out.println("Setting ai turn to true.");
+								updateIsAITurn(true);
 								return;
 							} else {
 								if (activePlayer == Game.TURN_SENTE) {
