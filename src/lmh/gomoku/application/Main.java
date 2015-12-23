@@ -10,12 +10,14 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -47,10 +49,12 @@ public class Main {
 	 */
 	private static final Dimension textFieldDimension = new Dimension(200, 54);
 	private static final Dimension horizontalLineDimension = new Dimension(500, 3);
+	private static final Dimension horizontalLineShortDimension = new Dimension(360, 3);
 	private static final Dimension signUpLoginBtnDimension = new Dimension(200, 70);
 	private static final Font loginHintFont = new Font("Calibri", Font.PLAIN, 36);
 	private static final Font signUpHintFont = new Font("Tahoma", Font.PLAIN, 36);
 	private static final Font signUpBtnFont = new Font("Tahoma", Font.PLAIN, 40);
+	private static final Font radioBtnsFont = new Font("Calibri", Font.PLAIN, 29);
 	private static final Border panelEmptyBorder = new EmptyBorder(20, 20, 20, 20);
 	/**
 	 * The reason why we need different lengths for the text fields is that
@@ -104,8 +108,7 @@ public class Main {
 		singleplayerBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game = new SingleplayerGame(4, Game.TURN_GOTE);
-				frame.dispose();
+				popSinglePlayerGameOptionWindow(frame);
 				// to be implemented later.
 //				displayUnimplementedMessage();
 			}
@@ -355,5 +358,80 @@ public class Main {
 		JOptionPane.showMessageDialog(null, "The functionality is not implemented yet."
 				+ "Our developers\nare working hard on it! Stay tuned!", "Sorry -- Unimplemented",
 				JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	/**
+	 * Displays the option frame for singleplayer game.
+	 * Prompt the user for turn and difficulty of the game.
+	 * If choices valid then start singlePlayerGame and dispose the
+	 * welcome frame.
+	 */
+	private static void popSinglePlayerGameOptionWindow(JFrame welcomeFrame) {
+		JFrame singlePlayerOptionFrame = new JFrame("Options");
+		singlePlayerOptionFrame.setVisible(true);
+		// TODO Start game if valid choices entered.
+//		game = new SingleplayerGame(4, Game.TURN_SENTE);
+		singlePlayerOptionFrame.setSize(600, 800);
+		JPanel singlePlayerOptionPanel = new JPanel();
+		singlePlayerOptionFrame.add(singlePlayerOptionPanel);
+		singlePlayerOptionPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
+		JLabel titleLabel = new JLabel("Options");
+		titleLabel.setBorder(new EmptyBorder(0,0,20,0));
+		titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 48));
+		singlePlayerOptionPanel.add(titleLabel);
+		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+		sep.setPreferredSize(horizontalLineDimension);
+		singlePlayerOptionPanel.add(sep);
+		UIManager.put("RadioButton.font", radioBtnsFont);
+		// TODO make this thing look nicer!!!!!!
+		JRadioButton senteOption = new JRadioButton("First");
+		JRadioButton goteOption = new JRadioButton("Second");
+		JRadioButton noviceDiffOption = new JRadioButton("Novice");
+		JRadioButton intermediateDiffOption = new JRadioButton("Intermediate");
+		JRadioButton advancedDiffOption = new JRadioButton("Advanced");
+		JRadioButton ultimateDiffOption = new JRadioButton("Ultimate");
+		JRadioButton mysteriousButton = new JRadioButton("Mysterious");
+		singlePlayerOptionPanel.add(senteOption);
+		singlePlayerOptionPanel.add(goteOption);
+		JSeparator buttonSep = new JSeparator(SwingConstants.HORIZONTAL);
+		buttonSep.setPreferredSize(horizontalLineShortDimension);
+		singlePlayerOptionPanel.add(buttonSep);
+		singlePlayerOptionPanel.add(noviceDiffOption);
+		singlePlayerOptionPanel.add(intermediateDiffOption);
+		singlePlayerOptionPanel.add(advancedDiffOption);
+		singlePlayerOptionPanel.add(ultimateDiffOption);
+		singlePlayerOptionPanel.add(mysteriousButton);
+
+		// create a group so that only one difficulty level is selected
+		ButtonGroup difficultyGroup = new ButtonGroup();
+		difficultyGroup.add(noviceDiffOption);
+		difficultyGroup.add(intermediateDiffOption);
+		difficultyGroup.add(advancedDiffOption);
+		difficultyGroup.add(ultimateDiffOption);
+		difficultyGroup.add(mysteriousButton);
+
+		// select two default things.
+		intermediateDiffOption.setSelected(true);
+		senteOption.setSelected(true);
+
+		// create a group so that only one turn is selected
+		ButtonGroup turnGroup = new ButtonGroup();
+		turnGroup.add(senteOption);
+		turnGroup.add(goteOption);
+
+		JButton playButton = Main.getPlainLookbtn("Play!", "Calibri", 33, Font.PLAIN, Color.CYAN);
+		singlePlayerOptionPanel.add(playButton);
+		playButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO get user's choices
+				singlePlayerOptionFrame.dispose();
+				if (senteOption.isSelected())
+					game = new SingleplayerGame(4, Game.TURN_SENTE);
+				else
+					game = new SingleplayerGame(4, Game.TURN_GOTE);
+				welcomeFrame.dispose();
+			}
+		});
 	}
 }

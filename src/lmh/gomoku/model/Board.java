@@ -53,17 +53,18 @@ public class Board {
 				@Override
 				public void run() {
 					System.out.println("Made move.");
+					long lastPrinted = System.currentTimeMillis();
 					while (true) {
+						if (System.currentTimeMillis() - lastPrinted > 2000) {
+							System.out.println("The ai turn status is " + isAITurn);
+							lastPrinted = System.currentTimeMillis();
+						}
 						if (isAITurn) {
+							updateIsAITurn(false);
 							// AI makes move and the board is updated
 							BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
 							System.out.println("Made move.");
-							// TODO now the AI could only be GOTE.
-							if (!((SingleplayerGame) g).updateBoardForAI
-									(aiMove.getXPos(), aiMove.getYPos(),
-											activePlayer == Game.TURN_SENTE)) {
-								g.errorRendering();
-							}
+//							// TODO now the AI could only be GOTE.
 							// Place icon onto board
 							Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
 							// update corresponding square as well
@@ -71,13 +72,7 @@ public class Board {
 							stoneCount++;
 							endGameCheck();
 							updateActivePlayer();
-							updateIsAITurn(false);
 						}
-//						try {
-//							Thread.sleep(100);
-//						} catch (InterruptedException e) {
-//							return;
-//						}
 					}
 				}
 			};
@@ -117,8 +112,7 @@ public class Board {
 								// Second, if player is allowed to take turn, update the board.
 								// TODO now the player can only be SENTE, not gote.
 								if (!((SingleplayerGame) g).updateBoardForAI
-										(square.getXCoord(), square.getYCoord(),
-												activePlayer == Game.TURN_SENTE)) {
+										(square.getXCoord(), square.getYCoord(), true)) {
 									g.errorRendering();
 								}
 								Image img;

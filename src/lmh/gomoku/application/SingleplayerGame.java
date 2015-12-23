@@ -32,7 +32,17 @@ public class SingleplayerGame extends Game {
 	private HumanPlayer player;
 	private renju.com.lmh.model.Board analysisBoard;
 
+	/**
+	 * Default constructor of SinglePlayerGame. AI difficulty is default to intermediate
+	 * because that is for now the most stable.
+	 * @param max_num_withdrawal maximum number of withdrawals the player gets.
+	 * @param playerTurn turn of the player
+	 */
 	public SingleplayerGame(int max_num_withdrawal, int playerTurn) {
+		this(max_num_withdrawal, playerTurn, Difficulty.INTERMEDIATE);
+	}
+
+	public SingleplayerGame(int max_num_withdrawal, int playerTurn, Difficulty AIDiff) {
 		super(true, playerTurn);
 		this.analysisBoard = new renju.com.lmh.model.Board(Board.width);
 		this.player = new HumanPlayer(playerTurn);
@@ -136,16 +146,16 @@ public class SingleplayerGame extends Game {
 		engine.endGameCleanup();
 	}
 
-	@Override
-	protected void makeAIMoveIfNecessary() {
-		int playerTurn = player.getTurn();
-		if (playerTurn == Game.TURN_GOTE) {
-			BoardLocation AIMove = AIMakeMove();
-			board.setSquareStoneByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
-			board.setSquareIconByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
-		}
-		board.updateActivePlayer();
-	}
+//	@Override
+//	protected void makeAIMoveIfNecessary() {
+//		int playerTurn = player.getTurn();
+//		if (playerTurn == Game.TURN_GOTE) {
+//			BoardLocation AIMove = AIMakeMove();
+//			board.setSquareStoneByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
+//			board.setSquareIconByTurn(AIMove.getXPos(), AIMove.getYPos(), Game.TURN_SENTE);
+//		}
+//		board.updateActivePlayer();
+//	}
 
 	public HumanPlayer getPlayer() {
 		return player;
