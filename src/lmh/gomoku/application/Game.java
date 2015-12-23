@@ -170,6 +170,13 @@ public abstract class Game {
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (gameStarted.getText().equals("Game Started.")) {
+					if (board.isFrozen()) {
+						JOptionPane.showMessageDialog(mainFrame, "The game already started.",
+								"Warning", JOptionPane.WARNING_MESSAGE);
+						return;
+					}
+				}
 				gameStart();
 			}
 		});
@@ -179,10 +186,7 @@ public abstract class Game {
 		board.resetBoard();
 		board.activate();
 		gameStarted.setText("Game Started.");
-		makeAIMoveIfNecessary();
 	}
-
-	protected void makeAIMoveIfNecessary() {}
 
 	public void gameEnd() {
 		board.cleanUp();

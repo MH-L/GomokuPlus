@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
@@ -37,10 +38,35 @@ public class MultiplayerGame extends Game {
 		this.btnWithdrawal.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (board.isFrozen()) {
+					JOptionPane.showMessageDialog(mainFrame, "The game has not yet started.",
+							"Warning", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 				withdraw();
 			}
 		});
-		this.btnTie = Main.getPlainLookbtn("Hint", "Open Sans", 23, Font.PLAIN, Color.PINK);
+		this.btnTie = Main.getPlainLookbtn("Propose Tie", "Open Sans", 23, Font.PLAIN, Color.PINK);
+		this.btnTie.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (board.isFrozen()) {
+					JOptionPane.showMessageDialog(mainFrame, "The game has not yet started.",
+							"Warning", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				int choice = JOptionPane.showConfirmDialog(mainFrame,
+						"Other player wants to tie the game. Do you agree?",
+						"Proposing tie", JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+
+				if (choice == JOptionPane.YES_OPTION) {
+
+				} else {
+
+				}
+			}
+		});
 		btnTie.setMargin(new Insets(0,0,0,0));
 		buttonPanel.add(btnWithdrawal);
 		buttonPanel.add(btnTie);
