@@ -487,4 +487,14 @@ public class Main {
 			}
 		});
 	}
+	
+	/**
+	 * The warning is shown when the options file is not well-formed or 
+	 * does not contain necessary keys. (Redundant keys are okay)
+	 */
+	public static void warnOptionsFileInvalid() {
+		JOptionPane.showMessageDialog(null, "The options file in local storage is invalid."
+				+ "\nThe new options file with default options is being generated.",
+				"Invalid options file", JOptionPane.WARNING_MESSAGE);
+	}
 }

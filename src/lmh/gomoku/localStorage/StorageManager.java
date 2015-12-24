@@ -1,15 +1,20 @@
 package lmh.gomoku.localStorage;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import lmh.gomoku.application.Main;
 import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
+import lmh.gomoku.exception.XMLException;
 import lmh.gomoku.model.IMove;
 import lmh.gomoku.util.RecordCreator;
 import lmh.gomoku.util.XMLHelper;
@@ -200,7 +205,13 @@ public class StorageManager {
 		gameHash = escapeBase64Str(gameHash);
 		storeGameRecord(moveStr, gameHash);
 	}
-
+	
+	/**
+	 * Escapes the base 64 encoded string as file name format. "/" is 
+	 * considered an invalid character in file names.
+	 * @param str the base64 encoded string to escape
+	 * @return string suitable for file names
+	 */
 	private static String escapeBase64Str(String str) {
 		char[] arr = str.toCharArray();
 		String retVal = "";
@@ -212,6 +223,64 @@ public class StorageManager {
 			}
 		}
 
+		return retVal;
+	}
+	
+	public Map<String, Object> getOptionsMapping() throws XMLException {
+		File options = new File(CONFIG + "\\options.xml");
+		// If options file does not exist then create one.
+		if (!options.exists())
+			try {
+				generateOptions();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		String configString = "";
+		
+		try {
+			FileInputStream fis = new FileInputStream(options);
+			byte[] inputData = new byte[(int) options.length()];
+			fis.read(inputData);
+			configString = new String(inputData, "UTF-8");
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return getOptionsMapping(configString);
+	}
+	
+	private Map<String, Object> getOptionsMapping(String optionsString) throws XMLException {
+		XMLElement optionsElement = null;
+		optionsElement = XMLHelper.strToXML(optionsString);
+		
+		XMLElement general = tryAndGetChild(optionsElement, "General");
+		XMLElement singlePlayerGame = tryAndGetChild(optionsElement, "SingleplayerGame");
+		XMLElement multiplayerGame = tryAndGetChild(optionsElement, "MultiplayerGame");
+		XMLElement networkGame = tryAndGetChild(optionsElement, "NetworkGame");
+		XMLElement AIGame = tryAndGetChild(optionsElement, "AIGame");
+		XMLElement analysisGame = tryAndGetChild(optionsElement, "AnalysisGame");
+		
+		Map<String, Object> generalsMap = new HashMap<String, Object>();
+		Map<String, Object> singleplayerMap = new HashMap<String, Object>();
+		Map<String, Object> multiplayerMap = new HashMap<String, Object>();
+		Map<String, Object> aiGameMap = new HashMap<String, Object>();
+		Map<String, Object> networkGameMap = new HashMap<String, Object>();
+		Map<String, Object> analysisGameMap = new HashMap<String, Object>();
+		
+		return new HashMap<String, Object>();
+	}
+	
+	private static XMLElement tryAndGetChild(XMLElement ele, String childName) throws XMLException {
+		XMLElement retVal = ele.getFirstChild(childName);
+		if (retVal == null)
+			throw new XMLException("Child not found.");
+		
 		return retVal;
 	}
 }

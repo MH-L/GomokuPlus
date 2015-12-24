@@ -41,6 +41,11 @@ public class XMLHelper {
 			childElements.add(child);
 			child.parentElement = this;
 		}
+		
+		public XMLElement getFirstChild(String name) {
+			List<XMLElement> foundResults = getChild(name);
+			return foundResults.isEmpty() ? null : foundResults.get(0);
+		}
 
 		public List<XMLElement> getChild(String name) {
 			List<XMLElement> retVal = new ArrayList<XMLElement>();
