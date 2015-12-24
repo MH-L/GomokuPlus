@@ -80,6 +80,8 @@ public class StorageManager {
 		}
 	}
 
+
+
 	public static void generateReadMe() throws IOException {
 		File readme = new File(DIR + "\\README.txt");
 		if (readme.createNewFile()) {
