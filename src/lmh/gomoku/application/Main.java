@@ -9,7 +9,9 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,6 +28,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import renju.com.lmh.application.Game.Difficulty;
 import lmh.gomoku.application.Game;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.localStorage.StorageManager;
@@ -54,6 +57,7 @@ public class Main {
 	private static final Font loginHintFont = new Font("Calibri", Font.PLAIN, 36);
 	private static final Font signUpHintFont = new Font("Tahoma", Font.PLAIN, 36);
 	private static final Font signUpBtnFont = new Font("Tahoma", Font.PLAIN, 40);
+	private static final Font panelSubTitleFont = new Font("Tahoma", Font.PLAIN, 35);
 	private static final Font radioBtnsFont = new Font("Calibri", Font.PLAIN, 29);
 	private static final Border panelEmptyBorder = new EmptyBorder(20, 20, 20, 20);
 	/**
@@ -371,34 +375,55 @@ public class Main {
 //		game = new SingleplayerGame(4, Game.TURN_SENTE);
 		singlePlayerOptionFrame.setSize(600, 800);
 		JPanel singlePlayerOptionPanel = new JPanel();
+		BoxLayout optionLayout = new BoxLayout(singlePlayerOptionPanel, BoxLayout.Y_AXIS);
+		singlePlayerOptionPanel.setLayout(optionLayout);
+
 		singlePlayerOptionFrame.add(singlePlayerOptionPanel);
 		singlePlayerOptionPanel.setBorder(new EmptyBorder(20, 5, 20, 5));
-		JLabel titleLabel = new JLabel("Options");
+		JLabel titleLabel = new JLabel("Game Options");
 		titleLabel.setBorder(new EmptyBorder(0,0,20,0));
 		titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 48));
 		singlePlayerOptionPanel.add(titleLabel);
+		titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-		sep.setPreferredSize(horizontalLineDimension);
-		singlePlayerOptionPanel.add(sep);
+//		sep.setPreferredSize(horizontalLineDimension);
+//		singlePlayerOptionPanel.add(sep);
 		UIManager.put("RadioButton.font", radioBtnsFont);
 		// TODO make this thing look nicer!!!!!!
+		JLabel chooseTurn = new JLabel("Choose your turn");
+		chooseTurn.setFont(panelSubTitleFont);
+		JLabel chooseDiff = new JLabel("Choose your difficulty");
+		chooseDiff.setFont(panelSubTitleFont);
 		JRadioButton senteOption = new JRadioButton("First");
 		JRadioButton goteOption = new JRadioButton("Second");
 		JRadioButton noviceDiffOption = new JRadioButton("Novice");
 		JRadioButton intermediateDiffOption = new JRadioButton("Intermediate");
-		JRadioButton advancedDiffOption = new JRadioButton("Advanced");
-		JRadioButton ultimateDiffOption = new JRadioButton("Ultimate");
+		JRadioButton advancedDiffOption = new JRadioButton("Advanced (slow)");
+		JRadioButton ultimateDiffOption = new JRadioButton("Ultimate (very slow)");
 		JRadioButton mysteriousButton = new JRadioButton("Mysterious");
+		singlePlayerOptionPanel.add(chooseTurn);
 		singlePlayerOptionPanel.add(senteOption);
 		singlePlayerOptionPanel.add(goteOption);
+		chooseTurn.setAlignmentX(Component.CENTER_ALIGNMENT);
+		goteOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+		senteOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+
 		JSeparator buttonSep = new JSeparator(SwingConstants.HORIZONTAL);
-		buttonSep.setPreferredSize(horizontalLineShortDimension);
-		singlePlayerOptionPanel.add(buttonSep);
+//		buttonSep.setPreferredSize(horizontalLineShortDimension);
+		JPanel turnOptionPanel = new JPanel();
+//		singlePlayerOptionPanel.add(buttonSep);
+		singlePlayerOptionPanel.add(chooseDiff);
 		singlePlayerOptionPanel.add(noviceDiffOption);
 		singlePlayerOptionPanel.add(intermediateDiffOption);
 		singlePlayerOptionPanel.add(advancedDiffOption);
 		singlePlayerOptionPanel.add(ultimateDiffOption);
 		singlePlayerOptionPanel.add(mysteriousButton);
+		chooseDiff.setAlignmentX(Component.CENTER_ALIGNMENT);
+		noviceDiffOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+		intermediateDiffOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+		advancedDiffOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+		ultimateDiffOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+		mysteriousButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		// create a group so that only one difficulty level is selected
 		ButtonGroup difficultyGroup = new ButtonGroup();
@@ -419,15 +444,42 @@ public class Main {
 
 		JButton playButton = Main.getPlainLookbtn("Play!", "Calibri", 33, Font.PLAIN, Color.CYAN);
 		singlePlayerOptionPanel.add(playButton);
+		playButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		playButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO get user's choices
 				singlePlayerOptionFrame.dispose();
+				boolean isSente = false;
 				if (senteOption.isSelected())
-					game = new SingleplayerGame(4, Game.TURN_SENTE);
-				else
-					game = new SingleplayerGame(4, Game.TURN_GOTE);
+					isSente = true;
+				if (noviceDiffOption.isSelected())
+					game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+						Game.TURN_GOTE, Difficulty.NOVICE);
+				else if (intermediateDiffOption.isSelected())
+					game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+						Game.TURN_GOTE, Difficulty.INTERMEDIATE);
+				else if (advancedDiffOption.isSelected())
+					game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+						Game.TURN_GOTE, Difficulty.ADVANCED);
+				else if (ultimateDiffOption.isSelected())
+					game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+						Game.TURN_GOTE, Difficulty.ULTIMATE);
+				else {
+					int randNum = new Random().nextInt(4);
+					if (randNum == 0)
+						game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+							Game.TURN_GOTE, Difficulty.NOVICE);
+					else if (randNum == 1)
+						game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+							Game.TURN_GOTE, Difficulty.INTERMEDIATE);
+					else if (randNum == 2)
+						game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+							Game.TURN_GOTE, Difficulty.ADVANCED);
+					else
+						game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
+							Game.TURN_GOTE, Difficulty.ULTIMATE);
+				}
 				welcomeFrame.dispose();
 			}
 		});
