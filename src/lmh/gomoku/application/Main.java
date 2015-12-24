@@ -58,7 +58,7 @@ public class Main {
 	private static final Font signUpHintFont = new Font("Tahoma", Font.PLAIN, 36);
 	private static final Font signUpBtnFont = new Font("Tahoma", Font.PLAIN, 40);
 	private static final Font panelSubTitleFont = new Font("Tahoma", Font.PLAIN, 35);
-	private static final Font radioBtnsFont = new Font("Calibri", Font.PLAIN, 29);
+	private static final Font radioBtnsFont = new Font("Calibri", Font.PLAIN, 32);
 	private static final Border panelEmptyBorder = new EmptyBorder(20, 20, 20, 20);
 	/**
 	 * The reason why we need different lengths for the text fields is that
@@ -96,10 +96,13 @@ public class Main {
 				"Network", "Open Sans", 28, Font.PLAIN, Color.RED);
 		JButton aiGameBtn = getPlainLookbtn("AI Game", "Open Sans", 28,
 				Font.PLAIN, Color.GRAY);
+		JButton optionsBtn = getPlainLookbtn(
+				"Options", "Open Sans", 28, Font.PLAIN, Color.WHITE);
 		btnPanel.add(singleplayerBtn);
 		btnPanel.add(multiplayerBtn);
 		btnPanel.add(networkBtn);
 		btnPanel.add(aiGameBtn);
+		btnPanel.add(optionsBtn);
 		try {
 			StorageManager.initializeStorage();
 		} catch (StorageException e1) {
@@ -373,7 +376,7 @@ public class Main {
 		singlePlayerOptionFrame.setVisible(true);
 		// TODO Start game if valid choices entered.
 //		game = new SingleplayerGame(4, Game.TURN_SENTE);
-		singlePlayerOptionFrame.setSize(600, 800);
+		singlePlayerOptionFrame.setSize(560, 700);
 		JPanel singlePlayerOptionPanel = new JPanel();
 		BoxLayout optionLayout = new BoxLayout(singlePlayerOptionPanel, BoxLayout.Y_AXIS);
 		singlePlayerOptionPanel.setLayout(optionLayout);

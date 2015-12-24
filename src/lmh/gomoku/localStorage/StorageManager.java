@@ -10,6 +10,7 @@ import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.model.IMove;
 import lmh.gomoku.util.RecordCreator;
+import lmh.gomoku.util.XMLHelper.XMLElement;
 
 /**
  * Class for local game storage. This class is not for server.
@@ -99,6 +100,60 @@ public class StorageManager {
 	}
 
 	public static void storeToken(byte[] token) {
+
+	}
+
+	/**
+	 * Generates the option file for the game when the game starts for the first time.
+	 * <Tentative plan>
+	 * Options file will include:
+	 * 1. Board Size (15 - 30)??
+	 * 2. Board Background color (with a few options)
+	 * 3. Auto save game records
+	 * 4. Animation interval for AI game
+	 * 5. Animation interval for analysis game
+	 * 6. Default AI difficulty for AI game
+	 * 7. Enable/disable timed singleplayer game and time limit
+	 * 8. Number of withdrawals given to player
+	 * 9. Player name in network game
+	 */
+	private static void generateOptions() {
+		File options = new File(CONFIG + "\\options.xml");
+		XMLElement baseElement = new XMLElement("Options", null);
+		XMLElement general = new XMLElement("General", null);
+		XMLElement singlePlayer = new XMLElement("Singleplayer Game", null);
+		XMLElement multiPlayer = new XMLElement("Multiplayer Game", null);
+		XMLElement network = new XMLElement("Network Game", null);
+		XMLElement AIGame = new XMLElement("AI Game", null);
+		XMLElement analysisGame = new XMLElement("Analysis Game", null);
+
+		XMLElement boardWidth = new XMLElement("Board Width", "15");
+		XMLElement enableTimed = new XMLElement("Timed Game", "Disabled");
+		XMLElement timeLimit = new XMLElement("Time Limit", "0");
+		XMLElement responseTime = new XMLElement("Response Interval", "1000");
+		XMLElement recordAutoSave = new XMLElement("Record Auto Save", "Enabled");
+		XMLElement animationInterval = new XMLElement("Animation Interval", "1000");
+		XMLElement backgroundColor = new XMLElement("Background Color", "Default");
+		XMLElement singlePlayerNumWithdrawal = new XMLElement("Withdrawal Limit", "4");
+		XMLElement multiPlayerNumWithdrawal = new XMLElement("Withdrawal Limit", "2");
+		XMLElement playerName = new XMLElement("Player Name", "");
+
+		baseElement.appendChild(general);
+		baseElement.appendChild(singlePlayer);
+		baseElement.appendChild(multiPlayer);
+		baseElement.appendChild(network);
+		baseElement.appendChild(AIGame);
+		baseElement.appendChild(analysisGame);
+		general.appendChild(boardWidth);
+		general.appendChild(backgroundColor);
+		general.appendChild(recordAutoSave);
+		singlePlayer.appendChild(enableTimed);
+		singlePlayer.appendChild(timeLimit);
+		singlePlayer.appendChild(singlePlayerNumWithdrawal);
+		multiPlayer.appendChild(multiPlayerNumWithdrawal);
+		network.appendChild(playerName);
+		AIGame.appendChild(responseTime);
+		analysisGame.appendChild(animationInterval);
 
 	}
 

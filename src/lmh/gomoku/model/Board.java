@@ -20,8 +20,8 @@ import lmh.gomoku.model.Coordinate.Stone;
 
 public class Board {
 	protected static Coordinate[][] grid;
-	public static final int width = 15;
-	public static final int height = 15;
+	public static final int width = 16;
+	public static final int height = 16;
 	private int activePlayer;
 	private boolean isFrozen = true;
 	private Coordinate lastMove1 = null;
@@ -49,7 +49,7 @@ public class Board {
 		this.suspensionRequired = suspensionRequired;
 		// Need to let AI make its first move if the player is second.
 		if (suspensionRequired) {
-			AIThread = new Thread() {			
+			AIThread = new Thread() {
 				@Override
 				public void run() {
 					System.out.println("SinglePlayer thread running!");
@@ -311,7 +311,10 @@ public class Board {
 		return Result.UNDECIDED;
 	}
 
-	public static Result checkWinning() {
+	public Result checkWinning() {
+		if (isBoardFull()) {
+			return Result.TIE;
+		}
 		Result rowsAndCols = checkRowColWinning();
 		if (rowsAndCols != Result.UNDECIDED) {
 			return rowsAndCols;
@@ -456,8 +459,10 @@ public class Board {
 			isFrozen = true;
 			if (currentGameResult == Result.SENTE) {
 				g.displayWinnerInfo(true);
-			} else {
+			} else if (currentGameResult == Result.GOTE) {
 				g.displayWinnerInfo(false);
+			} else {
+				g.displayTieMessageBoardFull();
 			}
 			g.gameEnd();
 			return true;

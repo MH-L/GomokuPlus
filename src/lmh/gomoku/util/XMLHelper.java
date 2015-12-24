@@ -77,7 +77,11 @@ public class XMLHelper {
 		return "</" + tagName + ">";
 	}
 
-	public static String elementToString(XMLElement ele, int baseIndent) {
+	public static String elementToString(XMLElement ele) {
+		return elementToString(ele, 0);
+	}
+
+	private static String elementToString(XMLElement ele, int baseIndent) {
 		String result = "";
 		for (int i = 0; i < baseIndent; i++) {
 			result += "\t";
