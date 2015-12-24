@@ -84,14 +84,16 @@ public class StorageManager {
 		}
 	}
 
-
-
+	/**
+	 * Generates readme file of the game at the first time the game starts.
+	 * @throws IOException
+	 */
 	public static void generateReadMe() throws IOException {
 		File readme = new File(DIR + "\\README.txt");
 		if (readme.createNewFile()) {
 			PrintWriter writer = new PrintWriter(DIR + "\\README.txt", "UTF-8");
 			String readmeContent =
-					String.format("%s\n\n%s\n%s\n%s\n\n%s\n\n%s\n%s\n%s",
+					String.format("%s\n\n%s\n%s\n%s\n\n%s\n\n%s\n%s\n%s\n%s\n%s\n%s",
 							"Welcome to Gomoku -- the simplest, yet one of the most interesting chess game.",
 							"If you have never heard of gomoku, let me briefly explain the rules. The game is like",
 							"an extended TicTacToe (which everyone knows), but the only difference is that, in order to",
@@ -99,7 +101,10 @@ public class StorageManager {
 							"Simple, huh? Yet it has many strategies, and you find it harder as you make progress.",
 							"This directory is for game contents. \\config folder is where all game configs are",
 							"stored, \\records is for game records which allow you to do retrospective studies",
-							"of each game you played, and \\tokens is for login tokens of the game.");
+							"of each game you played, and \\tokens is for login tokens of the game. Also do note",
+							"that the animation interval and response interval in the config are in milliseconds,",
+							"Do not attempt to modify these files because that may make them ill-formatted, thus",
+							"cannot be used by the game.");
 			writer.print(readmeContent);
 			writer.close();
 		}
@@ -183,6 +188,11 @@ public class StorageManager {
 		writer.close();
 	}
 
+	/**
+	 * Stores the game record into local storage.
+	 * @param moves Moves of a game
+	 * @throws IOException
+	 */
 	public static void storeGameRecord(List<? extends IMove> moves) throws IOException {
 		String moveStr = RecordCreator.generateRecordString(moves);
 		String gameHash = ConnectionManager.getGameHash(System.currentTimeMillis(), 1, 2);

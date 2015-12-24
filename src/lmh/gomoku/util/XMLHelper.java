@@ -18,6 +18,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * A class for generating XML files used and produced
+ * by the game.
+ * @author Minghao Liu
+ *
+ */
 public class XMLHelper {
 	public static class XMLElement {
 		private String name;

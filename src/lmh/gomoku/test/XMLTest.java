@@ -36,7 +36,7 @@ public class XMLTest {
 		// First, a simple string.
 		XMLElement sampleElement = new XMLElement("Testing", "For Test Purpose");
 		String shouldEqual = "<Testing>For Test Purpose</Testing>";
-		assertTrue(XMLHelper.elementToString(sampleElement, 0).equals(shouldEqual));
+		assertTrue(XMLHelper.elementToString(sampleElement).equals(shouldEqual));
 
 		// Then, a string with nested tags.
 		String multilineString = String.format(
@@ -52,7 +52,7 @@ public class XMLTest {
 		roundElement.appendChild(moveElement);
 		moveElement.appendChild(xElement);
 		moveElement.appendChild(yElement);
-		assertTrue(XMLHelper.elementToString(gameElement, 0).equals(multilineString));
+		assertTrue(XMLHelper.elementToString(gameElement).equals(multilineString));
 	}
 
 	@Test
