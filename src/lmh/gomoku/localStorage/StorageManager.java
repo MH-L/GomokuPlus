@@ -75,32 +75,12 @@ public class StorageManager {
 		}
 		try {
 			generateReadMe();
-			generateStats();
 		} catch (IOException e) {
 			throw new StorageException();
 		}
 	}
 
-	public static void generateStats() throws IOException {
-		// TODO Auto-generated method stub
-		System.out.println("inside");
-		File stats=new File(CONFIG+"\\STATS.txt");
-		//byte[] bytes=Encoding.
-		if(stats.createNewFile()){
-			System.out.println("ye");
-			int winNum=5;
-			int loseNum=7;
-			double percentage=0.41;
-			System.out.println("yeah");
-			PrintWriter writer = new PrintWriter(CONFIG+"\\STATS.txt", "UTF-8");
-			String readmeContent =
-					"win:"+winNum+", lose:"+loseNum+", percentage:"+percentage;
-			writer.print(readmeContent);
-			writer.close();
-		}
-		
-		
-	}
+
 
 	public static void generateReadMe() throws IOException {
 		File readme = new File(DIR + "\\README.txt");
