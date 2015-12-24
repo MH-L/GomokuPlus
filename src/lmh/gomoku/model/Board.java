@@ -49,9 +49,10 @@ public class Board {
 		this.suspensionRequired = suspensionRequired;
 		// Need to let AI make its first move if the player is second.
 		if (suspensionRequired) {
-			AIThread = new Thread() {
+			AIThread = new Thread() {			
 				@Override
 				public void run() {
+					System.out.println("SinglePlayer thread running!");
 					System.out.println("Made move.");
 					long lastPrinted = System.currentTimeMillis();
 					while (true) {
@@ -70,7 +71,7 @@ public class Board {
 							// update corresponding square as well
 							Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
 							stoneCount++;
-							endGameCheck();
+							doEndGameCheck();
 							updateActivePlayer();
 						}
 					}
@@ -128,7 +129,7 @@ public class Board {
 								} catch (IOException ee) {
 									g.errorRendering();
 								}
-								if (endGameCheck()) {
+								if (doEndGameCheck()) {
 									return;
 								}
 								updateActivePlayer();
@@ -162,7 +163,7 @@ public class Board {
 						} else {
 							g.displayOccupiedWarning();
 						}
-						endGameCheck();
+						doEndGameCheck();
 					}
 				});
 				boardPanel.add(square);
@@ -447,10 +448,11 @@ public class Board {
 	 * Checks if the game is ended and, if so, display winner info.
 	 * @return true if the game is ended
 	 */
-	public boolean endGameCheck() {
+	public boolean doEndGameCheck() {
 		Result currentGameResult = checkWinning();
 		if (currentGameResult != Result.UNDECIDED) {
-			AIThread.interrupt();
+			if (AIThread != null)
+				AIThread.interrupt();
 			isFrozen = true;
 			if (currentGameResult == Result.SENTE) {
 				g.displayWinnerInfo(true);
