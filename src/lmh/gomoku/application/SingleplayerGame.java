@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -15,6 +16,7 @@ import renju.com.lmh.exception.InvalidIndexException;
 import renju.com.lmh.model.BoardLocation;
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
+import lmh.gomoku.localStorage.StorageManager;
 import lmh.gomoku.model.Board;
 import lmh.gomoku.model.Coordinate;
 import lmh.gomoku.model.ServerGame.Move;
@@ -31,6 +33,7 @@ public class SingleplayerGame extends Game {
 	private GameEngine engine;
 	private HumanPlayer player;
 	private renju.com.lmh.model.Board analysisBoard;
+	
 
 	/**
 	 * Default constructor of SinglePlayerGame. AI difficulty is default to intermediate
@@ -141,6 +144,24 @@ public class SingleplayerGame extends Game {
 
 	@Override
 	public void gameEnd() {
+		//added
+		try {
+			System.out.println(Board.checkWinning());
+			System.out.println(player.getTurn());
+			if(Board.checkWinning()==Result.SENTE&&player.getTurn()==1
+					||Board.checkWinning()==Result.GOTE&&player.getTurn()==2){
+			StorageManager.generateStats(true);
+			System.out.println("win");
+			}
+			else if(Board.checkWinning()==Result.SENTE&&player.getTurn()==2
+					||Board.checkWinning()==Result.GOTE&&player.getTurn()==1){
+			StorageManager.generateStats(false);
+			System.out.println("lose");
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		super.gameEnd();
 		engine.endGameCleanup();
 	}

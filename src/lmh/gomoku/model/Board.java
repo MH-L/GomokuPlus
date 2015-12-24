@@ -456,6 +456,7 @@ public class Board {
 			isFrozen = true;
 			if (currentGameResult == Result.SENTE) {
 				g.displayWinnerInfo(true);
+				
 			} else {
 				g.displayWinnerInfo(false);
 			}
@@ -465,6 +466,7 @@ public class Board {
 
 		return false;
 	}
+
 
 	/**
 	 * Gets the total number of stones on board.

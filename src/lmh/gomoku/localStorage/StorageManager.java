@@ -3,11 +3,15 @@ package lmh.gomoku.localStorage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.Base64;
 import java.util.List;
 
+import lmh.gomoku.application.Game.Result;
 import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
+import lmh.gomoku.model.Board;
 import lmh.gomoku.model.IMove;
 import lmh.gomoku.util.RecordCreator;
 
@@ -33,6 +37,8 @@ public class StorageManager {
 	 * Directory for configuration values.
 	 */
 	private static final String CONFIG = DIR + "\\config";
+	private static int winNum=0;
+	private static int loseNum=0;
 
 	public static void initializeStorage() throws StorageException {
 		File gameMainDir = new File(DIR);
@@ -74,12 +80,53 @@ public class StorageManager {
 		}
 		try {
 			generateReadMe();
+			//generateStats();
 		} catch (IOException e) {
 			throw new StorageException();
 		}
 	}
 
-
+	public static void generateStats(boolean Userwin) throws IOException {
+		// TODO Auto-generated method stub
+		String fileName="stats.xml";
+		byte[] authBytes=fileName.getBytes(StandardCharsets.UTF_8);
+		String encoded=Base64.getEncoder().encodeToString(authBytes);
+		//System.out.println(fileName+"->"+encoded);
+		File stats=new File(CONFIG+"\\"+encoded);
+		if(!stats.exists()){
+			System.out.println("create file");
+			stats.createNewFile();
+		}	
+			if(Userwin){
+				System.out.println("userwin "+winNum);
+				winNum++;
+				}
+			else{
+				System.out.println("userlose "+loseNum);
+				loseNum++;
+			}
+			int total= winNum+loseNum;
+			float percentage;
+			if(total==0){
+			percentage=0;	
+			}
+			else{
+				System.out.println("totalnotzero");	
+             percentage = ((float) winNum) / ((float) total)*100;
+              }
+			System.out.println("yeah");
+			PrintWriter writer = new PrintWriter(CONFIG+"\\"+encoded, "UTF-8");
+			String statContent =
+					String.format("%s\n%s\n%s\n%s\n",
+					"win:"+winNum, 
+					"lose:"+loseNum, 
+					"total:"+total, 
+					"percentage:"+percentage+"%");
+			byte[] statsContent =statContent.getBytes(StandardCharsets.UTF_8);
+			String encodedStat=Base64.getEncoder().encodeToString(statsContent);
+			writer.print(encodedStat);
+			writer.close();
+	}
 
 	public static void generateReadMe() throws IOException {
 		File readme = new File(DIR + "\\README.txt");
