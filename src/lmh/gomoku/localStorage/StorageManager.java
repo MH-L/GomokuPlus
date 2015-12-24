@@ -1,8 +1,10 @@
 package lmh.gomoku.localStorage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.model.IMove;
 import lmh.gomoku.util.RecordCreator;
+import lmh.gomoku.util.XMLHelper;
 import lmh.gomoku.util.XMLHelper.XMLElement;
 
 /**
@@ -75,6 +78,7 @@ public class StorageManager {
 		}
 		try {
 			generateReadMe();
+			generateOptions();
 		} catch (IOException e) {
 			throw new StorageException();
 		}
@@ -118,27 +122,31 @@ public class StorageManager {
 	 * 7. Enable/disable timed singleplayer game and time limit
 	 * 8. Number of withdrawals given to player
 	 * 9. Player name in network game
+	 * @throws IOException
+	 * @throws UnsupportedEncodingException
+	 * @throws FileNotFoundException
 	 */
-	private static void generateOptions() {
+	private static void generateOptions()
+			throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		File options = new File(CONFIG + "\\options.xml");
 		XMLElement baseElement = new XMLElement("Options", null);
 		XMLElement general = new XMLElement("General", null);
-		XMLElement singlePlayer = new XMLElement("Singleplayer Game", null);
-		XMLElement multiPlayer = new XMLElement("Multiplayer Game", null);
-		XMLElement network = new XMLElement("Network Game", null);
-		XMLElement AIGame = new XMLElement("AI Game", null);
-		XMLElement analysisGame = new XMLElement("Analysis Game", null);
+		XMLElement singlePlayer = new XMLElement("SingleplayerGame", null);
+		XMLElement multiPlayer = new XMLElement("MultiplayerGame", null);
+		XMLElement network = new XMLElement("NetworkGame", null);
+		XMLElement AIGame = new XMLElement("AIGame", null);
+		XMLElement analysisGame = new XMLElement("AnalysisGame", null);
 
-		XMLElement boardWidth = new XMLElement("Board Width", "15");
-		XMLElement enableTimed = new XMLElement("Timed Game", "Disabled");
-		XMLElement timeLimit = new XMLElement("Time Limit", "0");
-		XMLElement responseTime = new XMLElement("Response Interval", "1000");
-		XMLElement recordAutoSave = new XMLElement("Record Auto Save", "Enabled");
-		XMLElement animationInterval = new XMLElement("Animation Interval", "1000");
-		XMLElement backgroundColor = new XMLElement("Background Color", "Default");
-		XMLElement singlePlayerNumWithdrawal = new XMLElement("Withdrawal Limit", "4");
-		XMLElement multiPlayerNumWithdrawal = new XMLElement("Withdrawal Limit", "2");
-		XMLElement playerName = new XMLElement("Player Name", "");
+		XMLElement boardWidth = new XMLElement("BoardWidth", "15");
+		XMLElement enableTimed = new XMLElement("TimedGame", "Disabled");
+		XMLElement timeLimit = new XMLElement("TimeLimit", "0");
+		XMLElement responseTime = new XMLElement("ResponseInterval", "1000");
+		XMLElement recordAutoSave = new XMLElement("RecordAutoSave", "Enabled");
+		XMLElement animationInterval = new XMLElement("AnimationInterval", "1000");
+		XMLElement backgroundColor = new XMLElement("BackgroundColor", "Default");
+		XMLElement singlePlayerNumWithdrawal = new XMLElement("WithdrawalLimit", "4");
+		XMLElement multiPlayerNumWithdrawal = new XMLElement("WithdrawalLimit", "2");
+		XMLElement playerName = new XMLElement("PlayerName", "");
 
 		baseElement.appendChild(general);
 		baseElement.appendChild(singlePlayer);
@@ -156,7 +164,12 @@ public class StorageManager {
 		network.appendChild(playerName);
 		AIGame.appendChild(responseTime);
 		analysisGame.appendChild(animationInterval);
-
+		if (options.createNewFile()) {
+			PrintWriter writer = new PrintWriter(CONFIG + "\\options.xml", "UTF-8");
+			String content = XMLHelper.elementToString(baseElement);
+			writer.print(content);
+			writer.close();
+		}
 	}
 
 	private static void storeGameRecord(String record, String gameHash) throws IOException {
