@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import lmh.gomoku.application.Main;
+import lmh.gomoku.application.Options;
 import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.exception.XMLException;
@@ -108,6 +109,7 @@ public class StorageManager {
 							"stored, \\records is for game records which allow you to do retrospective studies",
 							"of each game you played, and \\tokens is for login tokens of the game. Also do note",
 							"that the animation interval and response interval in the config are in milliseconds,",
+							"and the time limit for singleplayer games and multiplayer games are in seconds.",
 							"Do not attempt to modify these files because that may make them ill-formatted, thus",
 							"cannot be used by the game.");
 			writer.print(readmeContent);
@@ -226,7 +228,7 @@ public class StorageManager {
 		return retVal;
 	}
 	
-	public Map<String, Object> getOptionsMapping() throws XMLException {
+	public static Map<String, Object> getOptionsMapping() throws XMLException {
 		File options = new File(CONFIG + "\\options.xml");
 		// If options file does not exist then create one.
 		if (!options.exists())
@@ -255,10 +257,12 @@ public class StorageManager {
 		return getOptionsMapping(configString);
 	}
 	
-	private Map<String, Object> getOptionsMapping(String optionsString) throws XMLException {
+	private static Map<String, Object> getOptionsMapping(String optionsString) throws XMLException {
+		// Root element
 		XMLElement optionsElement = null;
 		optionsElement = XMLHelper.strToXML(optionsString);
 		
+		// Parent elements
 		XMLElement general = tryAndGetChild(optionsElement, "General");
 		XMLElement singlePlayerGame = tryAndGetChild(optionsElement, "SingleplayerGame");
 		XMLElement multiplayerGame = tryAndGetChild(optionsElement, "MultiplayerGame");
@@ -266,14 +270,79 @@ public class StorageManager {
 		XMLElement AIGame = tryAndGetChild(optionsElement, "AIGame");
 		XMLElement analysisGame = tryAndGetChild(optionsElement, "AnalysisGame");
 		
-		Map<String, Object> generalsMap = new HashMap<String, Object>();
-		Map<String, Object> singleplayerMap = new HashMap<String, Object>();
-		Map<String, Object> multiplayerMap = new HashMap<String, Object>();
-		Map<String, Object> aiGameMap = new HashMap<String, Object>();
-		Map<String, Object> networkGameMap = new HashMap<String, Object>();
-		Map<String, Object> analysisGameMap = new HashMap<String, Object>();
+		// Children elements
+		XMLElement boardWidth = tryAndGetChild(general, "BoardWidth");
+		XMLElement backgroundColor = tryAndGetChild(general, "BackgroundColor");
+		XMLElement recordAutoSave = tryAndGetChild(general, "RecordAutoSave");
+		XMLElement timedGame = tryAndGetChild(singlePlayerGame, "TimedGame");
+		XMLElement timeLimit = tryAndGetChild(singlePlayerGame, "TimeLimit");
+		XMLElement withdrawalLimitSingle = tryAndGetChild(singlePlayerGame, "WithdrawalLimit");
+		XMLElement playerName = tryAndGetChild(networkGame, "PlayerName");
+		XMLElement responseInterval = tryAndGetChild(AIGame, "ResponseInterval");
+		XMLElement animationInterval = tryAndGetChild(analysisGame, "AnimationInterval");
+		XMLElement withdrawalLimitMulti = tryAndGetChild(multiplayerGame, "WithdrawalLimit");
 		
-		return new HashMap<String, Object>();
+		// Contents of configuration
+		try{
+			int width = Integer.parseInt(boardWidth.getContent().trim());
+			String color = backgroundColor.getContent().trim();
+			boolean autoSave = Boolean.parseBoolean(recordAutoSave.getContent().trim());
+			boolean timedGameOption = timedGame.getContent().equals("Enabled");
+			int timeLimitInt = Integer.parseInt(timeLimit.getContent().trim());
+			int withdrawalLimitS = Integer.parseInt(withdrawalLimitSingle.getContent().trim());
+			int withdrawalLimitM = Integer.parseInt(withdrawalLimitMulti.getContent().trim());
+			String playerNameStr = playerName.getContent().trim();
+			int responseIntervalInt = Integer.parseInt(responseInterval.getContent().trim());
+			int animationIntervalInt = Integer.parseInt(animationInterval.getContent().trim());
+			
+			if (width < 15 || width > 30)
+				throw new XMLException("Invalid board width");
+			if (withdrawalLimitS < 0 || withdrawalLimitS > 4)
+				throw new XMLException("Invalid withdrawal limit for single player game.");
+			if (withdrawalLimitM < 0 || withdrawalLimitM > 3)
+				throw new XMLException("Invalid withdrawal limit for multiplayer game.");
+			if (!Options.isPlayerNameValid(playerNameStr))
+				throw new XMLException("Invalid player's name.");
+			if (timeLimitInt < 60 || timeLimitInt > 6000)
+				throw new XMLException("Invalid time limit.");
+			if (animationIntervalInt < 200 || animationIntervalInt > 10000)
+				throw new XMLException("Invalid animation interval.");
+			if (responseIntervalInt < 0 || responseIntervalInt > 8000)
+				throw new XMLException("Invalid response interval.");
+			
+			// Instantiate maps
+			Map<String, Object> generalsMap = new HashMap<String, Object>();
+			Map<String, Object> singleplayerMap = new HashMap<String, Object>();
+			Map<String, Object> multiplayerMap = new HashMap<String, Object>();
+			Map<String, Object> aiGameMap = new HashMap<String, Object>();
+			Map<String, Object> networkGameMap = new HashMap<String, Object>();
+			Map<String, Object> analysisGameMap = new HashMap<String, Object>();
+			
+			// Put keys into sub maps.
+			generalsMap.put("boardWidth", width);
+			generalsMap.put("backgroundColor", color);
+			generalsMap.put("recordAutoSave", autoSave);
+			singleplayerMap.put("timedGame", timedGameOption);
+			singleplayerMap.put("timeLimit", timeLimitInt);
+			singleplayerMap.put("withdrawalLimit", withdrawalLimitS);
+			multiplayerMap.put("withdrawalLimit", withdrawalLimitM);
+			networkGameMap.put("playerName", playerNameStr);
+			analysisGameMap.put("animationInterval", animationIntervalInt);
+			aiGameMap.put("responseInterval", responseIntervalInt);
+			
+			// Put children maps into retVal;
+			Map<String, Object> retVal = new HashMap<String, Object>();
+			retVal.put("general", generalsMap);
+			retVal.put("singleplayerGame", singleplayerMap);
+			retVal.put("multiplayerGame", multiplayerMap);
+			retVal.put("networkGame", networkGameMap);
+			retVal.put("AIGame", aiGameMap);
+			retVal.put("analysisGame", analysisGameMap);
+			
+			return retVal;
+		} catch (Exception e) {
+			throw new XMLException("The option parameters are invalid.");
+		}
 	}
 	
 	private static XMLElement tryAndGetChild(XMLElement ele, String childName) throws XMLException {
