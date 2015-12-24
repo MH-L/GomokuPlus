@@ -74,11 +74,12 @@ public class AIGame extends Game {
 	}
 
 	private void automaticStart() {
+		board.activate();
 		senteThread = new Thread() {
 			@Override
 			public void run() {
 				while (true) {
-					if (activePlayer) {
+					if (activePlayer && !board.isFrozen()) {
 						// time to make move when active player is true
 						try {
 							BoardLocation aiMove = senteEngine.makeMove();
@@ -94,12 +95,12 @@ public class AIGame extends Game {
 							// there are bugs in our AI code.
 							e.printStackTrace();
 						}
-						
-						try {
-							Thread.sleep(animationInterval);
-						} catch (InterruptedException e) {
-							continue;
-						}
+					}
+					
+					try {
+						Thread.sleep(animationInterval);
+					} catch (InterruptedException e) {
+						continue;
 					}
 				}
 			}
@@ -109,7 +110,7 @@ public class AIGame extends Game {
 			@Override
 			public void run() {
 				while (true) {
-					if (!activePlayer) {
+					if (!activePlayer && !board.isFrozen()) {
 						// time to make move when active player is false
 						try {
 							BoardLocation aiMove = goteEngine.makeMove();
@@ -140,6 +141,10 @@ public class AIGame extends Game {
 			@Override
 			public void run() {
 				while (true) {
+					if (senteThread.isAlive())
+						System.out.println("sente thread is alive");
+					if (goteThread.isAlive())
+						System.out.println("gote thread is alive");
 					if (!isNullMove(senteLastMove)) {
 						try {
 							senteEngine.updateBoardForAnalysis(senteLastMove, true);
@@ -174,6 +179,8 @@ public class AIGame extends Game {
 						}
 					}
 					
+					// NOTE!!! sleep is necessary because the thread scheduler does not
+					// switch context very often.
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -209,5 +216,25 @@ public class AIGame extends Game {
 	
 	private boolean isNullMove(BoardLocation move) {
 		return move.getXPos() == -1 && move.getYPos() == -1;
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public void gameEnd() {
+		// TODO kill previous threads and introduce new thread
+		super.gameEnd();
+		senteThread.stop();
+		senteThread = null;
+		goteThread.stop();
+		goteThread = null;
+		coordinator.stop();
+		coordinator = null;
+		senteLastMove = getNullMove();
+		goteLastMove = getNullMove();
+		activePlayer = true;
+		senteEngine.endGameCleanup();
+		goteEngine.endGameCleanup();
+		board.cleanUp();
+		automaticStart();
 	}
 }
