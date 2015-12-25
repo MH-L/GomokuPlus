@@ -184,10 +184,8 @@ public abstract class Game {
 		board.resetBoard();
 		board.activate();
 		gameStarted.setText("Game Started.");
-		makeAIMoveIfNecessary();
+		board.startAIThread();
 	}
-
-	protected void makeAIMoveIfNecessary() {}
 
 	public void gameEnd() {
 		board.cleanUp();

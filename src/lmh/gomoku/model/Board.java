@@ -49,37 +49,43 @@ public class Board {
 		this.suspensionRequired = suspensionRequired;
 		// Need to let AI make its first move if the player is second.
 		if (suspensionRequired) {
-			AIThread = new Thread() {
-				@Override
-				public void run() {
-					System.out.println("SinglePlayer thread running!");
-					System.out.println("Made move.");
-					long lastPrinted = System.currentTimeMillis();
-					while (true) {
-						if (System.currentTimeMillis() - lastPrinted > 2000) {
-							System.out.println("The ai turn status is " + isAITurn);
-							lastPrinted = System.currentTimeMillis();
+			startAIThread();
+		}
+	}
+	
+	public void startAIThread() {
+		AIThread = new Thread() {
+			@Override
+			public void run() {
+				System.out.println("SinglePlayer thread running!");
+				System.out.println("Made move.");
+				while (true) {
+					if (isAITurn && !isFrozen) {
+						updateIsAITurn(false);
+						// AI makes move and the board is updated
+						BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
+						System.out.println("Made move.");
+//						// TODO now the AI could only be GOTE.
+						// Place icon onto board
+						Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+						// update corresponding square as well
+						Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+						stoneCount++;
+						if (doEndGameCheck()) {
+							return;
 						}
-						if (isAITurn) {
-							updateIsAITurn(false);
-							// AI makes move and the board is updated
-							BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
-							System.out.println("Made move.");
-//							// TODO now the AI could only be GOTE.
-							// Place icon onto board
-							Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
-							// update corresponding square as well
-							Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
-							stoneCount++;
-							doEndGameCheck();
-							updateActivePlayer();
-						}
+						updateActivePlayer();
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						return;
 					}
 				}
-			};
+			}
+		};
 
-			AIThread.start();
-		}
+		AIThread.start();
 	}
 
 	protected void addCellsToBoard(JPanel boardPanel) {
