@@ -149,6 +149,7 @@ public class StorageManager {
 		XMLElement AIGame = new XMLElement("AIGame", null);
 		XMLElement analysisGame = new XMLElement("AnalysisGame", null);
 
+		// Note: XML tags do not allow spaces in them.
 		XMLElement boardWidth = new XMLElement("BoardWidth", "15");
 		XMLElement enableTimed = new XMLElement("TimedGame", "Disabled");
 		XMLElement timeLimit = new XMLElement("TimeLimit", "0");
@@ -182,6 +183,16 @@ public class StorageManager {
 			writer.print(content);
 			writer.close();
 		}
+	}
+
+	public boolean verifyConfigFile(File configFile) throws IOException {
+		FileInputStream fis = new FileInputStream(configFile);
+		byte[] data = new byte[(int) configFile.length()];
+		fis.read(data);
+		fis.close();
+		String configFileContents = new String(data, "UTF-8");
+		// TODO verify contents here.
+		return false;
 	}
 
 	private static void storeGameRecord(String record, String gameHash) throws IOException {
