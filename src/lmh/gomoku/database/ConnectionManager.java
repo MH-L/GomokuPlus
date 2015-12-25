@@ -18,7 +18,7 @@ public class ConnectionManager {
 		conf = ConfHelper.getInstance();
 	}
 
-	public ConnectionManager getInstance() {
+	public static ConnectionManager getInstance() {
 		if (instance == null) {
 			return new ConnectionManager();
 		} else {
@@ -52,41 +52,14 @@ public class ConnectionManager {
 				+ " ('%s', 'Rec-%s')", gameHash, gameHash);
 	}
 
-	public boolean createAccount(String username, String password, String invitationCode) {
-		/**
-		 * First check that the username is valid (i.e. first of all it does not
-		 * have any invalid characters, and the database does not have that record)
-		 */
-		if (!(AuthService.verifyPass(password) && AuthService.verifyUsername(username)))
-			return false;
-
-		String query = String.format("SELECT * FROM Credentials WHERE credential='%s';", username);
-		Statement stment = null;
-		boolean invitationValid = false;
-		HashHelper hashInst = HashHelper.getInstance();
-		String encryptedPassword = new String(hashInst.encrypt(password));
-		try {
-			stment = conn.createStatement();
-			ResultSet result = stment.executeQuery(query);
-			if (result.next())
-				invitationValid = true;
-			if (!invitationValid)
-				return false;
-			query = String.format("INSERT INTO Credentials (username, userID) VALUES ('%s', '%s');",
-					username, encryptedPassword);
-			stment.execute(query);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return true;
-
-	}
-
 	public static String getGameHash(long curmillis, int player1ID, int player2ID) {
 		String tohash = String.valueOf(curmillis) + player1ID;
 		tohash += player2ID;
 		HashHelper hashInstance = HashHelper.getInstance();
 		return new String(hashInstance.encrypt(tohash));
+	}
+
+	public Connection getActiveConnection() {
+		return conn;
 	}
 }

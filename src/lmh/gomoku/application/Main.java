@@ -31,6 +31,8 @@ import javax.swing.border.EmptyBorder;
 
 import renju.com.lmh.application.Game.Difficulty;
 import lmh.gomoku.application.Game;
+import lmh.gomoku.auth.AuthService;
+import lmh.gomoku.exception.RegistrationException;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.localStorage.StorageManager;
 
@@ -332,6 +334,25 @@ public class Main {
 						"give it to you.");
 				JOptionPane.showMessageDialog(null, helpMessage, "Help",
 						JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+
+		signUpBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String username = usernameField.getText();
+				String password = passwordField.getText();
+				String invitationCode = invitationField.getText();
+				try {
+					AuthService.createAccount(username, password, invitationCode);
+					JOptionPane.showMessageDialog(null, "The account registration has completed!",
+							"Success", JOptionPane.INFORMATION_MESSAGE);
+				} catch (RegistrationException e1) {
+					JOptionPane.showMessageDialog(null,
+							String.format("Account registration unsuccessful due to"
+							+ " the following reason: %s", e1.getMessage()),
+							"Registration Error!", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 	}
