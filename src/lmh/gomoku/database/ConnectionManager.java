@@ -3,6 +3,7 @@ package lmh.gomoku.database;
 import java.sql.*;
 import java.util.ArrayList;
 
+import lmh.gomoku.auth.AuthService;
 import lmh.gomoku.config.ConfHelper;
 import lmh.gomoku.model.ServerGame.Move;
 import lmh.gomoku.util.HashHelper;
@@ -17,7 +18,7 @@ public class ConnectionManager {
 		conf = ConfHelper.getInstance();
 	}
 
-	private ConnectionManager getInstance() {
+	public ConnectionManager getInstance() {
 		if (instance == null) {
 			return new ConnectionManager();
 		} else {
@@ -51,16 +52,35 @@ public class ConnectionManager {
 				+ " ('%s', 'Rec-%s')", gameHash, gameHash);
 	}
 
-	public static void createAccount(String username, String password) {
+	public boolean createAccount(String username, String password, String invitationCode) {
 		/**
 		 * First check that the username is valid (i.e. first of all it does not
 		 * have any invalid characters, and the database does not have that record)
 		 */
-		String query = String.format("SELECT FROM Credentials WHERE username='%s';", username);
+		if (!(AuthService.verifyPass(password) && AuthService.verifyUsername(username)))
+			return false;
+
+		String query = String.format("SELECT * FROM Credentials WHERE credential='%s';", username);
+		Statement stment = null;
+		boolean invitationValid = false;
 		HashHelper hashInst = HashHelper.getInstance();
 		String encryptedPassword = new String(hashInst.encrypt(password));
-		query = String.format("INSERT INTO Credentials (username, userID) VALUES ('%s', '%s');",
-				username, encryptedPassword);
+		try {
+			stment = conn.createStatement();
+			ResultSet result = stment.executeQuery(query);
+			if (result.next())
+				invitationValid = true;
+			if (!invitationValid)
+				return false;
+			query = String.format("INSERT INTO Credentials (username, userID) VALUES ('%s', '%s');",
+					username, encryptedPassword);
+			stment.execute(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return true;
+
 	}
 
 	public static String getGameHash(long curmillis, int player1ID, int player2ID) {

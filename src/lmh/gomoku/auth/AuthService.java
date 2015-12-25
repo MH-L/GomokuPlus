@@ -32,4 +32,26 @@ public class AuthService {
 		PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 	}
+
+	/**
+	 * Checks if a password matches our standard. A password has to contain at least one
+	 * letter, one digit, one special character and with length between 8 and 17.
+	 * @param password the password to check
+	 * @return
+	 */
+	public static boolean verifyPass(String password) {
+		String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{8,17}$";
+		return password.matches(regex);
+	}
+
+	/**
+	 * Checks if a username matches our standard. A username is valid if and only if
+	 * it contains only upper/lowercase letters, numbers and underscores.
+	 * @param username
+	 * @return
+	 */
+	public static boolean verifyUsername(String username) {
+		String regex = "^[a-zA-Z0-9]{4,16}$";
+		return username.matches(regex);
+	}
 }
