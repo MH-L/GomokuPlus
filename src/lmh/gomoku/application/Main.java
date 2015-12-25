@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -52,7 +53,6 @@ public class Main {
 	 */
 	private static final Dimension textFieldDimension = new Dimension(200, 54);
 	private static final Dimension horizontalLineDimension = new Dimension(500, 3);
-	private static final Dimension horizontalLineShortDimension = new Dimension(360, 3);
 	private static final Dimension signUpLoginBtnDimension = new Dimension(200, 70);
 	private static final Font loginHintFont = new Font("Calibri", Font.PLAIN, 36);
 	private static final Font signUpHintFont = new Font("Tahoma", Font.PLAIN, 36);
@@ -142,6 +142,13 @@ public class Main {
 				game = new AIGame();
 				frame.dispose();
 			}
+		});
+		
+		optionsBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				showOptionsDialog();
+			}	
 		});
 	}
 
@@ -374,9 +381,7 @@ public class Main {
 	private static void popSinglePlayerGameOptionWindow(JFrame welcomeFrame) {
 		JFrame singlePlayerOptionFrame = new JFrame("Options");
 		singlePlayerOptionFrame.setVisible(true);
-		// TODO Start game if valid choices entered.
-//		game = new SingleplayerGame(4, Game.TURN_SENTE);
-		singlePlayerOptionFrame.setSize(560, 700);
+		singlePlayerOptionFrame.setSize(560, 720);
 		JPanel singlePlayerOptionPanel = new JPanel();
 		BoxLayout optionLayout = new BoxLayout(singlePlayerOptionPanel, BoxLayout.Y_AXIS);
 		singlePlayerOptionPanel.setLayout(optionLayout);
@@ -388,39 +393,49 @@ public class Main {
 		titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 48));
 		singlePlayerOptionPanel.add(titleLabel);
 		titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-//		sep.setPreferredSize(horizontalLineDimension);
-//		singlePlayerOptionPanel.add(sep);
+		
 		UIManager.put("RadioButton.font", radioBtnsFont);
 		// TODO make this thing look nicer!!!!!!
 		JLabel chooseTurn = new JLabel("Choose your turn");
 		chooseTurn.setFont(panelSubTitleFont);
 		JLabel chooseDiff = new JLabel("Choose your difficulty");
 		chooseDiff.setFont(panelSubTitleFont);
-		JRadioButton senteOption = new JRadioButton("First");
-		JRadioButton goteOption = new JRadioButton("Second");
+		JRadioButton senteOption = new JRadioButton("Always First");
+		JRadioButton goteOption = new JRadioButton("Always Second");
+		JRadioButton randomOption = new JRadioButton("Random");
+		JRadioButton takeTurnOption = new JRadioButton("Alternate");
 		JRadioButton noviceDiffOption = new JRadioButton("Novice");
 		JRadioButton intermediateDiffOption = new JRadioButton("Intermediate");
 		JRadioButton advancedDiffOption = new JRadioButton("Advanced (slow)");
 		JRadioButton ultimateDiffOption = new JRadioButton("Ultimate (very slow)");
 		JRadioButton mysteriousButton = new JRadioButton("Mysterious");
+		JRadioButton bogo = new JRadioButton("Even novice is too hard");
 		singlePlayerOptionPanel.add(chooseTurn);
-		singlePlayerOptionPanel.add(senteOption);
-		singlePlayerOptionPanel.add(goteOption);
 		chooseTurn.setAlignmentX(Component.CENTER_ALIGNMENT);
 		goteOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+		randomOption.setAlignmentX(Component.CENTER_ALIGNMENT);
+		takeTurnOption.setAlignmentX(Component.CENTER_ALIGNMENT);
 		senteOption.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		JSeparator buttonSep = new JSeparator(SwingConstants.HORIZONTAL);
 //		buttonSep.setPreferredSize(horizontalLineShortDimension);
 		JPanel turnOptionPanel = new JPanel();
+		turnOptionPanel.add(senteOption);
+		turnOptionPanel.add(goteOption);
+		turnOptionPanel.add(randomOption);
+		turnOptionPanel.add(takeTurnOption);
+		singlePlayerOptionPanel.add(turnOptionPanel);
+		
+		JPanel diffOptionPanel = new JPanel();
+		diffOptionPanel.add(noviceDiffOption);
+		diffOptionPanel.add(intermediateDiffOption);
+		diffOptionPanel.add(advancedDiffOption);
+		diffOptionPanel.add(ultimateDiffOption);
+		diffOptionPanel.add(mysteriousButton);
+		diffOptionPanel.add(bogo);
 //		singlePlayerOptionPanel.add(buttonSep);
 		singlePlayerOptionPanel.add(chooseDiff);
-		singlePlayerOptionPanel.add(noviceDiffOption);
-		singlePlayerOptionPanel.add(intermediateDiffOption);
-		singlePlayerOptionPanel.add(advancedDiffOption);
-		singlePlayerOptionPanel.add(ultimateDiffOption);
-		singlePlayerOptionPanel.add(mysteriousButton);
+		singlePlayerOptionPanel.add(diffOptionPanel);
 		chooseDiff.setAlignmentX(Component.CENTER_ALIGNMENT);
 		noviceDiffOption.setAlignmentX(Component.CENTER_ALIGNMENT);
 		intermediateDiffOption.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -435,6 +450,7 @@ public class Main {
 		difficultyGroup.add(advancedDiffOption);
 		difficultyGroup.add(ultimateDiffOption);
 		difficultyGroup.add(mysteriousButton);
+		difficultyGroup.add(bogo);
 
 		// select two default things.
 		intermediateDiffOption.setSelected(true);
@@ -444,10 +460,16 @@ public class Main {
 		ButtonGroup turnGroup = new ButtonGroup();
 		turnGroup.add(senteOption);
 		turnGroup.add(goteOption);
+		turnGroup.add(randomOption);
+		turnGroup.add(takeTurnOption);
 
 		JButton playButton = Main.getPlainLookbtn("Play!", "Calibri", 33, Font.PLAIN, Color.CYAN);
+//		JLabel placeHolder = new JLabel("ImaplaceholderImaplaceholder");
+////		placeHolder.setVisible(false);
+		singlePlayerOptionPanel.add(Box.createVerticalStrut(20));
 		singlePlayerOptionPanel.add(playButton);
 		playButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		playButton.setMargin(new Insets(0,50,0,50));
 		playButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -469,6 +491,7 @@ public class Main {
 					game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
 						Game.TURN_GOTE, Difficulty.ULTIMATE);
 				else {
+					// For "Even novice is too hard", we use random XDDDD
 					int randNum = new Random().nextInt(4);
 					if (randNum == 0)
 						game = new SingleplayerGame(4, isSente ? Game.TURN_SENTE :
@@ -486,5 +509,52 @@ public class Main {
 				welcomeFrame.dispose();
 			}
 		});
+	}
+	
+	/**
+	 * The warning is shown when the options file is not well-formed or 
+	 * does not contain necessary keys. (Redundant keys are okay)
+	 */
+	public static void warnOptionsFileInvalid() {
+		JOptionPane.showMessageDialog(null, "The options file in local storage is invalid."
+				+ "\nThe new options file with default options is being generated.",
+				"Invalid options file", JOptionPane.WARNING_MESSAGE);
+	}
+	
+	public static void showOptionsDialog() {
+		JFrame optionsFrame = new JFrame("All Options");
+		optionsFrame.setVisible(true);
+		optionsFrame.setSize(500, 900);
+		JPanel optionsMainPanel = new JPanel();
+		BoxLayout optionsLayout = new BoxLayout(optionsMainPanel, BoxLayout.Y_AXIS);
+		optionsMainPanel.setLayout(optionsLayout);
+		optionsFrame.add(optionsMainPanel);
+		JPanel generalSettings = new JPanel();
+		JPanel singlePlayerSettings = new JPanel();
+		JPanel multiplayerSettings = new JPanel();
+		JPanel networkSettings = new JPanel();
+		JPanel AIGameSettings = new JPanel();
+		JPanel analysisSettings = new JPanel();
+		JLabel titleLabel = new JLabel("All Options");
+		JLabel label1 = new JLabel("Singleplayer Game");
+		JLabel label2 = new JLabel("Multiplayer Game");
+		JLabel label3 = new JLabel("Network Game");
+		JLabel label4 = new JLabel("AI Game");
+		JLabel label5 = new JLabel("Analysis");
+		JLabel label0 = new JLabel("General");
+		
+		generalSettings.add(label0);
+		singlePlayerSettings.add(label1);
+		multiplayerSettings.add(label2);
+		networkSettings.add(label3);
+		AIGameSettings.add(label4);
+		analysisSettings.add(label5);
+		optionsMainPanel.add(titleLabel);
+		optionsMainPanel.add(generalSettings);
+		optionsMainPanel.add(singlePlayerSettings);
+		optionsMainPanel.add(multiplayerSettings);
+		optionsMainPanel.add(networkSettings);
+		optionsMainPanel.add(analysisSettings);
+		
 	}
 }
