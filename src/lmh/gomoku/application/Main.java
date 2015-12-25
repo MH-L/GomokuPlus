@@ -31,6 +31,8 @@ import javax.swing.border.EmptyBorder;
 
 import renju.com.lmh.application.Game.Difficulty;
 import lmh.gomoku.application.Game;
+import lmh.gomoku.auth.AuthService;
+import lmh.gomoku.exception.RegistrationException;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.localStorage.StorageManager;
 
@@ -59,6 +61,7 @@ public class Main {
 	private static final Font signUpBtnFont = new Font("Tahoma", Font.PLAIN, 40);
 	private static final Font panelSubTitleFont = new Font("Tahoma", Font.PLAIN, 35);
 	private static final Font radioBtnsFont = new Font("Calibri", Font.PLAIN, 32);
+	private static final Font bigTitleFont = new Font("Calibri", Font.PLAIN, 58);
 	private static final Border panelEmptyBorder = new EmptyBorder(20, 20, 20, 20);
 	/**
 	 * The reason why we need different lengths for the text fields is that
@@ -143,12 +146,12 @@ public class Main {
 				frame.dispose();
 			}
 		});
-		
+
 		optionsBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				showOptionsDialog();
-			}	
+			}
 		});
 	}
 
@@ -185,7 +188,7 @@ public class Main {
 		JPanel loginPanel = new JPanel();
 		loginPanel.setBorder(panelEmptyBorder);
 		JLabel label = new JLabel("Log In");
-		label.setFont(new Font("Calibri", Font.PLAIN, 58));
+		label.setFont(bigTitleFont);
 		loginPanel.add(label);
 		JSeparator panelSeparator = new JSeparator(SwingConstants.HORIZONTAL);
 		panelSeparator.setPreferredSize(horizontalLineDimension);
@@ -333,6 +336,25 @@ public class Main {
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
+
+		signUpBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String username = usernameField.getText();
+				String password = passwordField.getText();
+				String invitationCode = invitationField.getText();
+				try {
+					AuthService.createAccount(username, password, invitationCode);
+					JOptionPane.showMessageDialog(null, "The account registration has completed!",
+							"Success", JOptionPane.INFORMATION_MESSAGE);
+				} catch (RegistrationException e1) {
+					JOptionPane.showMessageDialog(null,
+							String.format("Account registration unsuccessful due to"
+							+ " the following reason: %s", e1.getMessage()),
+							"Registration Error!", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 	}
 
 	/**
@@ -393,7 +415,7 @@ public class Main {
 		titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 48));
 		singlePlayerOptionPanel.add(titleLabel);
 		titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
+
 		UIManager.put("RadioButton.font", radioBtnsFont);
 		// TODO make this thing look nicer!!!!!!
 		JLabel chooseTurn = new JLabel("Choose your turn");
@@ -417,15 +439,13 @@ public class Main {
 		takeTurnOption.setAlignmentX(Component.CENTER_ALIGNMENT);
 		senteOption.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		JSeparator buttonSep = new JSeparator(SwingConstants.HORIZONTAL);
-//		buttonSep.setPreferredSize(horizontalLineShortDimension);
 		JPanel turnOptionPanel = new JPanel();
 		turnOptionPanel.add(senteOption);
 		turnOptionPanel.add(goteOption);
 		turnOptionPanel.add(randomOption);
 		turnOptionPanel.add(takeTurnOption);
 		singlePlayerOptionPanel.add(turnOptionPanel);
-		
+
 		JPanel diffOptionPanel = new JPanel();
 		diffOptionPanel.add(noviceDiffOption);
 		diffOptionPanel.add(intermediateDiffOption);
@@ -510,9 +530,9 @@ public class Main {
 			}
 		});
 	}
-	
+
 	/**
-	 * The warning is shown when the options file is not well-formed or 
+	 * The warning is shown when the options file is not well-formed or
 	 * does not contain necessary keys. (Redundant keys are okay)
 	 */
 	public static void warnOptionsFileInvalid() {
@@ -520,7 +540,7 @@ public class Main {
 				+ "\nThe new options file with default options is being generated.",
 				"Invalid options file", JOptionPane.WARNING_MESSAGE);
 	}
-	
+
 	public static void showOptionsDialog() {
 		JFrame optionsFrame = new JFrame("All Options");
 		optionsFrame.setVisible(true);
@@ -542,7 +562,16 @@ public class Main {
 		JLabel label4 = new JLabel("AI Game");
 		JLabel label5 = new JLabel("Analysis");
 		JLabel label0 = new JLabel("General");
-		
+		titleLabel.setFont(bigTitleFont);
+		label1.setFont(panelSubTitleFont);
+		label2.setFont(panelSubTitleFont);
+		label3.setFont(panelSubTitleFont);
+		label4.setFont(panelSubTitleFont);
+		label5.setFont(panelSubTitleFont);
+		label0.setFont(panelSubTitleFont);
+		titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		label0.setAlignmentX(Component.CENTER_ALIGNMENT);
+
 		generalSettings.add(label0);
 		singlePlayerSettings.add(label1);
 		multiplayerSettings.add(label2);
@@ -555,6 +584,6 @@ public class Main {
 		optionsMainPanel.add(multiplayerSettings);
 		optionsMainPanel.add(networkSettings);
 		optionsMainPanel.add(analysisSettings);
-		
+
 	}
 }

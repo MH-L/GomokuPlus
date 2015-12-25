@@ -149,6 +149,7 @@ public class StorageManager {
 		XMLElement AIGame = new XMLElement("AIGame", null);
 		XMLElement analysisGame = new XMLElement("AnalysisGame", null);
 
+		// Note: XML tags do not allow spaces in them.
 		XMLElement boardWidth = new XMLElement("BoardWidth", "15");
 		XMLElement enableTimed = new XMLElement("TimedGame", "Disabled");
 		XMLElement timeLimit = new XMLElement("TimeLimit", "0");
@@ -184,6 +185,16 @@ public class StorageManager {
 		}
 	}
 
+	public boolean verifyConfigFile(File configFile) throws IOException {
+		FileInputStream fis = new FileInputStream(configFile);
+		byte[] data = new byte[(int) configFile.length()];
+		fis.read(data);
+		fis.close();
+		String configFileContents = new String(data, "UTF-8");
+		// TODO verify contents here.
+		return false;
+	}
+
 	private static void storeGameRecord(String record, String gameHash) throws IOException {
 		String fileNameStr = String.format("%s%s%s%s", RECORD, "\\", gameHash,
 				RecordCreator.RECORD_FILE_TYPE_SUFFIX);
@@ -207,9 +218,9 @@ public class StorageManager {
 		gameHash = escapeBase64Str(gameHash);
 		storeGameRecord(moveStr, gameHash);
 	}
-	
+
 	/**
-	 * Escapes the base 64 encoded string as file name format. "/" is 
+	 * Escapes the base 64 encoded string as file name format. "/" is
 	 * considered an invalid character in file names.
 	 * @param str the base64 encoded string to escape
 	 * @return string suitable for file names
@@ -227,7 +238,7 @@ public class StorageManager {
 
 		return retVal;
 	}
-	
+
 	public static Map<String, Object> getOptionsMapping() throws XMLException {
 		File options = new File(CONFIG + "\\options.xml");
 		// If options file does not exist then create one.
@@ -241,9 +252,9 @@ public class StorageManager {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		
+
 		String configString = "";
-		
+
 		try {
 			FileInputStream fis = new FileInputStream(options);
 			byte[] inputData = new byte[(int) options.length()];
@@ -253,15 +264,15 @@ public class StorageManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return getOptionsMapping(configString);
 	}
-	
+
 	private static Map<String, Object> getOptionsMapping(String optionsString) throws XMLException {
 		// Root element
 		XMLElement optionsElement = null;
 		optionsElement = XMLHelper.strToXML(optionsString);
-		
+
 		// Parent elements
 		XMLElement general = tryAndGetChild(optionsElement, "General");
 		XMLElement singlePlayerGame = tryAndGetChild(optionsElement, "SingleplayerGame");
@@ -269,7 +280,7 @@ public class StorageManager {
 		XMLElement networkGame = tryAndGetChild(optionsElement, "NetworkGame");
 		XMLElement AIGame = tryAndGetChild(optionsElement, "AIGame");
 		XMLElement analysisGame = tryAndGetChild(optionsElement, "AnalysisGame");
-		
+
 		// Children elements
 		XMLElement boardWidth = tryAndGetChild(general, "BoardWidth");
 		XMLElement backgroundColor = tryAndGetChild(general, "BackgroundColor");
@@ -281,7 +292,7 @@ public class StorageManager {
 		XMLElement responseInterval = tryAndGetChild(AIGame, "ResponseInterval");
 		XMLElement animationInterval = tryAndGetChild(analysisGame, "AnimationInterval");
 		XMLElement withdrawalLimitMulti = tryAndGetChild(multiplayerGame, "WithdrawalLimit");
-		
+
 		// Contents of configuration
 		try{
 			int width = Integer.parseInt(boardWidth.getContent().trim());
@@ -294,7 +305,7 @@ public class StorageManager {
 			String playerNameStr = playerName.getContent().trim();
 			int responseIntervalInt = Integer.parseInt(responseInterval.getContent().trim());
 			int animationIntervalInt = Integer.parseInt(animationInterval.getContent().trim());
-			
+
 			if (width < 15 || width > 30)
 				throw new XMLException("Invalid board width");
 			if (withdrawalLimitS < 0 || withdrawalLimitS > 4)
@@ -309,7 +320,7 @@ public class StorageManager {
 				throw new XMLException("Invalid animation interval.");
 			if (responseIntervalInt < 0 || responseIntervalInt > 8000)
 				throw new XMLException("Invalid response interval.");
-			
+
 			// Instantiate maps
 			Map<String, Object> generalsMap = new HashMap<String, Object>();
 			Map<String, Object> singleplayerMap = new HashMap<String, Object>();
@@ -317,7 +328,7 @@ public class StorageManager {
 			Map<String, Object> aiGameMap = new HashMap<String, Object>();
 			Map<String, Object> networkGameMap = new HashMap<String, Object>();
 			Map<String, Object> analysisGameMap = new HashMap<String, Object>();
-			
+
 			// Put keys into sub maps.
 			generalsMap.put("boardWidth", width);
 			generalsMap.put("backgroundColor", color);
@@ -329,7 +340,7 @@ public class StorageManager {
 			networkGameMap.put("playerName", playerNameStr);
 			analysisGameMap.put("animationInterval", animationIntervalInt);
 			aiGameMap.put("responseInterval", responseIntervalInt);
-			
+
 			// Put children maps into retVal;
 			Map<String, Object> retVal = new HashMap<String, Object>();
 			retVal.put("general", generalsMap);
@@ -338,18 +349,18 @@ public class StorageManager {
 			retVal.put("networkGame", networkGameMap);
 			retVal.put("AIGame", aiGameMap);
 			retVal.put("analysisGame", analysisGameMap);
-			
+
 			return retVal;
 		} catch (Exception e) {
 			throw new XMLException("The option parameters are invalid.");
 		}
 	}
-	
+
 	private static XMLElement tryAndGetChild(XMLElement ele, String childName) throws XMLException {
 		XMLElement retVal = ele.getFirstChild(childName);
 		if (retVal == null)
 			throw new XMLException("Child not found.");
-		
+
 		return retVal;
 	}
 }
