@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Game.Result;
 import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
@@ -51,6 +52,8 @@ public class StorageManager {
 	private static final String CONFIG = DIR + "\\config";
 	private static int winNum=0;
 	private static int loseNum=0;
+	private static int tie=0;
+	private static float percentage;
 
 	public static void initializeStorage() throws StorageException {
 		File gameMainDir = new File(DIR);
@@ -99,47 +102,79 @@ public class StorageManager {
 		}
 	}
 
-
-	public static void generateStats(boolean Userwin) throws IOException {
+   	
+	public static void generateStats(int result) throws IOException {
 		// TODO Auto-generated method stub
-		String fileName="stats.xml";
-		byte[] authBytes=fileName.getBytes(StandardCharsets.UTF_8);
-		String encoded=Base64.getEncoder().encodeToString(authBytes);
-		//System.out.println(fileName+"->"+encoded);
-		File stats=new File(CONFIG+"\\"+encoded);
+		int[] array=new int[3];
+		String path=generateStatsFile();
+		File stats=new File(path);
 		if(!stats.exists()){
 			System.out.println("create file");
 			stats.createNewFile();
 		}	
-			if(Userwin){
-				System.out.println("userwin "+winNum);
-				winNum++;
+		System.out.println("file exists");
+		try {
+			String content;
+			content = Game.readstats(new File(StorageManager.generateStatsFile()));
+			array=Game.extractnumbers(content);
+			if(result==1){
+				winNum=array[0]+1;
 				}
-			else{
-				System.out.println("userlose "+loseNum);
-				loseNum++;
+			else if(result==2){
+				loseNum=array[1]+1;
+				System.out.println("lose"+loseNum);
 			}
-			int total= winNum+loseNum;
-			float percentage;
+			else if(result==0){
+				tie=array[2]+1;
+			}
+			int total= winNum+loseNum+tie;
 			if(total==0){
 			percentage=0;	
 			}
 			else{
-				System.out.println("totalnotzero");	
              percentage = ((float) winNum) / ((float) total)*100;
               }
 			System.out.println("yeah");
-			PrintWriter writer = new PrintWriter(CONFIG+"\\"+encoded, "UTF-8");
+			PrintWriter writer = new PrintWriter(path, "UTF-8");
 			String statContent =
-					String.format("%s\n%s\n%s\n%s\n",
-					"win:"+winNum, 
-					"lose:"+loseNum, 
-					"total:"+total, 
+					String.format("%s\n%s\n%s\n%s\n%s\n",
+					"win:"+winNum+"  ", 
+					"lose:"+loseNum+"  ", 
+					"tie:"+tie+"  ",
+					"total:"+total+"  ", 
 					"percentage:"+percentage+"%");
 			byte[] statsContent =statContent.getBytes(StandardCharsets.UTF_8);
 			String encodedStat=Base64.getEncoder().encodeToString(statsContent);
 			writer.print(encodedStat);
 			writer.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+			
+	}
+	
+	public static String generateStatsFile() {
+		// TODO Auto-generated method stub
+		String fileName="stats.txt";
+		byte[] authBytes=fileName.getBytes(StandardCharsets.UTF_8);
+		String encoded=Base64.getEncoder().encodeToString(authBytes);
+		String path= CONFIG+"\\"+encoded;
+		return path;
+		
+	}
+
+
+
+	public static int getwinNum(){
+		return winNum;
+	}
+	public static int getloseNum(){
+		return loseNum;
+	}
+	public static float getpercent(){
+		return percentage;
 	}
 
 

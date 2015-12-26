@@ -147,17 +147,20 @@ public class SingleplayerGame extends Game {
 	public void gameEnd() {
 		//added
 		try {
-			System.out.println(board.checkWinning());
-			System.out.println(player.getTurn());
-			if(board.checkWinning()==Result.SENTE&&player.getTurn()==1
-					||board.checkWinning()==Result.GOTE&&player.getTurn()==2){
-			StorageManager.generateStats(true);
-			System.out.println("win");
+			int userwin=1;
+			int userlose=2;
+			int tie=0;
+
+			if((board.checkWinning()==Result.SENTE&&player.getTurn()==1)
+					||(board.checkWinning()==Result.GOTE&&player.getTurn()==2)){
+			StorageManager.generateStats(userwin);
 			}
-			else if(board.checkWinning()==Result.SENTE&&player.getTurn()==2
-					||board.checkWinning()==Result.GOTE&&player.getTurn()==1){
-			StorageManager.generateStats(false);
-			System.out.println("lose");
+			else if((board.checkWinning()==Result.SENTE&&player.getTurn()==2)
+					||(board.checkWinning()==Result.GOTE&&player.getTurn()==1)){
+			StorageManager.generateStats(userlose);
+			}
+			else if(board.checkWinning()==Result.TIE){
+				StorageManager.generateStats(tie);
 			}
 		
 			

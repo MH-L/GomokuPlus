@@ -8,8 +8,13 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -29,7 +34,12 @@ import javax.swing.filechooser.FileFilter;
 
 import lmh.gomoku.application.Game;
 import lmh.gomoku.application.Main;
+import lmh.gomoku.exception.XMLException;
+import lmh.gomoku.localStorage.StorageManager;
 import lmh.gomoku.model.Board;
+import lmh.gomoku.util.RecordCreator;
+import lmh.gomoku.util.XMLHelper;
+import lmh.gomoku.util.XMLHelper.XMLElement;
 
 public abstract class Game {
 	protected static final Font smallGameFont = new Font("Open Sans",
@@ -339,7 +349,19 @@ public abstract class Game {
 		showStats.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				showStatsWindow();
+				String content;
+				try {
+					System.out.println("start read stats");
+					content=readstats(new File(StorageManager.generateStatsFile()));
+					showStatsWindow(content);
+					System.out.println("finish read stats");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					System.out.println("cannot read stats");
+					e.printStackTrace();
+					
+				}
+				
 			}
 		});
 
@@ -385,8 +407,48 @@ public abstract class Game {
 	}
 
 	protected void doSocketClose() {}
-
-	private static void showStatsWindow() {
+	
+	/**
+     * This method extract the counts of win/lose/tie in the stats file.
+     *
+     */ 
+	public static int[] extractnumbers(String statscontent){
+		int[] counts=new int[3];
+		String [] stringArray;
+		String str;
+		str = statscontent.replaceAll("[^-?0-9]+", " "); 
+		stringArray=str.trim().split(" ");
+		for(int i=0;i<3;i++){
+			counts[i]=Integer.parseInt(stringArray[i]);
+		}
+		return counts;	  
+		
+	}
+	/**
+     * This method loads statsfile from file system and returns the byte array of the content.
+     *
+     * @param fileName
+     * @return
+     * @throws Exception
+     */ 
+	public static String readstats(File statsfile) throws Exception {		 
+        byte[] decodedBytes = Base64.getDecoder().decode(loadFileAsBytesArray(statsfile));
+        String statscontent= new String(decodedBytes, "UTF-8");
+        System.out.println(statscontent);
+		return statscontent;
+    }
+	
+	public static byte[] loadFileAsBytesArray(File statsfile) throws Exception {
+        int length = (int) statsfile.length();
+        BufferedInputStream reader = new BufferedInputStream(new FileInputStream(statsfile));
+        byte[] bytes = new byte[length];
+        reader.read(bytes, 0, length);
+        reader.close();
+        return bytes;
+    }
+	
+		
+	/*private static void showStatsWindow() {
 		JFrame statsFrame = new JFrame("Stats");
 		statsFrame.setVisible(true);
 		statsFrame.setSize(defaultFrameSmall);
@@ -406,6 +468,17 @@ public abstract class Game {
 			lable.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 			statsPanel.add(lable);
 		}
+	}*/
+	
+	private static void showStatsWindow(String text) {
+		JFrame statsFrame = new JFrame("Stats");
+		statsFrame.setVisible(true);
+		statsFrame.setSize(defaultFrameDimension);
+		JLabel Text = new JLabel(text);  
+		Text.setFont(largeGameFont);
+		Text.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+		statsFrame.add(Text);
+		
 	}
 
 	public void displayOccupiedWarning() {
