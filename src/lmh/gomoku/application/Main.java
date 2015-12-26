@@ -344,7 +344,7 @@ public class Main {
 				String password = passwordField.getText();
 				String invitationCode = invitationField.getText();
 				try {
-					AuthService.createAccount(username, password, invitationCode);
+					AuthClient.createAccount(username, password, invitationCode);
 					JOptionPane.showMessageDialog(null, "The account registration has completed!",
 							"Success", JOptionPane.INFORMATION_MESSAGE);
 				} catch (RegistrationException e1) {

@@ -22,10 +22,13 @@ import lmh.gomoku.util.HashHelper;
  */
 public class AuthService {
 	public static final int PORT = 1993;
-	public static ConnectionManager manager;
+	private static ConnectionManager manager;
+	private static int threadCount = 0;
+	private static Thread cron;
 
 	public static void main(String[] args) {
 		manager = ConnectionManager.getInstance();
+		initializeCron();
 		try {
 			ServerSocket ss = new ServerSocket(PORT);
 			while (true) {
@@ -36,6 +39,21 @@ public class AuthService {
 			System.out.println("Cannot bind to the port. Port could be in use.");
 			System.exit(1);
 		}
+	}
+
+	private static void initializeCron() {
+		cron = new Thread() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						Thread.sleep(100000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
 	}
 
 	public static void authenticate(Socket clientSocket) throws IOException {
@@ -63,6 +81,18 @@ public class AuthService {
 	private static boolean verifyUsername(String username) {
 		String regex = "^[a-zA-Z0-9]{4,16}$";
 		return username.matches(regex);
+	}
+
+	public static void createAccountRawStrings(String usernameRaw, String passwordRaw, String invitationCodeRaw) {
+
+	}
+
+	/**
+	 * Generates today's key for encrypting username, password and credential.
+	 * @return
+	 */
+	private static String generateTodaysKey() {
+		return null;
 	}
 
 	/**
