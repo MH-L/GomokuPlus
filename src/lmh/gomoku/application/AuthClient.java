@@ -63,4 +63,12 @@ public class AuthClient {
 	public static void changeUserName(String newUsername, String oldUsername, String password) {
 
 	}
+
+	public static void userLogin(String username, String password) {
+
+	}
+
+	public static void loginUsingToken(String token) {
+
+	}
 }
