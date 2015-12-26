@@ -73,7 +73,7 @@ public abstract class Game {
 	 *
 	 */
 	public enum Result {
-		UNDECIDED, SENTE, GOTE
+		UNDECIDED, SENTE, GOTE, TIE
 	}
 
 	public Game() {
@@ -115,7 +115,7 @@ public abstract class Game {
 		gameStarted.setFont(smallGameFont);
 		historyPanel.add(gameStarted);
 
-		boardPanel = new JPanel(new GridLayout(15,15));
+		boardPanel = new JPanel(new GridLayout(Board.height,Board.width));
 		boardPanel.setPreferredSize(new Dimension(700, 700));
 
 		menuBar = createJMenuBar();
@@ -184,10 +184,8 @@ public abstract class Game {
 		board.resetBoard();
 		board.activate();
 		gameStarted.setText("Game Started.");
-		makeAIMoveIfNecessary();
+		board.startAIThread();
 	}
-
-	protected void makeAIMoveIfNecessary() {}
 
 	public void gameEnd() {
 		board.cleanUp();

@@ -20,8 +20,8 @@ import lmh.gomoku.model.Coordinate.Stone;
 
 public class Board {
 	protected static Coordinate[][] grid;
-	public static final int width = 15;
-	public static final int height = 15;
+	public static final int width = 16;
+	public static final int height = 16;
 	private int activePlayer;
 	private boolean isFrozen = true;
 	private Coordinate lastMove1 = null;
@@ -49,37 +49,43 @@ public class Board {
 		this.suspensionRequired = suspensionRequired;
 		// Need to let AI make its first move if the player is second.
 		if (suspensionRequired) {
-			AIThread = new Thread() {			
-				@Override
-				public void run() {
-					System.out.println("SinglePlayer thread running!");
-					System.out.println("Made move.");
-					long lastPrinted = System.currentTimeMillis();
-					while (true) {
-						if (System.currentTimeMillis() - lastPrinted > 2000) {
-							System.out.println("The ai turn status is " + isAITurn);
-							lastPrinted = System.currentTimeMillis();
+			startAIThread();
+		}
+	}
+	
+	public void startAIThread() {
+		AIThread = new Thread() {
+			@Override
+			public void run() {
+				System.out.println("SinglePlayer thread running!");
+				System.out.println("Made move.");
+				while (true) {
+					if (isAITurn && !isFrozen) {
+						updateIsAITurn(false);
+						// AI makes move and the board is updated
+						BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
+						System.out.println("Made move.");
+//						// TODO now the AI could only be GOTE.
+						// Place icon onto board
+						Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+						// update corresponding square as well
+						Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
+						stoneCount++;
+						if (doEndGameCheck()) {
+							return;
 						}
-						if (isAITurn) {
-							updateIsAITurn(false);
-							// AI makes move and the board is updated
-							BoardLocation aiMove = ((SingleplayerGame) g).AIMakeMove();
-							System.out.println("Made move.");
-//							// TODO now the AI could only be GOTE.
-							// Place icon onto board
-							Board.this.setSquareIconByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
-							// update corresponding square as well
-							Board.this.setSquareStoneByTurn(aiMove.getXPos(), aiMove.getYPos(), activePlayer);
-							stoneCount++;
-							doEndGameCheck();
-							updateActivePlayer();
-						}
+						updateActivePlayer();
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						return;
 					}
 				}
-			};
+			}
+		};
 
-			AIThread.start();
-		}
+		AIThread.start();
 	}
 
 	protected void addCellsToBoard(JPanel boardPanel) {
@@ -311,7 +317,10 @@ public class Board {
 		return Result.UNDECIDED;
 	}
 
-	public static Result checkWinning() {
+	public Result checkWinning() {
+		if (isBoardFull()) {
+			return Result.TIE;
+		}
 		Result rowsAndCols = checkRowColWinning();
 		if (rowsAndCols != Result.UNDECIDED) {
 			return rowsAndCols;
@@ -456,9 +465,12 @@ public class Board {
 			isFrozen = true;
 			if (currentGameResult == Result.SENTE) {
 				g.displayWinnerInfo(true);
-				
-			} else {
+
+			} else if (currentGameResult == Result.GOTE) {
+
 				g.displayWinnerInfo(false);
+			} else {
+				g.displayTieMessageBoardFull();
 			}
 			g.gameEnd();
 			return true;
@@ -467,7 +479,7 @@ public class Board {
 		return false;
 	}
 
-
+	
 	/**
 	 * Gets the total number of stones on board.
 	 */

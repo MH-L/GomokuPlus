@@ -18,6 +18,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * A class for generating XML files used and produced
+ * by the game.
+ * @author Minghao Liu
+ *
+ */
 public class XMLHelper {
 	public static class XMLElement {
 		private String name;
@@ -34,6 +40,11 @@ public class XMLHelper {
 		public void appendChild(XMLElement child) {
 			childElements.add(child);
 			child.parentElement = this;
+		}
+		
+		public XMLElement getFirstChild(String name) {
+			List<XMLElement> foundResults = getChild(name);
+			return foundResults.isEmpty() ? null : foundResults.get(0);
 		}
 
 		public List<XMLElement> getChild(String name) {
@@ -77,7 +88,11 @@ public class XMLHelper {
 		return "</" + tagName + ">";
 	}
 
-	public static String elementToString(XMLElement ele, int baseIndent) {
+	public static String elementToString(XMLElement ele) {
+		return elementToString(ele, 0);
+	}
+
+	private static String elementToString(XMLElement ele, int baseIndent) {
 		String result = "";
 		for (int i = 0; i < baseIndent; i++) {
 			result += "\t";

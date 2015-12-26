@@ -1,19 +1,31 @@
 package lmh.gomoku.localStorage;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lmh.gomoku.application.Game.Result;
 import lmh.gomoku.database.ConnectionManager;
 import lmh.gomoku.exception.StorageException;
 import lmh.gomoku.model.Board;
+import lmh.gomoku.application.Main;
+import lmh.gomoku.application.Options;
+import lmh.gomoku.database.ConnectionManager;
+import lmh.gomoku.exception.StorageException;
+import lmh.gomoku.exception.XMLException;
 import lmh.gomoku.model.IMove;
 import lmh.gomoku.util.RecordCreator;
+import lmh.gomoku.util.XMLHelper;
+import lmh.gomoku.util.XMLHelper.XMLElement;
 
 /**
  * Class for local game storage. This class is not for server.
@@ -80,11 +92,13 @@ public class StorageManager {
 		}
 		try {
 			generateReadMe();
-			//generateStats();
+			generateOptions();
+
 		} catch (IOException e) {
 			throw new StorageException();
 		}
 	}
+
 
 	public static void generateStats(boolean Userwin) throws IOException {
 		// TODO Auto-generated method stub
@@ -128,12 +142,18 @@ public class StorageManager {
 			writer.close();
 	}
 
+
+	/**
+	 * Generates readme file of the game at the first time the game starts.
+	 * @throws IOException
+	 */
+
 	public static void generateReadMe() throws IOException {
 		File readme = new File(DIR + "\\README.txt");
 		if (readme.createNewFile()) {
 			PrintWriter writer = new PrintWriter(DIR + "\\README.txt", "UTF-8");
 			String readmeContent =
-					String.format("%s\n\n%s\n%s\n%s\n\n%s\n\n%s\n%s\n%s",
+					String.format("%s\n\n%s\n%s\n%s\n\n%s\n\n%s\n%s\n%s\n%s\n%s\n%s",
 							"Welcome to Gomoku -- the simplest, yet one of the most interesting chess game.",
 							"If you have never heard of gomoku, let me briefly explain the rules. The game is like",
 							"an extended TicTacToe (which everyone knows), but the only difference is that, in order to",
@@ -141,7 +161,11 @@ public class StorageManager {
 							"Simple, huh? Yet it has many strategies, and you find it harder as you make progress.",
 							"This directory is for game contents. \\config folder is where all game configs are",
 							"stored, \\records is for game records which allow you to do retrospective studies",
-							"of each game you played, and \\tokens is for login tokens of the game.");
+							"of each game you played, and \\tokens is for login tokens of the game. Also do note",
+							"that the animation interval and response interval in the config are in milliseconds,",
+							"and the time limit for singleplayer games and multiplayer games are in seconds.",
+							"Do not attempt to modify these files because that may make them ill-formatted, thus",
+							"cannot be used by the game.");
 			writer.print(readmeContent);
 			writer.close();
 		}
@@ -149,6 +173,69 @@ public class StorageManager {
 
 	public static void storeToken(byte[] token) {
 
+	}
+
+	/**
+	 * Generates the option file for the game when the game starts for the first time.
+	 * <Tentative plan>
+	 * Options file will include:
+	 * 1. Board Size (15 - 30)??
+	 * 2. Board Background color (with a few options)
+	 * 3. Auto save game records
+	 * 4. Animation interval for AI game
+	 * 5. Animation interval for analysis game
+	 * 6. Default AI difficulty for AI game
+	 * 7. Enable/disable timed singleplayer game and time limit
+	 * 8. Number of withdrawals given to player
+	 * 9. Player name in network game
+	 * @throws IOException
+	 * @throws UnsupportedEncodingException
+	 * @throws FileNotFoundException
+	 */
+	private static void generateOptions()
+			throws FileNotFoundException, UnsupportedEncodingException, IOException {
+		File options = new File(CONFIG + "\\options.xml");
+		XMLElement baseElement = new XMLElement("Options", null);
+		XMLElement general = new XMLElement("General", null);
+		XMLElement singlePlayer = new XMLElement("SingleplayerGame", null);
+		XMLElement multiPlayer = new XMLElement("MultiplayerGame", null);
+		XMLElement network = new XMLElement("NetworkGame", null);
+		XMLElement AIGame = new XMLElement("AIGame", null);
+		XMLElement analysisGame = new XMLElement("AnalysisGame", null);
+
+		XMLElement boardWidth = new XMLElement("BoardWidth", "15");
+		XMLElement enableTimed = new XMLElement("TimedGame", "Disabled");
+		XMLElement timeLimit = new XMLElement("TimeLimit", "0");
+		XMLElement responseTime = new XMLElement("ResponseInterval", "1000");
+		XMLElement recordAutoSave = new XMLElement("RecordAutoSave", "Enabled");
+		XMLElement animationInterval = new XMLElement("AnimationInterval", "1000");
+		XMLElement backgroundColor = new XMLElement("BackgroundColor", "Default");
+		XMLElement singlePlayerNumWithdrawal = new XMLElement("WithdrawalLimit", "4");
+		XMLElement multiPlayerNumWithdrawal = new XMLElement("WithdrawalLimit", "2");
+		XMLElement playerName = new XMLElement("PlayerName", "");
+
+		baseElement.appendChild(general);
+		baseElement.appendChild(singlePlayer);
+		baseElement.appendChild(multiPlayer);
+		baseElement.appendChild(network);
+		baseElement.appendChild(AIGame);
+		baseElement.appendChild(analysisGame);
+		general.appendChild(boardWidth);
+		general.appendChild(backgroundColor);
+		general.appendChild(recordAutoSave);
+		singlePlayer.appendChild(enableTimed);
+		singlePlayer.appendChild(timeLimit);
+		singlePlayer.appendChild(singlePlayerNumWithdrawal);
+		multiPlayer.appendChild(multiPlayerNumWithdrawal);
+		network.appendChild(playerName);
+		AIGame.appendChild(responseTime);
+		analysisGame.appendChild(animationInterval);
+		if (options.createNewFile()) {
+			PrintWriter writer = new PrintWriter(CONFIG + "\\options.xml", "UTF-8");
+			String content = XMLHelper.elementToString(baseElement);
+			writer.print(content);
+			writer.close();
+		}
 	}
 
 	private static void storeGameRecord(String record, String gameHash) throws IOException {
@@ -162,6 +249,11 @@ public class StorageManager {
 		writer.close();
 	}
 
+	/**
+	 * Stores the game record into local storage.
+	 * @param moves Moves of a game
+	 * @throws IOException
+	 */
 	public static void storeGameRecord(List<? extends IMove> moves) throws IOException {
 		String moveStr = RecordCreator.generateRecordString(moves);
 		String gameHash = ConnectionManager.getGameHash(System.currentTimeMillis(), 1, 2);
@@ -169,7 +261,13 @@ public class StorageManager {
 		gameHash = escapeBase64Str(gameHash);
 		storeGameRecord(moveStr, gameHash);
 	}
-
+	
+	/**
+	 * Escapes the base 64 encoded string as file name format. "/" is 
+	 * considered an invalid character in file names.
+	 * @param str the base64 encoded string to escape
+	 * @return string suitable for file names
+	 */
 	private static String escapeBase64Str(String str) {
 		char[] arr = str.toCharArray();
 		String retVal = "";
@@ -181,6 +279,131 @@ public class StorageManager {
 			}
 		}
 
+		return retVal;
+	}
+	
+	public static Map<String, Object> getOptionsMapping() throws XMLException {
+		File options = new File(CONFIG + "\\options.xml");
+		// If options file does not exist then create one.
+		if (!options.exists())
+			try {
+				generateOptions();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		String configString = "";
+		
+		try {
+			FileInputStream fis = new FileInputStream(options);
+			byte[] inputData = new byte[(int) options.length()];
+			fis.read(inputData);
+			configString = new String(inputData, "UTF-8");
+			fis.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return getOptionsMapping(configString);
+	}
+	
+	private static Map<String, Object> getOptionsMapping(String optionsString) throws XMLException {
+		// Root element
+		XMLElement optionsElement = null;
+		optionsElement = XMLHelper.strToXML(optionsString);
+		
+		// Parent elements
+		XMLElement general = tryAndGetChild(optionsElement, "General");
+		XMLElement singlePlayerGame = tryAndGetChild(optionsElement, "SingleplayerGame");
+		XMLElement multiplayerGame = tryAndGetChild(optionsElement, "MultiplayerGame");
+		XMLElement networkGame = tryAndGetChild(optionsElement, "NetworkGame");
+		XMLElement AIGame = tryAndGetChild(optionsElement, "AIGame");
+		XMLElement analysisGame = tryAndGetChild(optionsElement, "AnalysisGame");
+		
+		// Children elements
+		XMLElement boardWidth = tryAndGetChild(general, "BoardWidth");
+		XMLElement backgroundColor = tryAndGetChild(general, "BackgroundColor");
+		XMLElement recordAutoSave = tryAndGetChild(general, "RecordAutoSave");
+		XMLElement timedGame = tryAndGetChild(singlePlayerGame, "TimedGame");
+		XMLElement timeLimit = tryAndGetChild(singlePlayerGame, "TimeLimit");
+		XMLElement withdrawalLimitSingle = tryAndGetChild(singlePlayerGame, "WithdrawalLimit");
+		XMLElement playerName = tryAndGetChild(networkGame, "PlayerName");
+		XMLElement responseInterval = tryAndGetChild(AIGame, "ResponseInterval");
+		XMLElement animationInterval = tryAndGetChild(analysisGame, "AnimationInterval");
+		XMLElement withdrawalLimitMulti = tryAndGetChild(multiplayerGame, "WithdrawalLimit");
+		
+		// Contents of configuration
+		try{
+			int width = Integer.parseInt(boardWidth.getContent().trim());
+			String color = backgroundColor.getContent().trim();
+			boolean autoSave = Boolean.parseBoolean(recordAutoSave.getContent().trim());
+			boolean timedGameOption = timedGame.getContent().equals("Enabled");
+			int timeLimitInt = Integer.parseInt(timeLimit.getContent().trim());
+			int withdrawalLimitS = Integer.parseInt(withdrawalLimitSingle.getContent().trim());
+			int withdrawalLimitM = Integer.parseInt(withdrawalLimitMulti.getContent().trim());
+			String playerNameStr = playerName.getContent().trim();
+			int responseIntervalInt = Integer.parseInt(responseInterval.getContent().trim());
+			int animationIntervalInt = Integer.parseInt(animationInterval.getContent().trim());
+			
+			if (width < 15 || width > 30)
+				throw new XMLException("Invalid board width");
+			if (withdrawalLimitS < 0 || withdrawalLimitS > 4)
+				throw new XMLException("Invalid withdrawal limit for single player game.");
+			if (withdrawalLimitM < 0 || withdrawalLimitM > 3)
+				throw new XMLException("Invalid withdrawal limit for multiplayer game.");
+			if (!Options.isPlayerNameValid(playerNameStr))
+				throw new XMLException("Invalid player's name.");
+			if (timeLimitInt < 60 || timeLimitInt > 6000)
+				throw new XMLException("Invalid time limit.");
+			if (animationIntervalInt < 200 || animationIntervalInt > 10000)
+				throw new XMLException("Invalid animation interval.");
+			if (responseIntervalInt < 0 || responseIntervalInt > 8000)
+				throw new XMLException("Invalid response interval.");
+			
+			// Instantiate maps
+			Map<String, Object> generalsMap = new HashMap<String, Object>();
+			Map<String, Object> singleplayerMap = new HashMap<String, Object>();
+			Map<String, Object> multiplayerMap = new HashMap<String, Object>();
+			Map<String, Object> aiGameMap = new HashMap<String, Object>();
+			Map<String, Object> networkGameMap = new HashMap<String, Object>();
+			Map<String, Object> analysisGameMap = new HashMap<String, Object>();
+			
+			// Put keys into sub maps.
+			generalsMap.put("boardWidth", width);
+			generalsMap.put("backgroundColor", color);
+			generalsMap.put("recordAutoSave", autoSave);
+			singleplayerMap.put("timedGame", timedGameOption);
+			singleplayerMap.put("timeLimit", timeLimitInt);
+			singleplayerMap.put("withdrawalLimit", withdrawalLimitS);
+			multiplayerMap.put("withdrawalLimit", withdrawalLimitM);
+			networkGameMap.put("playerName", playerNameStr);
+			analysisGameMap.put("animationInterval", animationIntervalInt);
+			aiGameMap.put("responseInterval", responseIntervalInt);
+			
+			// Put children maps into retVal;
+			Map<String, Object> retVal = new HashMap<String, Object>();
+			retVal.put("general", generalsMap);
+			retVal.put("singleplayerGame", singleplayerMap);
+			retVal.put("multiplayerGame", multiplayerMap);
+			retVal.put("networkGame", networkGameMap);
+			retVal.put("AIGame", aiGameMap);
+			retVal.put("analysisGame", analysisGameMap);
+			
+			return retVal;
+		} catch (Exception e) {
+			throw new XMLException("The option parameters are invalid.");
+		}
+	}
+	
+	private static XMLElement tryAndGetChild(XMLElement ele, String childName) throws XMLException {
+		XMLElement retVal = ele.getFirstChild(childName);
+		if (retVal == null)
+			throw new XMLException("Child not found.");
+		
 		return retVal;
 	}
 }

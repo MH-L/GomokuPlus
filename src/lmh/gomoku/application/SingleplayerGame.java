@@ -34,6 +34,7 @@ public class SingleplayerGame extends Game {
 	private HumanPlayer player;
 	private renju.com.lmh.model.Board analysisBoard;
 	
+	
 
 	/**
 	 * Default constructor of SinglePlayerGame. AI difficulty is default to intermediate
@@ -146,18 +147,20 @@ public class SingleplayerGame extends Game {
 	public void gameEnd() {
 		//added
 		try {
-			System.out.println(Board.checkWinning());
+			System.out.println(board.checkWinning());
 			System.out.println(player.getTurn());
-			if(Board.checkWinning()==Result.SENTE&&player.getTurn()==1
-					||Board.checkWinning()==Result.GOTE&&player.getTurn()==2){
+			if(board.checkWinning()==Result.SENTE&&player.getTurn()==1
+					||board.checkWinning()==Result.GOTE&&player.getTurn()==2){
 			StorageManager.generateStats(true);
 			System.out.println("win");
 			}
-			else if(Board.checkWinning()==Result.SENTE&&player.getTurn()==2
-					||Board.checkWinning()==Result.GOTE&&player.getTurn()==1){
+			else if(board.checkWinning()==Result.SENTE&&player.getTurn()==2
+					||board.checkWinning()==Result.GOTE&&player.getTurn()==1){
 			StorageManager.generateStats(false);
 			System.out.println("lose");
 			}
+		
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

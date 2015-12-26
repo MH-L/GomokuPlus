@@ -7,6 +7,7 @@ import renju.com.lmh.application.Game.Difficulty;
 import renju.com.lmh.exception.InvalidIndexException;
 import renju.com.lmh.model.BoardLocation;
 import lmh.gomoku.application.Game;
+import lmh.gomoku.model.Board;
 
 /**
  * A class for the kind of game which involves only two
@@ -55,19 +56,19 @@ public class AIGame extends Game {
 	 */
 	private BoardLocation senteLastMove = getNullMove();
 	private BoardLocation goteLastMove = getNullMove();
-	
+
 	public AIGame() {
 		this(Difficulty.INTERMEDIATE, Difficulty.INTERMEDIATE);
 	}
-	
+
 	public AIGame(Difficulty senteDiff, Difficulty goteDiff) {
 		super();
 		board.freeze();
 		JLabel titleLabel = new JLabel("AI Game");
 		titleLabel.setFont(smallGameFont);
 		titlePanel.add(titleLabel);
-		renju.com.lmh.model.Board senteAnalysisBoard = new renju.com.lmh.model.Board(15);
-		renju.com.lmh.model.Board goteAnalysisBoard = new renju.com.lmh.model.Board(15);
+		renju.com.lmh.model.Board senteAnalysisBoard = new renju.com.lmh.model.Board(Board.width);
+		renju.com.lmh.model.Board goteAnalysisBoard = new renju.com.lmh.model.Board(Board.width);
 		senteEngine = new GameEngine(senteDiff, senteAnalysisBoard, true);
 		goteEngine = new GameEngine(goteDiff, goteAnalysisBoard, false);
 		automaticStart();
@@ -95,8 +96,10 @@ public class AIGame extends Game {
 							// there are bugs in our AI code.
 							e.printStackTrace();
 						}
+					} else if (board.isFrozen()) {
+						return;
 					}
-					
+
 					try {
 						Thread.sleep(animationInterval);
 					} catch (InterruptedException e) {
@@ -105,7 +108,7 @@ public class AIGame extends Game {
 				}
 			}
 		};
-		
+
 		goteThread = new Thread() {
 			@Override
 			public void run() {
@@ -126,8 +129,10 @@ public class AIGame extends Game {
 							// to know its call trace when this indeed happens.
 							e.printStackTrace();
 						}
+					} else if (board.isFrozen()) {
+						return;
 					}
-					
+
 					try {
 						Thread.sleep(animationInterval);
 					} catch (InterruptedException e) {
@@ -136,7 +141,7 @@ public class AIGame extends Game {
 				}
 			}
 		};
-		
+
 		coordinator = new Thread() {
 			@Override
 			public void run() {
@@ -155,7 +160,7 @@ public class AIGame extends Game {
 							if (AIGame.this.board.doEndGameCheck()) {
 								return;
 							}
-							// active player should only be updated when lastMoves are made onto 
+							// active player should only be updated when lastMoves are made onto
 							// the analysis boards of each game engine.
 							updateActivePlayerWithLock(false);
 						} catch (InvalidIndexException e) {
@@ -178,7 +183,7 @@ public class AIGame extends Game {
 							e.printStackTrace();
 						}
 					}
-					
+
 					// NOTE!!! sleep is necessary because the thread scheduler does not
 					// switch context very often.
 					try {
@@ -189,7 +194,7 @@ public class AIGame extends Game {
 				}
 			}
 		};
-		
+
 		senteThread.start();
 		goteThread.start();
 		coordinator.start();
@@ -200,7 +205,7 @@ public class AIGame extends Game {
 
 	@Override
 	protected void addStartButtonListener(JButton btn) {}
-	
+
 	/**
 	 * Updates the active player when there exists lock on it.
 	 */
@@ -209,26 +214,19 @@ public class AIGame extends Game {
 			activePlayer = active;
 		}
 	}
-	
+
 	private BoardLocation getNullMove() {
 		return new BoardLocation(-1, -1);
 	}
-	
+
 	private boolean isNullMove(BoardLocation move) {
 		return move.getXPos() == -1 && move.getYPos() == -1;
 	}
-	
-	@SuppressWarnings("deprecation")
+
 	@Override
 	public void gameEnd() {
 		// TODO kill previous threads and introduce new thread
 		super.gameEnd();
-		senteThread.stop();
-		senteThread = null;
-		goteThread.stop();
-		goteThread = null;
-		coordinator.stop();
-		coordinator = null;
 		senteLastMove = getNullMove();
 		goteLastMove = getNullMove();
 		activePlayer = true;

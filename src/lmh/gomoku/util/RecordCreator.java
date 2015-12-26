@@ -70,7 +70,7 @@ public class RecordCreator {
 		}
 
 		game.appendChild(steps);
-		return XMLHelper.elementToString(game, 0);
+		return XMLHelper.elementToString(game);
 	}
 
 	public static String generateRecordString(List<? extends IMove> moves) {
