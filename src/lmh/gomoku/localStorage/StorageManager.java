@@ -96,6 +96,8 @@ public class StorageManager {
 		try {
 			generateReadMe();
 			generateOptions();
+			generateInitialStatsFile();
+			
 
 		} catch (IOException e) {
 			throw new StorageException();
@@ -103,19 +105,43 @@ public class StorageManager {
 	}
 
    	
+	private static void generateInitialStatsFile() throws StorageException {
+		// TODO Auto-generated method stub
+		String path=generateStatsFile();
+		File stats=new File(path);
+		if(!stats.exists()){
+			System.out.println("create empty file");
+			try {
+				stats.createNewFile();
+				PrintWriter writer = new PrintWriter(path, "UTF-8");
+				String statContent =
+						String.format("%s\n%s\n%s\n%s\n%s\n",
+						"win:"+"0  ", 
+						"lose:"+"0  ", 
+						"tie:"+"0  ",
+						"total:"+"0  ", 
+						"percentage:"+"0"+"%");
+				byte[] statsContent =statContent.getBytes(StandardCharsets.UTF_8);
+				String encodedStat=Base64.getEncoder().encodeToString(statsContent);
+				writer.print(encodedStat);
+				writer.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				throw new StorageException("Unable to create initial stats file");
+			}
+		}
+	}
+
+
 	public static void generateStats(int result) throws IOException {
 		// TODO Auto-generated method stub
 		int[] array=new int[3];
 		String path=generateStatsFile();
-		File stats=new File(path);
-		if(!stats.exists()){
-			System.out.println("create file");
-			stats.createNewFile();
-		}	
 		System.out.println("file exists");
 		try {
 			String content;
 			content = Game.readstats(new File(StorageManager.generateStatsFile()));
+			System.out.print(content);
 			array=Game.extractnumbers(content);
 			if(result==1){
 				winNum=array[0]+1;
@@ -134,7 +160,7 @@ public class StorageManager {
 			else{
              percentage = ((float) winNum) / ((float) total)*100;
               }
-			System.out.println("yeah");
+			//System.out.println("yeah");
 			PrintWriter writer = new PrintWriter(path, "UTF-8");
 			String statContent =
 					String.format("%s\n%s\n%s\n%s\n%s\n",
